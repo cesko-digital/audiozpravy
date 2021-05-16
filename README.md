@@ -6,4 +6,4 @@
 
 ## Kontakty
 
-**Techlead: ** Jiří Zikeš, jiri@xomlo.io, 725 523 929
+**Techlead:** Jiří Zikeš, jiri@xomlo.io, 725 523 929
