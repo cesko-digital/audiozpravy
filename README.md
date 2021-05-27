@@ -2,6 +2,16 @@
 
 # 🎧 Audiozprávy
 
+## Struktura projektu
+
+**/app** - mobilní aplikace Audiozpráv
+
+**/backend** - API aplikace (rekomendační systém)
+
+**/infrastructure** - Terraform definice infrastruktury
+
+**/pipeline** - pipeline zpracování nových zpráv
+
 ## Setup projektu
 
 ## Kontakty
