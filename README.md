@@ -12,7 +12,13 @@
 
 **/pipeline** - pipeline zpracování nových zpráv
 
-## Setup projektu
+## Setup mobilní aplikace
+
+``cd app`` - move to app directory
+
+``yarn install`` - install project dependencies
+
+``yarn start`` - to start dev enviroment
 
 ## Kontakty
 
