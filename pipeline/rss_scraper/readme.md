@@ -35,18 +35,3 @@ below.
     ```
     aws s3 sync . s3://audiozpravy/articles/ --exclude "*" --include "articles-*"
     ```
-
-# How to develop
-
-## Code Quality
-
-1. Install reqs
-   ```
-   pip install -r requirements-dev.txt
-   ```
-
-2. Fix formatting
-    ```
-    black pipeline
-    isort pipeline --profile black
-    ```
