@@ -13,7 +13,8 @@ const Stack = createStackNavigator();
 export default function App() {
   let [fontsLoaded] = useFonts({
     MondaBold: require('./assets/fonts/Monda-Bold.ttf'),
-    RobotoLight: require('./assets/fonts/Roboto-Light.ttf')
+    RobotoLight: require('./assets/fonts/Roboto-Light.ttf'),
+    RobotoBold: require('./assets/fonts/Roboto-Bold.ttf')
   });
 
   if (!fontsLoaded) {

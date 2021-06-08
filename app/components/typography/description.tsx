@@ -13,6 +13,7 @@ const Description: FC<Props> = ({ children, style }) => (
       lineHeight: 20,
       fontFamily: "RobotoLight",
       color: Color["black-100"],
+      fontWeight: "300",
       ...style,
     }}
   >
