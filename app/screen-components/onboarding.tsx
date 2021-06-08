@@ -1,5 +1,7 @@
 import React from "react";
-import { Button, View } from "react-native";
+import { View } from "react-native";
+
+import MainButton from "../components/buttons/main-button";
 import Description from "../components/typography/description";
 import Heading from "../components/typography/heading";
 import { Screens } from "../screens";
@@ -9,29 +11,35 @@ const OnboardingScreen = ({ navigation }) => {
   return (
     <View
       style={{
-        padding: 56,
+        flex: 1,
+        flexDirection: "column",
+        justifyContent: "space-between",
       }}
     >
-      <View
-        style={{
-          borderLeftWidth: 4,
-          borderLeftColor: Color["black-16"],
-          padding: 6,
-          marginTop: 64,
-        }}
-      >
-        <Heading>Audio zprávy</Heading>
+      <View style={{ marginHorizontal: 56, marginTop: 56 }}>
+        <View
+          style={{
+            borderLeftWidth: 4,
+            borderLeftColor: Color["black-16"],
+            padding: 6,
+            marginTop: 64,
+          }}
+        >
+          <Heading>Audio zprávy</Heading>
+        </View>
+        <Description style={{ marginTop: 28 }}>
+          Všechny zprávy ze všech zpravodajských portálů pro Vás jako audio.
+          Pusťte si 30s ukázky zadarmo nebo si kupte kredity a poslechněte si
+          dlouhou verzi. Stačí si jen naklikat frontu zpráv nebo nechte výběr na
+          naší umělé inteligenci, která se neustále učí z Vašich reakcí.
+        </Description>
       </View>
-      <Description style={{ marginTop: 28 }}>
-        Všechny zprávy ze všech zpravodajských portálů pro Vás jako audio.
-        Pusťte si 30s ukázky zadarmo nebo si kupte kredity a poslechněte si
-        dlouhou verzi. Stačí si jen naklikat frontu zpráv nebo nechte výběr na
-        naší umělé inteligenci, která se neustále učí z Vašich reakcí.
-      </Description>
-      <Button
-        title="Nastavit témata"
+      <MainButton
         onPress={() => navigation.navigate(Screens.topics)}
-      />
+        style={{ marginHorizontal: 48, marginBottom: 56 }}
+      >
+        Nastavit témata
+      </MainButton>
     </View>
   );
 };
