@@ -1,5 +1,6 @@
 import React from "react";
-import { View } from "react-native";
+import { Text, View } from "react-native";
+import { TouchableOpacity } from "react-native";
 
 import MainButton from "../components/buttons/main-button";
 import Description from "../components/typography/description";
@@ -34,12 +35,36 @@ const OnboardingScreen = ({ navigation }) => {
           naší umělé inteligenci, která se neustále učí z Vašich reakcí.
         </Description>
       </View>
-      <MainButton
-        onPress={() => navigation.navigate(Screens.topics)}
-        style={{ marginHorizontal: 48, marginBottom: 56 }}
-      >
-        Nastavit témata
-      </MainButton>
+      <View style={{ marginHorizontal: 48, marginBottom: 56 }}>
+        <MainButton onPress={() => navigation.navigate(Screens.topics)}>
+          Nastavit témata
+        </MainButton>
+        <View
+          style={{
+            display: "none",
+            flexDirection: "row",
+            justifyContent: "center",
+            marginTop: 32,
+          }}
+        >
+          <Text
+            style={{
+              fontFamily: "RobotoLight",
+              fontWeight: "300",
+              color: Color["black-100"],
+            }}
+          >
+            Už máte účet?
+          </Text>
+          <TouchableOpacity onPress={() => {}} style={{ marginLeft: 3 }}>
+            <Text
+              style={{ fontFamily: "RobotoBold", color: Color["black-100"] }}
+            >
+              Přihlaste se
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     </View>
   );
 };
