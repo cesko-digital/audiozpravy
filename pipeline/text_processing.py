@@ -87,13 +87,13 @@ def add_lemmatized_texts(articles: pd.DataFrame) -> None:
     lemmatized_texts = []
     for i, article in tqdm(articles.iterrows()):
         lemmatized_texts.append(
-            " ".join(lemmatizer.get_lemmas(article.title + article.summary))
+            " ".join(lemmatizer.get_lemmas(article.title + " " + article.summary))
         )
     articles["lemmatized_texts"] = lemmatized_texts
 
 
 def fit_tf_idf(texts: pd.Series) -> Tuple[csr_matrix, np.ndarray]:
-    vectorizer = TfidfVectorizer()
+    vectorizer = TfidfVectorizer(min_df=2)  # max_df=0.05
     X = vectorizer.fit_transform(texts)
     words = np.array(vectorizer.get_feature_names())
     return X, words

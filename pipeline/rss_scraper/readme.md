@@ -35,3 +35,7 @@ below.
     ```
     aws s3 sync . s3://audiozpravy/articles/ --exclude "*" --include "articles-*"
     ```
+7. delete old snapshots
+    ```
+    ls -1 | grep "articles-" | grep -v "todays date" | xargs rm --
+    ```

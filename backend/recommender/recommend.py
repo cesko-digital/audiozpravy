@@ -6,14 +6,14 @@ import feedparser
 import numpy as np
 
 
-def get_relevant_words(td_idx_matrix, words, row_id):
-    row = td_idx_matrix.getrow(row_id).toarray().squeeze()
+def get_relevant_words(tf_idf_matrix, words, row_id):
+    row = tf_idf_matrix.getrow(row_id).toarray().squeeze()
     # (row != 0).sum() ... make top N variable?
     top_matches = row.argsort()[::-1][:10]
     return words[top_matches], row[top_matches]
 
 
-# relevant_words, scores = get_relevant_words(td_idx_matrix, words, 80)
+# relevant_words, scores = get_relevant_words(tf_idf_matrix, words, 80)
 
 
 def get_daily_google_trends() -> List[Dict]:
@@ -52,15 +52,13 @@ def estimate_popularity(daily_trends, X, words):
     popularity = np.zeros((X.shape[0], 1))
 
     for top_trend in daily_trends:
-        value = top_trend["summary"]
-        if not value:
-            value = top_trend["value"]
+        value = top_trend["summary"] + " " + top_trend["value"]
         trend_words = value.replace(",", "").split()
         matches = np.where(np.isin(words, trend_words))[0]
         traffic_score = int(top_trend["traffic"].replace(",", "").replace("+", ""))
         # TODO: get more fine-grained similarity with w2v
         #     trend_w2v_words = set(trend_words).intersection(word_set)
-        #     article_w2v_words = set(get_relevant_words(td_idx_matrix, words, 0)[0]).intersection(word_set)
+        #     article_w2v_words = set(get_relevant_words(tf_idf_matrix, words, 0)[0]).intersection(word_set)
         #     print(trend_w2v_words)
         #     print(article_w2v_words)
         #     res = wv_from_bin.n_similarity(trend_w2v_words, article_w2v_words)
@@ -83,4 +81,4 @@ def recommend(articles, X, words):
     return articles.iloc[top_ids[:10], 0].values
 
 
-# td_idx_matrix = X.tocsr()
+# tf_idf_matrix = X.tocsr()
