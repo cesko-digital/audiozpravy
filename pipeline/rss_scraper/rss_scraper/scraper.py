@@ -47,4 +47,4 @@ def scrape_feeds():
 
     # TODO: fix formatting for single digit integers e.g. 5 --> "05"
     df_name = "-".join([str(i) for i in tuple(time.localtime())[:5]])
-    articles.to_csv("articles-" + df_name, index=None)
+    articles.to_csv(f"s3/articles/articles-{df_name}.csv", index=None)
