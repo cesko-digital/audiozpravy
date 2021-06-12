@@ -52,9 +52,7 @@ def estimate_popularity(daily_trends, X, words):
     popularity = np.zeros((X.shape[0], 1))
 
     for top_trend in daily_trends:
-        value = top_trend["summary"]
-        if not value:
-            value = top_trend["value"]
+        value = top_trend["summary"] + " " + top_trend["value"]
         trend_words = value.replace(",", "").split()
         matches = np.where(np.isin(words, trend_words))[0]
         traffic_score = int(top_trend["traffic"].replace(",", "").replace("+", ""))
