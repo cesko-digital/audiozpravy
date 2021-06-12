@@ -12,6 +12,10 @@
 
 **/pipeline** - pipeline zpracování nových zpráv
 
+## Architektura
+
+![](services.svg)
+
 ## Setup mobilní aplikace
 
 ``cd app`` - move to app directory
