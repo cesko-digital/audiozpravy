@@ -14,8 +14,9 @@ const OnboardingScreen = ({ navigation }) => {
         flex: 1,
         flexDirection: "column",
         justifyContent: "space-between",
-        marginTop: 120,
-        marginBottom: 56,
+        paddingTop: 120,
+        paddingBottom: 56,
+        backgroundColor: "white",
       }}
     >
       <View style={{ marginHorizontal: 56 }}>

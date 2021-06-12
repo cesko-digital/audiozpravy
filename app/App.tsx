@@ -26,6 +26,7 @@ export default function App() {
           <Stack.Screen
             name={Screens.onboarding}
             component={OnboardingScreen}
+            options={{ headerShown: false }}
           />
           <Stack.Screen name={Screens.topics} component={TopicsScreen} />
         </Stack.Navigator>
