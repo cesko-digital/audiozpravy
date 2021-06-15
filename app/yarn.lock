@@ -1139,11 +1139,6 @@
   dependencies:
     "@types/hammerjs" "^2.0.36"
 
-"@expo-google-fonts/monda@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@expo-google-fonts/monda/-/monda-0.1.0.tgz#5da194332102a4aae81c0e36f9fba26bb79620c4"
-  integrity sha512-Zjh2DwjLoNK7mkuaL1DMdJZenXJr6lk8vn9XylrKL6FeUE0SF4CTTgaGoPns8bgPBw/oXxVFiIWaZtDkfzZwiw==
-
 "@expo/config-plugins@1.0.33", "@expo/config-plugins@^1.0.18":
   version "1.0.33"
   resolved "https://registry.npmjs.org/@expo/config-plugins/-/config-plugins-1.0.33.tgz#8ee78ea6f939f7e04606e9afa22b32139ea974a0"
