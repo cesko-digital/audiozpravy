@@ -44,9 +44,14 @@ def periodic_update():
             global articles
             global X
             global words
-            articles_new = pd.read_csv("s3_input/articles.csv")
-            X_new = np.load("s3_input/X.npy", allow_pickle=True)
-            words_new = np.load("s3_input/words.npy", allow_pickle=True)
+            import os
+
+            print()
+            print(f"####: {os.getcwd()}")
+
+            articles_new = pd.read_csv("s3/articles.csv")
+            X_new = np.load("s3/X.npy", allow_pickle=True)
+            words_new = np.load("s3/words.npy", allow_pickle=True)
 
             # TODO: check to make sure if this lock is enough to prevent access
             # to different versions of these variables as given time
@@ -65,11 +70,11 @@ def pretty_format_date(date: datetime) -> str:
     delta = datetime.now() - date
 
     if delta < timedelta(days=7):
-        return format_timedelta(delta, locale='cs_CZ')
+        return format_timedelta(delta, locale="cs_CZ")
     elif date > datetime(year=datetime.now().year, month=1, day=1):
-        return format_date(date, "d. MMMM", locale='cs_CZ')
+        return format_date(date, "d. MMMM", locale="cs_CZ")
     else:
-        return format_date(date, "d. MMMM y", locale='cs_CZ')
+        return format_date(date, "d. MMMM y", locale="cs_CZ")
 
 
 def format_articles(selected_articles: pd.DataFrame) -> pd.DataFrame:
@@ -80,17 +85,18 @@ def format_articles(selected_articles: pd.DataFrame) -> pd.DataFrame:
     selected_articles["published"] = pd.to_datetime(
         selected_articles.published.map(tuple).map(lambda x: datetime(*x[:5]))
     )
-    selected_articles["published"] = selected_articles["published"].map(pretty_format_date)
+    selected_articles["published"] = selected_articles["published"].map(
+        pretty_format_date
+    )
 
     return selected_articles
 
 
 def select_based_on_recency(articles: pd.DataFrame) -> List[Dict]:
     # TODO: add other types of recommendation
-    selected_articles = (
-        articles.sort_values("published", ascending=False)
-                .iloc[:20][["title", "link", "summary", "published", "category"]]
-    )
+    selected_articles = articles.sort_values("published", ascending=False).iloc[:20][
+        ["title", "link", "summary", "published", "category"]
+    ]
     return format_articles(selected_articles).to_dict("records")
 
 
