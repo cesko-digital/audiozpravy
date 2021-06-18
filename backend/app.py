@@ -118,4 +118,4 @@ api.add_resource(FeedRest, "/feed")
 
 if __name__ == "__main__":
     periodic_update()
-    app.run()  # debug=True
+    app.run(host="0.0.0.0", port=5000)  # debug=True
