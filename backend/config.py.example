@@ -1,0 +1,5 @@
+CONFIG = {
+    "awsAccessKey": "",
+    "awsSecretKey": "",
+    "s3Bucket": "",
+}
