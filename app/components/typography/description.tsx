@@ -1,21 +1,19 @@
 import React, { FC } from "react";
-import { Text, TextStyle } from "react-native";
+import { StyleSheet, Text, TextProps, TextStyle } from "react-native";
 import Color from "../../shared/colors";
 
-interface Props {
-  style?: TextStyle;
-}
-
-const Description: FC<Props> = ({ children, style }) => (
+const Description: FC<TextProps> = ({ children, style }) => (
   <Text
-    style={{
-      fontSize: 14,
-      lineHeight: 20,
-      fontFamily: "RobotoLight",
-      color: Color["black-100"],
-      fontWeight: "300",
-      ...style,
-    }}
+    style={StyleSheet.compose(
+      {
+        fontSize: 14,
+        lineHeight: 20,
+        fontFamily: "RobotoLight",
+        color: Color["black-100"],
+        fontWeight: "300",
+      },
+      style
+    )}
   >
     {children}
   </Text>
