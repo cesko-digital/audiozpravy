@@ -110,7 +110,8 @@ def feed(method=None):
 
 class FeedRest(Resource):
     def get(self):
-        payload = select_based_on_recency(articles)
+        selected = select_based_on_recency(articles)
+        payload = format_articles(selected).to_dict("records")
         return payload
 
 
