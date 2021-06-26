@@ -37,7 +37,11 @@ export default function App() {
             component={OnboardingScreen}
             options={{ headerShown: false }}
           />
-          <Stack.Screen name={Screens.topics} component={TopicsScreen} />
+          <Stack.Screen
+            name={Screens.topics}
+            component={TopicsScreen}
+            options={{ headerShown: false }}
+          />
           <Stack.Screen
             name={Screens.home}
             component={HomeTabs}
