@@ -1,15 +1,17 @@
-import React, {useState} from "react";
-import { StyleSheet, View, Text, Button } from "react-native";
-import { TouchableHighlight } from "react-native-gesture-handler";
+import React, {useState} from 'react';
+import { Screens } from '../screens';
+import { StyleSheet, View, Text, Button } from 'react-native';
 
-import Heading from "../components/typography/heading";
-import CategoryButton from "../components/typography/category-button.tsx";
+import Heading from '../components/typography/heading';
+import Description from '../components/typography/description';
+import MainButton from '../components/buttons/main-button'
+import CategoryButton from '../components/buttons/category-button.tsx';
 
-import { FontAwesome5 } from "@expo/vector-icons";
-import Color from "../shared/colors";
+import { FontAwesome5 } from '@expo/vector-icons';
+import Color from '../shared/colors';
 
 const TopicsScreen = ({ navigation }) => {
-  const [isActive, setActive] = useState(false); // state
+  const [selectedCategories, setSelectedCategories]  = useState([]); 
   
   const categories = [
     {id: 1, name: 'Ekonomika'}, 
@@ -27,70 +29,58 @@ const TopicsScreen = ({ navigation }) => {
     {id: 13, name: 'Vakcíny'}, 
     {id: 14, name: 'Bělorusko'}, 
     {id: 15, name: 'Regiony'}
-  ];
+  ];  
   
-  const categoryBtn = categories.map((category) =>  
-      <TouchableHighlight
-            onHideUnderlay={() => {
-              this.setActive({ isActive: false });
-            }}
-            onShowUnderlay={() => {
-              this.setActive({ isActive: true });
-            }}>
-        <CategoryButton
-          key={category.id}
-          onPress={choiceCategories}
-        >{category.name}</CategoryButton>
-     </TouchableHighlight>
-      );
-
-
-  let favouriteCategories = []; // není funkční
-  const choiceCategories = (event) => {
-    favouriteCategories.push(event.target.id);
-   
-    console.log(favouriteCategories);
-  }
+  const categoryBtn = categories.map((category) => 
+    <CategoryButton
+      key={category.id}
+      onPress={() => {
+        if (selectedCategories.includes(category.name)) {
+          selectedCategories.splice(selectedCategories.indexOf(category.name), 1);
+        }  else {
+          selectedCategories.push(category.name)
+          setSelectedCategories(selectedCategories);
+        }
+        console.log(selectedCategories);
+      }}
+      selectedCategories = {selectedCategories}
+    >{category.name}</CategoryButton>
+  );
 
   return (
     <>
       <View style={ styles.container } >
-        <FontAwesome5 name="long-arrow-alt-left" size={16} color="#0D0B12" />
+        <FontAwesome5 name='long-arrow-alt-left' size={16} color='#0D0B12' /> 
         <Heading style={ styles.title }>Co vás zajímá?</Heading>
         <Text
           style={ styles.subtitle }> 
           Vyberte alespoň tři témata
         </Text>
-        <Text style={ styles.text }
+        <Description style={{fontSize: 16, marginBottom: 24}}
         >
           Aplikace se automaticky učí, co se Vám líbí. 
           Naučené volby můžete upravit v nastavení.
-        </Text>
+        </Description>
         <View style={ styles.sectionBtn }>
           {categoryBtn}
         </View>
-        <Button 
-          title="Poslechnout si výběr"
-          color="#0D0B12"
-          onPress={() => navigation.navigate(Screens.categories)}
-        ></Button>
+        <MainButton 
+          onPress={() => {
+            if (selectedCategories.length < 3) {
+              console.log('Musíš vybrat alespoň tři kategorie')
+            } else {
+              navigation.navigate(Screens.categories)}}
+          }  
+        >Poslechnout si výběr</MainButton>
       </View>
-
     </>
 )
 }
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 32,
-    paddingBottom: 32,
-    paddingLeft: 24,
-    paddingRight: 24
-  },
-  arrow: {
-    width: 16,
-    height: 8,
-    marginBottom: 16
+    paddingVertical: 32,
+    paddingHorizontal: 24
   },
   title: {
     fontSize: 32,
@@ -99,30 +89,16 @@ const styles = StyleSheet.create({
   subtitle: {
     fontWeight: 700,
     fontSize: 18,
-    marginBottom: 8
-  },
-  text: {
-    fontSize: 16,
-    lineHeight: 24,
-    fontWeight: '300',
-    marginBottom: 24,
+    marginBottom: 8,
+    fontFamily: 'RobotoLight'
   },
   sectionBtn: {
-    margin: 10,
     marginBottom: 80,
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'start'
-  },
-  activeButton: {
-    borderColor: Color["blue"],
-    backgroundColor: Color["blue"],
-    color: "#fff"
-  },
-  blackButton: {
-    borderRadius: 40,
-    backgroundColor: Color["black-100"]
   }
 })  
+
 
 export default TopicsScreen;
