@@ -27,7 +27,10 @@ export default function App() {
             name={Screens.onboarding}
             component={OnboardingScreen}
           />
-          <Stack.Screen name={Screens.topics} component={TopicsScreen} />
+          <Stack.Screen 
+            name={Screens.topics} 
+            component={TopicsScreen}
+            options={{ headerShown: false }} />
         </Stack.Navigator>
       </NavigationContainer>
     );
