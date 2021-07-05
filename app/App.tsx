@@ -40,7 +40,6 @@ export default function App() {
           <Stack.Screen 
             name={Screens.topics} 
             component={TopicsScreen}
-            options={{ headerShown: false }}
              />
           <Stack.Screen
             name={Screens.home}
