@@ -23,7 +23,7 @@ const TopicsScreen = ({ navigation }) => {
     {id: 7, name: "Regiony", active: false}, 
     {id: 8, name: "Zdraví", active: true}, 
     {id: 9, name: "Koronavirus", active: false},
-    {id: 10, name: "Volby do parlamentu.", active: false},
+    {id: 10, name: "Volby do parlamentu", active: false},
     {id: 11, name: "Bitcoin", active: false}, 
     {id: 12, name: "Myanmar", active: false}, 
     {id: 13, name: "Vakcíny", active: false}, 
