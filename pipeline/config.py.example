@@ -1,0 +1,8 @@
+CONFIG = {
+    "azureKey": "",
+    "azureRegion": "",
+    "awsAccessKey": "",
+    "awsSecretKey": "",
+    "s3Bucket": "",
+    "s3BucketAudio": ""
+}
