@@ -14,7 +14,7 @@ const TopicsScreen = ({ navigation }) => {
   const [active, setActive]  = useState([1, 4, 8]);
   
   const categories = [
-    {id: 1, name: "Ekonomika.", active: true}, 
+    {id: 1, name: "Ekonomika", active: true}, 
     {id: 2, name: "Zprávy z domova", active: false}, 
     {id: 3, name: "Zprávy ze světa", active: false}, 
     {id: 4, name: "Sport", active: true}, 
