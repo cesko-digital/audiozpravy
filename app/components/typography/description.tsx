@@ -1,8 +1,8 @@
 import React, { FC } from "react";
-import { StyleSheet, Text, TextProps, TextStyle } from "react-native";
+import { StyleSheet, Text, TextProps } from "react-native";
 import Color from "../../shared/colors";
 
-const Description: FC<TextProps> = ({ children, style }) => (
+const Description: FC<TextProps> = ({ children, style, ...rest }) => (
   <Text
     style={StyleSheet.compose(
       {
@@ -14,6 +14,7 @@ const Description: FC<TextProps> = ({ children, style }) => (
       },
       style
     )}
+    {...rest}
   >
     {children}
   </Text>
