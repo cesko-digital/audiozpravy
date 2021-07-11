@@ -6,7 +6,11 @@ from text_processing import (
     add_lemmatized_texts,
     fit_tf_idf
 )
-
+import boto3
+from botocore.exceptions import ClientError
+import os
+from tts import (process_audio, upload_to_s3)
+from config import CONFIG
 
 if __name__ == "__main__":
     print("scraping feeds...")
@@ -18,8 +22,21 @@ if __name__ == "__main__":
     add_lemmatized_texts(df)
     X, words = fit_tf_idf(df["lemmatized_texts"])
 
-    print("uploading artifacts to s3...")
+    print("text-to-speach processing...")
+    for (index, row) in df.iterrows():
+        filename = process_audio(
+            title = row['title'],
+            content = row['summary']
+        )
+
+        df.loc[index, 'audio'] = filename
+
+    print("saving artifacts...")
     df.to_csv("s3/articles.csv")
     np.save("s3/words", words)
     np.save("s3/X", X)
+
+    print("uploading artifacts to s3...")
+    upload_to_s3()
+
     print("Done!")
