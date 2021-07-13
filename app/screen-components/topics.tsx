@@ -34,7 +34,12 @@ const TopicsScreen = ({ navigation }) => {
   return (
     <>
       <View style={ styles.container } >
-        <FontAwesome5 name="long-arrow-alt-left" size={16} color="#0D0B12" /> 
+        <FontAwesome5 
+          name="long-arrow-alt-left" 
+          size={16} 
+          color="#0D0B12"
+          onPress={() => {navigation.navigate(Screens.onboarding)} }
+        /> 
         <Heading style={ styles.title }>Co vás zajímá?</Heading>
         <Text
           style={ styles.subtitle }> 
@@ -65,8 +70,7 @@ const TopicsScreen = ({ navigation }) => {
           )}
         </View>
           <MainButton 
-            onPress={() => {navigation.navigate(Screens.categories)}
-            }
+            onPress={() => {navigation.navigate(Screens.home)} }
           >Poslechnout si výběr</MainButton>        
       </View>
     </>
