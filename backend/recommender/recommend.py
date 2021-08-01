@@ -44,7 +44,7 @@ def calculate_frecency(popularity, age):
     # how much will be older articles penalized,
     # interpretation: the denomintaor is number of seconds after which the score halves
     lambda_const = log(2) / (7 * 24 * 60 * 60)  # 7 days
-    return np.multiply(popularity, np.exp(-lambda_const * age))
+    return np.multiply(70 + np.log(popularity), np.exp(-lambda_const * age))
 
 
 def estimate_popularity(daily_trends, X, words):
