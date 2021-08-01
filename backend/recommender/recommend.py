@@ -3,6 +3,7 @@ from datetime import datetime
 import time
 from math import e, log
 from typing import Dict, List
+from cachetools import cached, TTLCache
 import pandas as pd
 
 import feedparser
@@ -18,7 +19,7 @@ def get_relevant_words(tf_idf_matrix, words, row_id):
 
 # relevant_words, scores = get_relevant_words(tf_idf_matrix, words, 80)
 
-
+@cached(cache=TTLCache(maxsize=2, ttl=1800))
 def get_daily_google_trends() -> List[Dict]:
     trend_feed = "https://trends.google.cz/trends/trendingsearches/daily/rss?geo=CZ"
     trends = feedparser.parse(trend_feed)
