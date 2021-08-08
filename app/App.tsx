@@ -37,10 +37,10 @@ export default function App() {
             component={OnboardingScreen}
             options={{ headerShown: false }}
           />
-          <Stack.Screen 
-            name={Screens.topics} 
+          <Stack.Screen
+            name={Screens.topics}
             component={TopicsScreen}
-            options={{ headerShown: false }} 
+            options={{ headerShown: false }}
           />
           <Stack.Screen
             name={Screens.home}
