@@ -80,14 +80,14 @@ def recommend(articles, X, words):
     daily_trends = get_daily_google_trends()
     popularity = estimate_popularity(daily_trends, X, words) + 1
 
-    tz = pytz.timezone('Europe/Prague')
+    tz = pytz.timezone("Europe/Prague")
     now_timestamp = datetime.timestamp(datetime.now(tz))
-    age = now_timestamp - articles.published.values.astype(np.int64)/1e9
+    age = now_timestamp - articles.published.values.astype(np.int64) / 1e9
 
     frecency = np.squeeze(np.asarray(calculate_frecency(popularity.T, age)))
     top_ids = frecency.argsort()[::-1][:20]
     result = articles.iloc[top_ids[:20], :][
-        ["title", "link", "summary", "published", "category"]
+        ["title", "link", "summary", "published", "category", "audio"]
     ]
     result["badges"] = "x"
 
@@ -105,13 +105,14 @@ def recommend(articles, X, words):
             print("trending")
             badge_row.append({"name": "Trending", "color": "badge-success"})
         badges.append(badge_row)
-    
+
     result["badges"] = badges
     return result
+
 
 def select_based_on_recency(articles: pd.DataFrame) -> List[Dict]:
     # TODO: add other types of recommendation
     selected_articles = articles.sort_values("published", ascending=False).iloc[:20][
-        ["title", "link", "summary", "published", "category"]
+        ["title", "link", "summary", "published", "category", "audio"]
     ]
     return selected_articles

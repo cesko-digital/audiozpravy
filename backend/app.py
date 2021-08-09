@@ -9,6 +9,7 @@ from flask_restful import Resource, Api
 from recommender.recommend import select_based_on_recency, recommend
 import boto3
 from botocore.exceptions import ClientError
+from os import environ
 
 import time
 import threading
@@ -36,23 +37,28 @@ FeedparserTime = namedtuple(
 
 lock = threading.Lock()
 
+
 def periodic_update():
-    session = boto3.Session(
-        aws_access_key_id=CONFIG['awsAccessKey'],
-        aws_secret_access_key=CONFIG['awsSecretKey'],
-    )
+    local_dev = environ.get("LOCAL_DEV", 0)
+    if not local_dev:
+        session = boto3.Session(
+            aws_access_key_id=CONFIG["awsAccessKey"],
+            aws_secret_access_key=CONFIG["awsSecretKey"],
+        )
 
-    s3_client = boto3.client(
-        's3',
-        aws_access_key_id=CONFIG['awsAccessKey'],
-        aws_secret_access_key=CONFIG['awsSecretKey']
-    )
+        s3_client = boto3.client(
+            "s3",
+            aws_access_key_id=CONFIG["awsAccessKey"],
+            aws_secret_access_key=CONFIG["awsSecretKey"],
+        )
 
-    for object in session.resource('s3').Bucket(CONFIG['s3Bucket']).objects.all():
-        try:
-            s3_client.download_file(CONFIG['s3Bucket'], object.key, 's3_input/' + object.key)
-        except:
-            print("file not found")
+        for object in session.resource("s3").Bucket(CONFIG["s3Bucket"]).objects.all():
+            try:
+                s3_client.download_file(
+                    CONFIG["s3Bucket"], object.key, "s3_input/" + object.key
+                )
+            except:
+                print("file not found")
 
     # possibly more robust solution https://networklore.com/start-task-with-flask/
     def background_job():
@@ -106,7 +112,7 @@ def format_articles(selected_articles: pd.DataFrame) -> pd.DataFrame:
     # )
     selected_articles["published"] = selected_articles["published"].map(
         pretty_format_date
-    )   
+    )
 
     return selected_articles
 
@@ -123,7 +129,8 @@ def feed(method=None):
         raise Exception("Unknown method!")
     payload = format_articles(selected).to_dict("records")
 
-    return render_template("feed.html", articles=payload)
+    local_dev = environ.get("LOCAL_DEV", 0)
+    return render_template("feed.html", articles=payload, local_dev=local_dev)
 
 
 class FeedRest(Resource):
