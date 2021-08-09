@@ -7,10 +7,12 @@ from babel.dates import format_timedelta, format_date
 from collections import namedtuple
 from flask_restful import Resource, Api
 from recommender.recommend import select_based_on_recency, recommend
+import boto3
+from botocore.exceptions import ClientError
 
 import time
 import threading
-
+from config import CONFIG
 
 ARTICLES_REFRESH = 900  # 15 min
 
@@ -34,8 +36,24 @@ FeedparserTime = namedtuple(
 
 lock = threading.Lock()
 
-
 def periodic_update():
+    session = boto3.Session(
+        aws_access_key_id=CONFIG['awsAccessKey'],
+        aws_secret_access_key=CONFIG['awsSecretKey'],
+    )
+
+    s3_client = boto3.client(
+        's3',
+        aws_access_key_id=CONFIG['awsAccessKey'],
+        aws_secret_access_key=CONFIG['awsSecretKey']
+    )
+
+    for object in session.resource('s3').Bucket(CONFIG['s3Bucket']).objects.all():
+        try:
+            s3_client.download_file(CONFIG['s3Bucket'], object.key, 's3_input/' + object.key)
+        except:
+            print("file not found")
+
     # possibly more robust solution https://networklore.com/start-task-with-flask/
     def background_job():
         """
