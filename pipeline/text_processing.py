@@ -8,6 +8,7 @@ from scipy.sparse import csr_matrix
 from sklearn.feature_extraction.text import TfidfVectorizer
 from tqdm import tqdm
 from ufal.morphodita import Forms, TaggedLemmas, Tagger, TokenRanges
+import time
 
 # model download: https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-1836#
 MODEL_PATH = "czech-morfflex-pdt-161115/czech-morfflex-pdt-161115.tagger"
@@ -75,9 +76,9 @@ def load_article_snapshots(snapshot_names: str) -> pd.DataFrame:
 
     # parse datetime tuple from the format the feedparser and pandas saved it in
     # TODO: fix this on csv save
-    articles.published = articles.published.map(
-        lambda x: eval(x.replace("time.struct_time", "FeedparserTime"))
-    )
+    articles.published = pd.to_datetime(articles.published.map(
+        lambda x: tuple(eval(x.replace("time.struct_time", "FeedparserTime")))
+    ).map(time.mktime), unit="s")
 
     return articles
 

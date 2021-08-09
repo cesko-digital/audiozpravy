@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from babel.dates import format_timedelta, format_date
 from collections import namedtuple
 from flask_restful import Resource, Api
+from recommender.recommend import select_based_on_recency, recommend
 
 import time
 import threading
@@ -49,8 +50,8 @@ def periodic_update():
             print()
             print(f"####: {os.getcwd()}")
 
-            articles_new = pd.read_csv("s3/articles.csv")
-            X_new = np.load("s3/X.npy", allow_pickle=True)
+            articles_new = pd.read_csv("s3/articles.csv", parse_dates=["published"])
+            X_new = np.load("s3/X.npy", allow_pickle=True).tolist()
             words_new = np.load("s3/words.npy", allow_pickle=True)
 
             # TODO: check to make sure if this lock is enough to prevent access
@@ -79,37 +80,38 @@ def pretty_format_date(date: datetime) -> str:
 
 def format_articles(selected_articles: pd.DataFrame) -> pd.DataFrame:
     # TODO: resolve feedparser time format elsewhere
-    selected_articles["published"] = selected_articles["published"].map(
-        lambda x: eval(x.replace("time.struct_time", "FeedparserTime"))
-    )
-    selected_articles["published"] = pd.to_datetime(
-        selected_articles.published.map(tuple).map(lambda x: datetime(*x[:5]))
-    )
+    # selected_articles["published"] = selected_articles["published"].map(
+    #     lambda x: eval(x.replace("time.struct_time", "FeedparserTime"))
+    # )
+    # selected_articles["published"] = pd.to_datetime(
+    #     selected_articles.published.map(tuple).map(lambda x: datetime(*x[:5]))
+    # )
     selected_articles["published"] = selected_articles["published"].map(
         pretty_format_date
-    )
+    )   
 
     return selected_articles
 
 
-def select_based_on_recency(articles: pd.DataFrame) -> List[Dict]:
-    # TODO: add other types of recommendation
-    selected_articles = articles.sort_values("published", ascending=False).iloc[:20][
-        ["title", "link", "summary", "published", "category"]
-    ]
-    return format_articles(selected_articles).to_dict("records")
-
-
 @app.route("/")
-def feed():
-    payload = select_based_on_recency(articles)
+@app.route("/<method>")
+def feed(method=None):
+    if method == "frecency":
+        print("started recommending!")
+        selected = recommend(articles, X, words)
+    elif not method:
+        selected = select_based_on_recency(articles)
+    else:
+        raise Exception("Unknown method!")
+    payload = format_articles(selected).to_dict("records")
 
     return render_template("feed.html", articles=payload)
 
 
 class FeedRest(Resource):
     def get(self):
-        payload = select_based_on_recency(articles)
+        selected = select_based_on_recency(articles)
+        payload = format_articles(selected).to_dict("records")
         return payload
 
 
