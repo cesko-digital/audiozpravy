@@ -1,8 +1,11 @@
 import time
 
 import feedparser
+from numpy.lib.financial import ipmt
 import pandas as pd
 from tqdm import tqdm
+from os import environ
+import json
 
 from . import SOURCES
 
@@ -15,14 +18,20 @@ def get_entry_value(entry, name, mapping, default=None):
 def scrape_feeds():
     entries = []
 
+    local_dev = environ.get("LOCAL_DEV", 0)
+
     for source in SOURCES:
         source_name = source["name"]
         print(f"scraping {source_name} RSS feed")
         for feed in tqdm(source["feeds"]):
-            persed_feed = feedparser.parse(feed)
-            for e in persed_feed.entries:
+            if local_dev:
+                with open("local_dev/feed_snapshot.json", "r") as f:
+                    parsed_feed = feedparser.util.FeedParserDict(json.load(f))
+            else:
+                parsed_feed = feedparser.parse(feed)
+            for e in parsed_feed.entries:
                 cat_func = source["mapping"]["category_func"]
-                category = cat_func(persed_feed, e)
+                category = cat_func(parsed_feed, e)
                 entries.append(
                     {
                         "title": get_entry_value(e, "title", source["mapping"]),
@@ -42,6 +51,9 @@ def scrape_feeds():
                         "source": source_name,
                     }
                 )
+            if local_dev:
+                # we have snapshot of just one feed
+                break
 
     articles = pd.DataFrame(entries)
 

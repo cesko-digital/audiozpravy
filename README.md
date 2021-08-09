@@ -72,6 +72,14 @@ Oficiální repozitář týmu Audiozpráv v projeku #run-inovace-zpravodajskeho-
 
 `isort pipeline --profile black` - formátování
 
+### Lokální vývoj
+
+Stačí zadát env variable a spustit dva hlavní skripty takto:
+```
+LOCAL_DEV=1 pipeline/main.py
+LOCAL_DEV=1 backend/app.py
+```
+
 ## ☎️ Komu se mám ozvat?
 
 **Techlead:** Jiří Zikeš (jiri@xomlo.io, 725 523 929)

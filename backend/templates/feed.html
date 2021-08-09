@@ -30,8 +30,12 @@
             <p>{{article.audio}}</p>
 
             <audio controls style="margin-top: 10px">
+              {% if local_dev == 0 %}
               <source src="https://cesko-digital-audiozpravy-audio.s3.eu-central-1.amazonaws.com/{{article.audio}}"
                 type="audio/wav">
+              {% else %}
+              <source src="file:///s3/audio/sample.wav" type="audio/wav">
+              {% endif %}
               Your browser does not support the audio element.
             </audio>
           </div>
