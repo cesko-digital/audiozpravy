@@ -1,7 +1,7 @@
 import time
 
 import feedparser
-from numpy.lib.financial import ipmt
+from numpy_financial import ipmt
 import pandas as pd
 from tqdm import tqdm
 from os import environ
