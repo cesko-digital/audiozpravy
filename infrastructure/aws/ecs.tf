@@ -34,11 +34,11 @@ resource "aws_ecs_task_definition" "backend" {
   execution_role_arn = aws_iam_role.ecs_backend_task_execution_role.arn
   task_role_arn = aws_iam_role.ecs_backend_task_role.arn
   cpu       = "256"
-  memory    = "1024"
+  memory    = "512"
   container_definitions = jsonencode([
     {
       name      = "backend"
-      image     = "${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.aws-region}.amazonaws.com/audiozpravy-backend:latest"
+      image     = "${aws_ecr_repository.audiozpravy_backend.repository_url}:latest"
       essential = true
       environment = [
                 {
@@ -68,7 +68,7 @@ resource "aws_ecs_service" "backend" {
   name            = "backend"
   cluster         = aws_ecs_cluster.audiozpravy_ecs_cluster.id
   task_definition = aws_ecs_task_definition.backend.arn
-  desired_count   = 2
+  desired_count   = 1
   launch_type     = "FARGATE"
   scheduling_strategy                = "REPLICA"
   #iam_role        = aws_iam_role.ecs_backend_task_role.arn
