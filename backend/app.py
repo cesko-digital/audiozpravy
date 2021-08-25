@@ -13,7 +13,7 @@ from os import environ
 
 import time
 import threading
-from config import CONFIG
+
 
 ARTICLES_REFRESH = 900  # 15 min
 
@@ -41,6 +41,8 @@ lock = threading.Lock()
 def periodic_update():
     local_dev = environ.get("LOCAL_DEV", 0)
     if not local_dev:
+        from config import CONFIG
+
         session = boto3.Session(
             aws_access_key_id=CONFIG["awsAccessKey"],
             aws_secret_access_key=CONFIG["awsSecretKey"],

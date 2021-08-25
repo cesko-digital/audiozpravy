@@ -74,10 +74,12 @@ Oficiální repozitář týmu Audiozpráv v projeku #run-inovace-zpravodajskeho-
 
 ### Lokální vývoj
 
+Doporučujeme vyvíjet pomocí virtual enviroments a běžet alespoň python 3.7.9.
+
 Stačí zadát env variable a spustit dva hlavní skripty takto:
 ```
-LOCAL_DEV=1 pipeline/main.py
-LOCAL_DEV=1 backend/app.py
+LOCAL_DEV=1 python pipeline/main.py
+LOCAL_DEV=1 python backend/app.py
 ```
 
 ## ☎️ Komu se mám ozvat?
