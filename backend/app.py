@@ -74,9 +74,9 @@ def periodic_update():
             print()
             print(f"####: {os.getcwd()}")
 
-            articles_new = pd.read_csv("s3/articles.csv", parse_dates=["published"])
-            X_new = np.load("s3/X.npy", allow_pickle=True).tolist()
-            words_new = np.load("s3/words.npy", allow_pickle=True)
+            articles_new = pd.read_csv("s3_input/articles.csv", parse_dates=["published"])
+            X_new = np.load("s3_input/X.npy", allow_pickle=True).tolist()
+            words_new = np.load("s3_input/words.npy", allow_pickle=True)
 
             # TODO: check to make sure if this lock is enough to prevent access
             # to different versions of these variables as given time
