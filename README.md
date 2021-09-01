@@ -72,6 +72,24 @@ Oficiální repozitář týmu Audiozpráv v projeku #run-inovace-zpravodajskeho-
 
 `isort pipeline --profile black` - formátování
 
+### Spuštění v Dockeru lokálně
+
+Pipeline:
+
+```
+cd pipeline
+docker build -t az-pipeline .
+docker run -ti --env LOCAL_DEV=1 -v /path/to/your/local/s3:/app/s3 az-pipeline
+```
+
+Backend:
+
+```
+cd backend
+docker build -t az-backend .
+docker run -ti --env LOCAL_DEV=1 -p 5000:5000 az-backend
+```
+
 ### Lokální vývoj
 
 Doporučujeme vyvíjet pomocí virtual enviroments a běžet alespoň python 3.7.9.

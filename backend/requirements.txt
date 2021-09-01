@@ -5,3 +5,6 @@ pandas==1.2.4
 numpy==1.20.3
 boto3==1.17.96
 cachetools==4.2.2
+cachetools
+feedparser==6.0.2
+scipy
