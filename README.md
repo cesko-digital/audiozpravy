@@ -100,6 +100,10 @@ LOCAL_DEV=1 python pipeline/main.py
 LOCAL_DEV=1 python backend/app.py
 ```
 
+### Testování
+
+V hlavním adresáři stačí spustit příkaz `pytest`
+
 ## ☎️ Komu se mám ozvat?
 
 **Techlead:** Jiří Zikeš (jiri@xomlo.io, 725 523 929)

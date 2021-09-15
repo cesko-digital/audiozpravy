@@ -36,7 +36,7 @@ def _scrape_feed(source, local_dev):
                     "summary": e.get("summary"),
                     "published": e.get("published_parsed"),
                     "tags": [t["term"] for t in e.get("tags")],
-                    "category": category,
+                    "category": category.name,
                     "credit": e.get("credit"),
                     "source": e.get("source_name"),
                 }
