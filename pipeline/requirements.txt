@@ -8,4 +8,5 @@ scikit-learn==0.24.2
 ufal.morphodita==1.10.1.1
 boto3==1.17.96
 azure-cognitiveservices-speech==1.17.0
-numpy_financial
+numpy-financial==1.0.0
+pytest==5.3.2

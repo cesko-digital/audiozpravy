@@ -6,7 +6,6 @@ import boto3
 from botocore.exceptions import ClientError
 import os
 from tts import process_audio, upload_to_s3
-from config import CONFIG
 from os import environ
 
 if __name__ == "__main__":

@@ -13,7 +13,7 @@ from os import environ
 
 import time
 import threading
-from config import CONFIG
+
 
 ARTICLES_REFRESH = 900  # 15 min
 
@@ -41,6 +41,8 @@ lock = threading.Lock()
 def periodic_update():
     local_dev = environ.get("LOCAL_DEV", 0)
     if not local_dev:
+        from config import CONFIG
+
         session = boto3.Session(
             aws_access_key_id=CONFIG["awsAccessKey"],
             aws_secret_access_key=CONFIG["awsSecretKey"],
@@ -119,12 +121,24 @@ def format_articles(selected_articles: pd.DataFrame) -> pd.DataFrame:
 
 @app.route("/")
 @app.route("/<method>")
-def feed(method=None):
+@app.route("/<method>/<category>")
+def feed(method=None, category=None):
+    if category:
+        print(f"suggesting for category: {category}")
+        print(articles.category.drop_duplicates())
+        mask = articles["category"] == category
+        articles_for_feed = articles[mask]
+        X_for_feed = X[mask]
+        print(articles_for_feed.shape)
+        print(articles.shape)
+    else:
+        articles_for_feed = articles
+        X_for_feed = X
     if method == "frecency":
         print("started recommending!")
-        selected = recommend(articles, X, words)
+        selected = recommend(articles_for_feed, X_for_feed, words)
     elif not method:
-        selected = select_based_on_recency(articles)
+        selected = select_based_on_recency(articles_for_feed)
     else:
         raise Exception("Unknown method!")
     payload = format_articles(selected).to_dict("records")

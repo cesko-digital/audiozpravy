@@ -11,7 +11,6 @@ import os
 from botocore.exceptions import ClientError
 import unicodedata
 import re
-from config import CONFIG
 from os import environ
 
 
@@ -28,6 +27,7 @@ def process_audio(title: str, content: str) -> str:
     if local_dev:
         return "sample.wav"
 
+    from config import CONFIG
     speech_config = SpeechConfig(CONFIG["azureKey"], CONFIG["azureRegion"])
     synthesizer = SpeechSynthesizer(speech_config=speech_config, audio_config=None)
 
@@ -47,6 +47,8 @@ def process_audio(title: str, content: str) -> str:
 
 
 def upload_to_s3():
+    from config import CONFIG
+
     s3_client = boto3.client(
         "s3",
         aws_access_key_id=CONFIG["awsAccessKey"],

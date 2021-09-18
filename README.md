@@ -92,11 +92,17 @@ docker run -ti --env LOCAL_DEV=1 -p 5000:5000 az-backend
 
 ### Lokální vývoj
 
+Doporučujeme vyvíjet pomocí virtual enviroments a běžet alespoň python 3.7.9.
+
 Stačí zadát env variable a spustit dva hlavní skripty takto:
 ```
-LOCAL_DEV=1 pipeline/main.py
-LOCAL_DEV=1 backend/app.py
+LOCAL_DEV=1 python pipeline/main.py
+LOCAL_DEV=1 python backend/app.py
 ```
+
+### Testování
+
+V hlavním adresáři stačí spustit příkaz `pytest`
 
 ## ☎️ Komu se mám ozvat?
 
