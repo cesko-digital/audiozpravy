@@ -6,5 +6,6 @@ export const Screens = {
   friends: "friends",
   news: "news",
   queue: "queue",
-  settings: "settings"
+  settings: "settings",
+  firstVisit: "firstVisit",
 };

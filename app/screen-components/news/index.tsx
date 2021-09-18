@@ -5,36 +5,38 @@ import TabViewNews from "./news-tabview";
 
 const NewsScreen = () => {
   return (
-    <View
-      style={{
-        backgroundColor: "white",
-        height: "100%",
-        width: "100%",
-        position: "relative",
-      }}
-    >
+    <>
       <View
         style={{
-          position: "absolute",
-          width: "90%",
-          height: "5%",
-          left: 16,
-          top: 24,
-          zIndex: 10,
+          backgroundColor: "white",
+          height: "100%",
+          width: "100%",
+          position: "relative",
         }}
       >
-        <Text
+        <View
           style={{
-            color: Color["black-100"],
-            fontFamily: "RobotoBold",
-            fontSize: 24,
+            position: "absolute",
+            width: "90%",
+            height: "5%",
+            left: 16,
+            top: 24,
+            zIndex: 10,
           }}
         >
-          Nejnovější zprávy
-        </Text>
+          <Text
+            style={{
+              color: Color["black-100"],
+              fontFamily: "RobotoBold",
+              fontSize: 24,
+            }}
+          >
+            Nejnovější zprávy
+          </Text>
+        </View>
+        <TabViewNews />
       </View>
-      <TabViewNews />
-    </View>
+    </>
   );
 };
 
