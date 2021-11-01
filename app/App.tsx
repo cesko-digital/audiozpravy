@@ -15,6 +15,7 @@ import QueueScreen from "./screen-components/queue";
 import CategoriesScreen from "./screen-components/categories";
 import SettingsScreen from "./screen-components/settings";
 import Bar from "./components/buttons/navigation/bar";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -30,6 +31,7 @@ export default function App() {
     return <AppLoading />;
   } else {
     return (
+      <SafeAreaView style={{flex: 1}}>
       <NavigationContainer>
         <Stack.Navigator>
           <Stack.Screen
@@ -49,6 +51,7 @@ export default function App() {
           />
         </Stack.Navigator>
       </NavigationContainer>
+      </SafeAreaView>
     );
   }
 }

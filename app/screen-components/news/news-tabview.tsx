@@ -8,6 +8,8 @@ import NewsNavList from "./news-list";
 const renderTabBar = (props) => {
   return (
     <TabBar
+
+    scrollEnabled={true}
       {...props}
       indicatorStyle={{ backgroundColor: "white" }}
       style={{
@@ -69,10 +71,7 @@ export default function TabViewNews() {
       initialLayout={initialLayout}
       renderTabBar={renderTabBar}
       style={{
-        backgroundColor: "white",
-        marginTop: 72,
-        width: "95%",
-        alignSelf: "center",
+        flex: 1 
       }}
     />
   );

@@ -5,23 +5,17 @@ import TabViewNews from "./news-tabview";
 
 const NewsScreen = () => {
   return (
-    <>
       <View
         style={{
-          backgroundColor: "white",
-          height: "100%",
-          width: "100%",
-          position: "relative",
+          flex: 1,
+          backgroundColor: "white"
         }}
       >
         <View
           style={{
-            position: "absolute",
-            width: "90%",
-            height: "5%",
-            left: 16,
-            top: 24,
-            zIndex: 10,
+            paddingStart: 16,
+            paddingTop: 24,
+            paddingBottom: 8
           }}
         >
           <Text
@@ -36,7 +30,6 @@ const NewsScreen = () => {
         </View>
         <TabViewNews />
       </View>
-    </>
   );
 };
 

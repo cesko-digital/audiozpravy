@@ -38,7 +38,7 @@ const CategoriesScreen = ({ navigation }) => {
       <Heading>Kategorie</Heading>
       <Text style={styles.subtitle}>Hledáš něco konkrétního?</Text>
       <Search style={styles.searchArea} />
-      <Title>Populární témata</Title>
+      <Title size={1}>Populární témata</Title>
       <View style={styles.sectionBtn}>
         {categories.map((category) => (
           <CategoryButton

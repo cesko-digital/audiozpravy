@@ -32,7 +32,6 @@ const TopicsScreen = ({ navigation }) => {
   ];
 
   return (
-    <>
       <View style={styles.container}>
         <FontAwesome5
           name="long-arrow-alt-left"
@@ -75,14 +74,15 @@ const TopicsScreen = ({ navigation }) => {
           Poslechnout si výběr
         </MainButton>
       </View>
-    </>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     paddingVertical: 32,
     paddingHorizontal: 24,
+    backgroundColor: "white"
   },
   title: {
     fontSize: 32,

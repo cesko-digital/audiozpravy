@@ -5,19 +5,7 @@ import { FontAwesome5 } from "@expo/vector-icons";
 
 const Search = ({ style }) => {
   return (
-    <View
-      style={StyleSheet.compose(
-        {
-          flexDirection: "row",
-          backgroundColor: "#E7E7E7",
-          alignContent: "center",
-          padding: "none",
-          borderRadius: 30,
-          marginBottom: 20,
-        },
-        style
-      )}
-    >
+    <View style={[styles.container, style]}>
       <View style={styles.searchInput}>
         <TextInput style={styles.input} />
         <FontAwesome5
@@ -27,7 +15,7 @@ const Search = ({ style }) => {
           color="#0D0B12"
         />
       </View>
-      <MainButton style={styles.searchButton} children={"Hledat"} />
+      <MainButton style={styles.searchButton} children={"Hledat"} onPress={() => alert("Chci hledat")} />
     </View>
   );
 };
@@ -37,7 +25,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     backgroundColor: "#E7E7E7",
     alignContent: "center",
-    padding: "none",
     borderRadius: 30,
     marginBottom: 20,
   },
@@ -51,7 +38,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: "RobotoBold",
     position: "absolute",
-
     top: "28%",
     left: 15,
   },
@@ -59,7 +45,7 @@ const styles = StyleSheet.create({
     flex: 8,
   },
   searchButton: {
-    flex: 1,
+    flex: 2
   },
 });
 

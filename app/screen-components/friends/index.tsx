@@ -6,30 +6,25 @@ import TabViewFriends from "./friends-tabview";
 const FriendsScreen = () => {
   return (
     <View
+    style={{
+      flex: 1,
+      backgroundColor: "white"
+    }}
+  >
+    <View
       style={{
-        backgroundColor: "white",
-        height: "100%",
-        width: "100%",
-        position: "relative",
+        paddingStart: 16,
+        paddingTop: 24,
+        paddingBottom: 8
       }}
     >
-      <View
+      <Text
         style={{
-          position: "absolute",
-          width: "90%",
-          height: "5%",
-          left: 16,
-          top: 24,
-          zIndex: 10,
+          color: Color["black-100"],
+          fontFamily: "RobotoBold",
+          fontSize: 24,
         }}
       >
-        <Text
-          style={{
-            color: Color["black-100"],
-            fontFamily: "RobotoBold",
-            fontSize: 24,
-          }}
-        >
           Přátelé
         </Text>
       </View>

@@ -37,8 +37,8 @@ export const ListeningPost = ({ title, img, published, name }) => (
     >
       <View
         style={{
-          width: "6rem",
-          height: "3.5rem",
+          width: 80,
+          height: 60,
           paddingRight: 15,
           position: "relative",
         }}
@@ -61,8 +61,8 @@ export const ListeningPost = ({ title, img, published, name }) => (
             width: 30,
             backgroundColor: "black",
             position: "absolute",
-            top: "1rem",
-            left: "1.5rem",
+            top: 15,
+            left: 20,
           }}
         >
           <MaterialCommunityIcons name="play" color="white" size={20} />
@@ -77,6 +77,7 @@ export const ListeningPost = ({ title, img, published, name }) => (
         <View style={{ width: "80%" }}>
           <Text
             style={{ fontFamily: "RobotoBold", fontSize: 14, lineHeight: 20 }}
+            numberOfLines={2}
           >
             {title}
           </Text>
@@ -124,8 +125,8 @@ export const CollectionPost = ({ collection, img, name }) => (
     >
       <View
         style={{
-          width: "10rem",
-          height: "3.5rem",
+          width: 160,
+          height: 60,
           paddingRight: 15,
           position: "relative",
         }}
@@ -148,8 +149,8 @@ export const CollectionPost = ({ collection, img, name }) => (
             width: 30,
             backgroundColor: Color["black-100"],
             position: "absolute",
-            top: "1rem",
-            left: "1.5rem",
+            top: 15,
+            left: 20,
           }}
         >
           <MaterialCommunityIcons name="play" color="white" size={20} />
@@ -164,6 +165,7 @@ export const CollectionPost = ({ collection, img, name }) => (
         <View style={{ width: "80%" }}>
           <Text
             style={{ fontFamily: "RobotoBold", fontSize: 14, lineHeight: 20 }}
+            numberOfLines={2}
           >
             {collection.title}
           </Text>
@@ -219,7 +221,7 @@ export const CategoryPost = ({ category, name }) => (
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            marginRight: "8vw",
+            marginRight: 8,
           }}
         >
           <Text
@@ -271,10 +273,9 @@ export const JoinedPost = ({ name }) => (
             borderRadius: 12,
             width: 121,
             height: 36,
-            display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            marginRight: "2vw",
+            marginRight: 8,
           }}
         >
           <Text

@@ -63,10 +63,7 @@ export default function TabViewFriends() {
       initialLayout={initialLayout}
       renderTabBar={renderTabBar}
       style={{
-        backgroundColor: "white",
-        marginTop: 72,
-        width: "95%",
-        alignSelf: "center",
+        flex: 1 
       }}
     />
   );

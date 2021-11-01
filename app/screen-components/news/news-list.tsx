@@ -6,8 +6,10 @@ import {
   Image,
   TextStyle,
   TouchableOpacity,
+  ImageBackground
 } from "react-native";
 import Color from "../../shared/colors";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const articles = [
   {
@@ -48,36 +50,23 @@ const PlusIcon: FC<Props> = ({ style }) => (
   <TouchableOpacity
     onPress={() => alert("Přidáno do fronty!")}
     style={{
-      height: "10%",
-      width: "10%",
+      height: 24,
+      width: 24,
       justifyContent: "center",
       alignItems: "center",
       alignSelf: "center",
     }}
   >
-    <View style={{}}>
-      <Text
-        style={{
-          fontSize: 28,
-          fontFamily: "RobotoLight",
-          color: Color["black-32"],
-          fontWeight: "500",
-          ...style,
-        }}
-      >
-        +
-      </Text>
-    </View>
+      <MaterialCommunityIcons name="plus" color={Color["black-32"]} size={24}/>
   </TouchableOpacity>
 );
 
 const Item = ({ title, img, published }) => (
-  <View style={{ width: "100%", alignItems: "center" }}>
+  <View style={{alignItems: "center" }}>
     <View
       style={{
         flexDirection: "row",
         justifyContent: "space-between",
-        alignItems: "flex-start",
         width: "95%",
         paddingBottom: 15,
         paddingTop: 15,
@@ -85,12 +74,12 @@ const Item = ({ title, img, published }) => (
         borderBottomWidth: 1,
       }}
     >
-      <View style={{ width: "4.5rem", height: "3rem" }}>
+      <View style={{ width: 80, height: 55 }}>
         <Image
           style={{
             width: "100%",
             height: "100%",
-            borderRadius: 10,
+            borderRadius: 10
           }}
           source={{
             uri: img,
@@ -100,18 +89,22 @@ const Item = ({ title, img, published }) => (
       <TouchableOpacity
         onPress={() => alert("Chci zobrazit zprávu!")}
         style={{
-          width: "60%",
+          flex: 1,
+          marginStart: 16,
+          marginEnd: 8
+          // width: "60%",
         }}
       >
-        <View>
+        <View style={{}}>
           <Text
             style={{ fontFamily: "RobotoBold", fontSize: 14, lineHeight: 20 }}
+            numberOfLines={2}
           >
             {title}
           </Text>
           <Text
             style={{
-              fontFamily: "RobotoLight",
+              fontWeight: "400",
               fontSize: 10,
               lineHeight: 16,
               color: Color["black-24"],
@@ -133,17 +126,14 @@ const NewsNavList = ({ topic }) => {
   return (
     <View
       style={{
-        backgroundColor: "white",
-        width: "100%",
-        height: "100%",
-        position: "absolute",
-        top: 0,
+        flex: 1
       }}
     >
       <FlatList
         data={articles}
         renderItem={renderItem}
         keyExtractor={(item) => item.title}
+        style={{}}
       />
     </View>
   );
