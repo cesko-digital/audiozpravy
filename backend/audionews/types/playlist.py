@@ -18,6 +18,10 @@ class PlaylistNode(DjangoObjectType):
     class Meta:
         model = Playlist
         interfaces = (Node,)
+        filter_fields = {
+            "type": ["exact"],
+            "prepared_for_date": ["gte", "lte"],
+        }
 
     def resolve_articles(root, info, **kwargs):
         return Playlist.objects.get(id=root.id).articles

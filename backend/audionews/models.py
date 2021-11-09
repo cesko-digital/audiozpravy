@@ -43,6 +43,7 @@ class Article(models.Model):
     url = models.CharField(max_length=256)
     text = models.CharField(max_length=10000)
     pub_date = models.DateField()
+    recording_created_at = models.DateTimeField()
     recording_url = models.CharField(max_length=256)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='articles')
 
@@ -55,9 +56,9 @@ class Article(models.Model):
 
 
 class Play(models.Model):
-    listener =  models.ForeignKey(Listener, on_delete=models.CASCADE, related_name='plays')
-    article =  models.ForeignKey(Article, on_delete=models.CASCADE, related_name='plays')
-    play_date = models.DateField(auto_now_add=True)
+    listener = models.ForeignKey(Listener, on_delete=models.CASCADE, related_name='plays')
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='plays')
+    played_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
         return f"{self.listener.username}-{self.article.title}"
@@ -69,7 +70,9 @@ class Play(models.Model):
 class Playlist(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='playlists')
     articles = models.ManyToManyField(Article, related_name='playlists')
-    prepared_for_date = models.DateField(auto_now_add=True)
+    prepared_for_date = models.DateField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    type = models.CharField(max_length=256)
 
     def __str__(self) -> str:
         return f"{self.listener.username}-{self.article.title}"
