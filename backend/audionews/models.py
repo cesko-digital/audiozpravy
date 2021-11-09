@@ -6,7 +6,6 @@ class Listener(User):
     device_id = models.CharField(max_length=256)
 
     class Meta:
-        proxy = True
         ordering = ['device_id']
         db_table="a_listener"
 
@@ -78,6 +77,7 @@ class Playlist(models.Model):
         return f"{self.listener.username}-{self.article.title}"
 
     class Meta:
+        ordering = ['created_at']
         db_table="a_playlist"
 
 

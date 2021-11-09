@@ -1,5 +1,5 @@
 from django.contrib.auth.models import Permission
-from graphene import ID, ClientIDMutation, Field, ResolveInfo, String, Integer
+from graphene import ID, ClientIDMutation, Field, ResolveInfo, String, Int
 from graphql import GraphQLError
 from graphql_jwt.decorators import login_required, permission_required, staff_member_required
 from graphql_relay import from_global_id
@@ -38,7 +38,7 @@ class PlayArticle(ClientIDMutation):
     play = Field(PlayNode)
 
     class Input:
-        article_id = Integer(required=True)
+        article_id = Int(required=True)
         device_id = String(required=True)
 
     @classmethod

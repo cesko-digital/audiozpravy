@@ -7,10 +7,11 @@ from graphql.execution.base import ResolveInfo
 from promise.promise import Promise
 from ..models import Article, Listener, Play, Provider
 from .play import PlayNode
-
+from .article import ArticleNode
 
 class ListenerNode(DjangoObjectType):
     plays = List(NonNull(PlayNode), required=True)
+    queue = List(NonNull(ArticleNode), article_ids=List(Int))
 
     class Meta:
         model = Listener
@@ -26,4 +27,9 @@ class ListenerNode(DjangoObjectType):
     def resolve_plays(root, info, **kwargs):
         return Play.objects.filter(listener_id=root.id).all()
 
+    def resolve_queue(root, info, **kwargs):
+        print(info)
+        print(kwargs)
+        return Article.objects.all()
+        #TODO: Napojit na recommendation engine
 
