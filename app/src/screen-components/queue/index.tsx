@@ -101,7 +101,7 @@ const Item = ({ item, isPlaying }) => {
       >
         <View style={{}}>
           <Text
-            style={[fonts.titleSmall, { color: theme.colors.textInverse, lineHeight: 20 }]}
+            style={StyleSheet.compose(fonts.titleSmall, { color: theme.colors.textInverse, lineHeight: 20 })}
             numberOfLines={2}
           >
             {item.title}

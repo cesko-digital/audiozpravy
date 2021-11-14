@@ -74,10 +74,9 @@ const HomeTabs = () => {
   const insets = useSafeAreaInsets();
 
   return (
-    <Tab.Navigator initialRouteName={Screens.userNews} tabBar={Bar} tabBarOptions={{
+    <Tab.Navigator initialRouteName={Screens.userNews} tabBar={props => <Bar {...props} />} tabBarOptions={{
       style: {
-        backgroundColor: scheme === 'dark' ? AppDarkTheme.colors.background : AppLightTheme.colors.background,
-        marginBottom: insets.bottom,
+        backgroundColor: scheme === 'dark' ? AppDarkTheme.colors.background : AppLightTheme.colors.background
       }
     }}>
       <Tab.Screen

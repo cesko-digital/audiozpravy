@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useState } from "react";
-import { View, Dimensions, Text } from "react-native";
+import { View, Dimensions, Text, StyleSheet } from "react-native";
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import NewsNavList from "./news-list";
 import Fonts from "../../theme/fonts";
@@ -28,11 +28,11 @@ const renderTabBar = (props) => {
           }}
         >
           <Text
-            style={[fonts.titleRegular, {
+            style={StyleSheet.compose(fonts.titleRegular, {
               color: focused ? theme.colors.text : theme.colors.textSemiLight,
               marginRight: 4,
               paddingTop: 5,
-            }]}
+            })}
           >
             {route.title}
           </Text>

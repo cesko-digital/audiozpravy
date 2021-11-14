@@ -147,12 +147,12 @@ const NewsFilter: FC<INewsFilter> = ({ initialTimeRanges, initialCategories, ini
             <TouchableWithoutFeedback onPress={() => { toggleExpansion(); }} >
                 <View style={styles.filterHeader}>
                     <MaterialCommunityIcons name={expanded ? 'close' : 'filter'} size={24} color={theme.colors.textSemiLight} />
-                    <Text style={[fonts.titleRegular, { color: theme.colors.textSemiLight, marginStart: 8 }]}>{expanded ? 'Zavřít filtry' : 'Filtrovat'}</Text>
+                    <Text style={StyleSheet.compose(fonts.titleRegular, { color: theme.colors.textSemiLight, marginStart: 8 })}>{expanded ? 'Zavřít filtry' : 'Filtrovat'}</Text>
                 </View>
             </TouchableWithoutFeedback>
 
-            <Animated.View style={[{ height: animationHeight, opacity: animationOpacity }]}>
-                <View style={[styles.filterContainer, {}]}>
+            <Animated.View style={{ height: animationHeight, opacity: animationOpacity }}>
+                <View style={styles.filterContainer}>
                     <ScrollView horizontal={true}>
                         <View style={styles.filterRow}>
                             <CategoryButton key={0} onPress={() => { setTimeRanges([]) }} active={selectedTimeRanges.length == 0}>

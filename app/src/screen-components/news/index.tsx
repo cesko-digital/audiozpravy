@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, View, Image } from "react-native";
+import { Text, View, Image, StyleSheet } from "react-native";
 import NewsList from "./news-list";
 import { LinearGradient } from "expo-linear-gradient";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -18,17 +18,17 @@ const NewsScreen = ({ route, navigation }) => {
           <Image source={image} style={{ width: '100%', height: 62, position: 'absolute', opacity: 0.25 }} />
         }
         <View style={{ height: 62, justifyContent: 'center', flex: 1 }}>
-        <MaterialCommunityIcons
-              name="chevron-left"
-              color={theme.colors.textInverse}
-              size={36}
-              style={{position: 'absolute', top: 6, left: 0, padding: 6}}
-              onPress={() => {
-                navigation.goBack();
-              }}
-            />
+          <MaterialCommunityIcons
+            name="chevron-left"
+            color={theme.colors.textInverse}
+            size={36}
+            style={{ position: 'absolute', top: 6, left: 0, padding: 6 }}
+            onPress={() => {
+              navigation.goBack();
+            }}
+          />
           <View style={{ flexDirection: 'row', alignContent: 'center', alignItems: 'center', alignSelf: 'center' }}>
-          <Text style={[fonts.titleLarge, { color: theme.colors.textInverse }]}>
+            <Text style={StyleSheet.compose(fonts.titleLarge, { color: theme.colors.textInverse })}>
               {title}
             </Text>
           </View>
