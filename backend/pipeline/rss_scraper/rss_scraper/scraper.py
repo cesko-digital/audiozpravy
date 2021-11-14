@@ -19,7 +19,7 @@ def _scrape_feed(source, local_dev):
             with open("pipeline/local_dev/feed_snapshot.json", "r") as f:
                 parsed_feed = feedparser.util.FeedParserDict(json.load(f))
         else:
-            parsed_feed = feedparser.parse(feed)
+            parsed_feed = feedparser.parse(feed['url'])
         for e in parsed_feed.entries:
             category_obj = feed["category"]
             if callable(category_obj):
@@ -35,7 +35,7 @@ def _scrape_feed(source, local_dev):
                     "link": e.get("link"),
                     "summary": e.get("summary"),
                     "published": e.get("published_parsed"),
-                    "tags": [t["term"] for t in e.get("tags")],
+                    "tags": [t["term"] for t in e.get("tags")] if e.get("tags") else None,
                     "category": category.name,
                     "credit": e.get("credit"),
                     "source": e.get("source_name"),
