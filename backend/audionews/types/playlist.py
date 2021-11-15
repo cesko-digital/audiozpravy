@@ -34,6 +34,7 @@ class PlaylistNode(DjangoObjectType):
     def resolve_category(root, info, **kwargs):
         return Playlist.objects.get(id=root.id).category
 
+    #TODO: GET articles from db and rewrite the algorithm to get articles from db
     def resolve_articles_trending(root, info, **kwargs):
         """ Get articles based on current google trends """
         category, created = Category.objects.get_or_create(name="daily_trend")
@@ -53,8 +54,8 @@ class PlaylistNode(DjangoObjectType):
                     category=category_article,
                     title = row.title,
                     perex=row.summary,
-                    recording_created_at=datetime.,
-                    pub_date=row.published,
+                    recording_created_at=datetime.datetime.now(),
+                    pub_date=datetime.datetime.fromtimestamp(row.published),
                     url=str(row.link),
                     provider=provider
                 )
@@ -63,5 +64,6 @@ class PlaylistNode(DjangoObjectType):
 
 
     def resolve_articles_recommended(self, info, **kwargs):
-        #TODO: Add user articles from Play history to create similar articles
+        """ Recommend articles based on user history"""
+        #TODO
         pass
