@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, FC } from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import Fonts from "../../theme/fonts";
+import useFonts from "../../theme/fonts";
 import { useTheme } from '../../theme'
 import CategoryButton from "../../components/buttons/category-button";
 import { Text, View, StyleSheet, ScrollView, Animated, TouchableWithoutFeedback, Easing } from "react-native";
@@ -18,7 +18,7 @@ interface INewsFilter {
 
 const NewsFilter: FC<INewsFilter> = ({ initialTimeRanges, initialCategories, initialTypes, isExpanded, onFilterChange, onExpadedChange }) => {
     const theme = useTheme();
-    const fonts = Fonts(theme);
+    const fonts = useFonts();
 
     const [selectedTimeRanges, setTimeRanges] = useState(initialTimeRanges);
     const [selectedCategories, setCategories] = useState(initialCategories);

@@ -4,13 +4,11 @@ import NewsList from "../news/news-list";
 import Fonts from "../../theme/fonts";
 import { useTheme } from '../../theme'
 import NewsFilter from "./news-filter";
-import { AppStatusBar, useStatusBar } from "../../components/statusBar"
+import AppStatusBar from "../../components/statusBar"
 
 const UserNewsScreen = ({ route, navigation }) => {
   const theme = useTheme();
   const fonts = Fonts(theme);
-  useStatusBar('dark-content')
-
   const [selectedCategories, setCategories] = useState([]);
   const [selectedTimeRanges, setTimeRanges] = useState([]);
   const [selectedTypes, setTypes] = useState([]);

@@ -1,7 +1,8 @@
 import React, { useCallback } from 'react';
-import { View, StatusBar } from 'react-native';
-import { useSafeAreaInsets, SafeAreaProvider } from 'react-native-safe-area-context';
+import { View, StatusBar, StatusBarStyle } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
+
 
 const useStatusBar = (style, animated = true) => {
     useFocusEffect(
@@ -11,13 +12,14 @@ const useStatusBar = (style, animated = true) => {
     );
 };
 
-const AppStatusBar = ({
-    backgroundColor,
-    barStyle = "dark-content",
+export interface AppStatusBarProps {
+    backgroundColor: string
+    barStyle: StatusBarStyle
 }
-) => {
+const AppStatusBar = ({ backgroundColor, barStyle = "dark-content" }: AppStatusBarProps) => {
 
     const insets = useSafeAreaInsets();
+    useStatusBar(barStyle)
 
     return (
         <View style={{ height: insets.top, backgroundColor }}>
@@ -28,4 +30,4 @@ const AppStatusBar = ({
         </View>
     );
 };
-export { AppStatusBar, SafeAreaProvider, useStatusBar }
+export default AppStatusBar

@@ -1,10 +1,10 @@
 import React from "react";
 import { Text, View, StyleSheet, SectionList, TouchableOpacity, Image } from "react-native";
 import Player from "../../components/player";
-import Fonts from "../../theme/fonts";
+import useFonts from "../../theme/fonts";
 import { useTheme } from '../../theme'
 import Color from "../../theme/colors";
-import { AppStatusBar, useStatusBar } from "../../components/statusBar"
+import AppStatusBar from "../../components/statusBar"
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const DATA = [
@@ -50,7 +50,7 @@ const DATA = [
 
 const Item = ({ item, isPlaying }) => {
   const theme = useTheme();
-  const fonts = Fonts(theme);
+  const fonts = useFonts(theme);
 
   return (<View style={{ alignItems: "center" }}>
     <View
@@ -124,8 +124,7 @@ const Item = ({ item, isPlaying }) => {
 
 const QueueScreen = ({ navigation }) => {
   const theme = useTheme();
-  const fonts = Fonts(theme);
-  useStatusBar('light-content');
+  const fonts = useFonts();
 
   const styles = StyleSheet.create({
     container: {
@@ -133,7 +132,7 @@ const QueueScreen = ({ navigation }) => {
       backgroundColor: theme.colors.backgroundNegative
     },
     header: {
-      ...fonts.textSmall,
+      ...fonts.textSmall as Object,
       color: Color["black-8"],
       paddingStart: 16,
       paddingTop: 8,

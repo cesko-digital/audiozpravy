@@ -2,7 +2,7 @@ import { DefaultTheme, DarkTheme, useTheme as useThemeOriginal } from "@react-na
 import Color from "./colors";
 
 
-export declare type AppTheme = {
+export type AppTheme = {
     dark: boolean;
     colors: {
         primary: string;
@@ -33,7 +33,7 @@ export const AppLightTheme: AppTheme = {
     },
 };
 
-export const AppDarkTheme: AppTheme= {
+export const AppDarkTheme: AppTheme = {
     ...DarkTheme,
     colors: {
         ...DarkTheme.colors,

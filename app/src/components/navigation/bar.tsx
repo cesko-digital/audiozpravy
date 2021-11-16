@@ -1,12 +1,15 @@
-import React from "react";
-import { View, StyleSheet } from "react-native";
+import React, { memo } from "react";
+import { View, StyleSheet, StyleProp, ViewStyle } from "react-native";
 import Tab from "./tab";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { BottomTabBarProps, BottomTabBarOptions } from "@react-navigation/bottom-tabs";
 
-const Bar = ({ style, state, descriptors, navigation }) => {
+const Bar = ({ style, state, descriptors, navigation }: BottomTabBarProps<BottomTabBarOptions>) => {
   const focusedOptions = descriptors[state.routes[state.index].key].options;
   const barHiddenForCurrentTab = focusedOptions.tabBarVisible === false;
   const insets = useSafeAreaInsets();
+  const tabBarStyle = style as StyleProp<ViewStyle>
+
   if (barHiddenForCurrentTab) {
     return null;
   }
@@ -27,7 +30,7 @@ const Bar = ({ style, state, descriptors, navigation }) => {
           shadowRadius: 3.84,
           elevation: 5,
           justifyContent: "space-between",
-        }, style)}
+        }, tabBarStyle)}
       >
         {state.routes.map((route, index) => (
           <Tab
@@ -39,9 +42,9 @@ const Bar = ({ style, state, descriptors, navigation }) => {
           />
         ))}
       </View>
-      <View style={StyleSheet.compose({ height: insets.bottom }, style)}></View>
+      <View style={StyleSheet.compose({ height: insets.bottom }, tabBarStyle)}></View>
     </View>
   );
 };
 
-export default Bar;
+export default memo(Bar);

@@ -1,17 +1,22 @@
 /**
  * This file contains all application's style relative to fonts
  */
- import { StyleSheet } from 'react-native'
- import { useTheme, Theme } from '@react-navigation/native';
+import { StyleProp, StyleSheet, TextStyle, ViewStyle } from 'react-native'
+import { useTheme, Theme } from '@react-navigation/native';
 
- enum FontSize {
-    'small' = 14,
-    'regular' = 16,
-    'large' = 24,
+enum FontSize {
+  'small' = 14,
+  'regular' = 16,
+  'large' = 24,
 }
 
- export default function(theme : Theme): any {
-   return StyleSheet.create({
+export interface FontsTheme {
+  [key: string]: StyleProp<TextStyle>;
+}
+
+export default function useFonts(): FontsTheme {
+  const theme = useTheme()
+  return StyleSheet.create({
     textSmall: {
       fontSize: FontSize.small,
       color: theme.colors.text,
@@ -55,4 +60,4 @@
       textAlign: 'right',
     },
   })
- }
+}

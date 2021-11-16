@@ -1,14 +1,13 @@
 import React from "react";
-import { Text, View, StyleSheet } from "react-native";
+import { Text, View, StyleSheet, ViewStyle, StyleProp, TextStyle } from "react-native";
 import TabViewNews from "./news-tabview";
-import Fonts from "../../theme/fonts";
+import useFonts from "../../theme/fonts";
 import { useTheme } from '@react-navigation/native';
-import { AppStatusBar, useStatusBar } from "../../components/statusBar"
+import AppStatusBar from "../../components/statusBar"
 
 const NewsScreen = ({ navigation }) => {
   const theme = useTheme();
-  const fonts = Fonts(theme);
-  useStatusBar('dark-content')
+  const fonts = useFonts();
 
   return (
     <View style={{ flex: 1 }} >
