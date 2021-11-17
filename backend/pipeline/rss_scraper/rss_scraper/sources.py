@@ -1,32 +1,20 @@
-from enum import Enum, auto
+from classes import CategoryEnum
 
 
-class Category(Enum):
-    DOMOV = auto()
-    ZAHRANICI = auto()
-    SPORT = auto()
-    BYZNYS = auto()
-    KULTURA = auto()
-    ZDRAVI = auto()
-    CESTOVANI = auto()
-    RELAX = auto()
-    VEDA = auto()  # rozdelit na veda a technologie?
-    AUTO = auto()
-    ZIVOTNI_STYL = auto()
-    HISTORIE = auto()
+
 
 
 def parse_ctidoma_category(url):
     cat_code = url.replace("https://www.ctidoma.cz/", "").split("/")[0]
     mapping = {
-        "zpravodajstvi-historie": Category.HISTORIE,
-        "osobnosti": Category.RELAX,
-        "zivotni-styl": Category.ZIVOTNI_STYL,
-        "v-obraze": Category.RELAX,
-        "politika": Category.DOMOV,  # tohle asi neni presne?
-        "zpravodajstvi": Category.DOMOV,  # tohle asi neni presne?
-        "historie": Category.HISTORIE,
-        "zajimavosti": Category.RELAX,
+        "zpravodajstvi-historie": CategoryEnum.HISTORIE,
+        "osobnosti": CategoryEnum.RELAX,
+        "zivotni-styl": CategoryEnum.ZIVOTNI_STYL,
+        "v-obraze": CategoryEnum.RELAX,
+        "politika": CategoryEnum.DOMOV,  # tohle asi neni presne?
+        "zpravodajstvi": CategoryEnum.DOMOV,  # tohle asi neni presne?
+        "historie": CategoryEnum.HISTORIE,
+        "zajimavosti": CategoryEnum.RELAX,
     }
     return mapping[cat_code]
 
@@ -37,43 +25,43 @@ SOURCES = [
         "feeds": [
             {
                 "url": "https://servis.lidovky.cz/rss.aspx?r=ln_domov",
-                "category": Category.DOMOV,
+                "category": CategoryEnum.DOMOV,
             },
             {
                 "url": "https://servis.lidovky.cz/rss.aspx?r=ln_zahranici",
-                "category": Category.ZAHRANICI,
+                "category": CategoryEnum.ZAHRANICI,
             },
             {
                 "url": "https://servis.lidovky.cz/rss.aspx?c=ln_sport",
-                "category": Category.SPORT,
+                "category": CategoryEnum.SPORT,
             },
             {
                 "url": "https://servis.lidovky.cz/rss.aspx?c=ln_byznys",
-                "category": Category.BYZNYS,
+                "category": CategoryEnum.BYZNYS,
             },
             {
                 "url": "https://servis.lidovky.cz/rss.aspx?r=ln_kultura",
-                "category": Category.KULTURA,
+                "category": CategoryEnum.KULTURA,
             },
             {
                 "url": "https://servis.lidovky.cz/rss.aspx?r=ln-zdravi",
-                "category": Category.ZDRAVI,
+                "category": CategoryEnum.ZDRAVI,
             },
             {
                 "url": "https://servis.lidovky.cz/rss.aspx?c=ln_cestovani",
-                "category": Category.CESTOVANI,
+                "category": CategoryEnum.CESTOVANI,
             },
             {
                 "url": "https://servis.lidovky.cz/rss.aspx?c=ln_relax",
-                "category": Category.RELAX,
+                "category": CategoryEnum.RELAX,
             },
             {
                 "url": "https://servis.lidovky.cz/rss.aspx?r=ln_veda",
-                "category": Category.VEDA,
+                "category": CategoryEnum.VEDA,
             },
             {
                 "url": "https://servis.lidovky.cz/rss.aspx?r=ln-auto",
-                "category": Category.AUTO,
+                "category": CategoryEnum.AUTO,
             },
         ],
     },
@@ -82,43 +70,43 @@ SOURCES = [
         "feeds": [
             {
                 "url": "https://www.irozhlas.cz/rss/irozhlas/section/zpravy-domov",
-                "category": Category.DOMOV,
+                "category": CategoryEnum.DOMOV,
             },
             {
                 "url": "https://www.irozhlas.cz/rss/irozhlas/section/zpravy-svet",
-                "category": Category.ZAHRANICI,
+                "category": CategoryEnum.ZAHRANICI,
             },
             {
                 "url": "https://www.irozhlas.cz/rss/irozhlas/section/sport",
-                "category": Category.SPORT,
+                "category": CategoryEnum.SPORT,
             },
             {
                 "url": "https://www.irozhlas.cz/rss/irozhlas/section/ekonomika",
-                "category": Category.BYZNYS,
+                "category": CategoryEnum.BYZNYS,
             },
             {
                 "url": "https://www.irozhlas.cz/rss/irozhlas/section/kultura",
-                "category": Category.KULTURA,
+                "category": CategoryEnum.KULTURA,
             },
             {
                 "url": "https://www.irozhlas.cz/rss/irozhlas/section/zivotni-styl",
-                "category": Category.ZIVOTNI_STYL,
+                "category": CategoryEnum.ZIVOTNI_STYL,
             },
             {
                 "url": "https://www.irozhlas.cz/rss/irozhlas/section/veda-technologie",
-                "category": Category.VEDA,
+                "category": CategoryEnum.VEDA,
             },
         ],
     },
     {
         "name": "denikn.cz",
         "feeds": [
-            {"url": "https://denikn.cz/cesko/feed/", "category": Category.DOMOV},
-            {"url": "https://denikn.cz/svet/feed", "category": Category.ZAHRANICI},
-            {"url": "https://denikn.cz/sport/feed", "category": Category.SPORT},
-            {"url": "https://denikn.cz/ekonomika/feed", "category": Category.BYZNYS},
-            {"url": "https://denikn.cz/kultura/feed", "category": Category.KULTURA},
-            {"url": "https://denikn.cz/veda/feed", "category": Category.VEDA},
+            {"url": "https://denikn.cz/cesko/feed/", "category": CategoryEnum.DOMOV},
+            {"url": "https://denikn.cz/svet/feed", "category": CategoryEnum.ZAHRANICI},
+            {"url": "https://denikn.cz/sport/feed", "category": CategoryEnum.SPORT},
+            {"url": "https://denikn.cz/ekonomika/feed", "category": CategoryEnum.BYZNYS},
+            {"url": "https://denikn.cz/kultura/feed", "category": CategoryEnum.KULTURA},
+            {"url": "https://denikn.cz/veda/feed", "category": CategoryEnum.VEDA},
         ],
     },
     {

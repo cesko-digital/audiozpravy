@@ -24,7 +24,7 @@ class PlaylistNode(DjangoObjectType):
         }
 
     def resolve_articles(root, info, **kwargs):
-        return Playlist.objects.get(id=root.id).articles
+        return Playlist.objects.get(id=root.id).articles_for_feed_df
 
     def resolve_category(root, info, **kwargs):
         return Playlist.objects.get(id=root.id).category

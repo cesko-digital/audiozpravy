@@ -18,5 +18,5 @@ if __name__ == '__main__':
                                   provider=provider
     )
     playlist, created = Playlist.objects.get_or_create(category=category)
-    playlist.articles.add(article)
+    playlist.articles_for_feed_df.add(article)
     play, created = Play.objects.get_or_create(article=article, listener=listener)
