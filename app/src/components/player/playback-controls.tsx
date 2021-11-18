@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React, { FC, useState } from "react";
 import {
   StyleSheet,
   TouchableOpacity,
@@ -9,6 +9,7 @@ import { View } from "react-native";
 import Svg, { Path } from "react-native-svg";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Color from "../../theme/colors";
+import TrackPlayer, { useProgress, useTrackPlayerEvents, Event, State } from 'react-native-track-player';
 
 interface Props extends ViewProps {
   onRewind(): void;
@@ -22,6 +23,14 @@ const PlaybackControls: FC<Props> = ({
   onNext,
   style,
 }) => {
+
+  const [isPlaying, setPlaying] = useState(false);
+
+  useTrackPlayerEvents([Event.PlaybackState], async (event) => {
+    const state = await TrackPlayer.getState();
+    setPlaying(state == State.Playing)
+  });
+
   return (
     <View
       style={StyleSheet.compose(
@@ -50,7 +59,7 @@ const PlaybackControls: FC<Props> = ({
         }}
       >
         <MaterialCommunityIcons
-          name="play"
+          name={isPlaying ? "pause" : "play"}
           color={Color["black-100"]}
           size={46}
         />

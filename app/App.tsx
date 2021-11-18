@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -18,6 +18,7 @@ import { useColorScheme, View } from 'react-native';
 import { AppDarkTheme, AppLightTheme } from './src/theme'
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
+import TrackPlayer from './src/trackPlayer'
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -33,6 +34,10 @@ export default function App() {
   const theme = scheme === 'dark' ? AppDarkTheme : AppLightTheme
   const [bgColor, setBgColor] = useState("#ffffff")
 
+  useEffect(() => {
+    TrackPlayer.registerService()
+    TrackPlayer.resetPlayer()
+  })
 
   if (!fontsLoaded) {
     return <AppLoading />;
@@ -105,10 +110,7 @@ const HomeTabs = () => {
         options={{
           title: "Fronta",
           tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons
-              name="playlist-music"
-              color={color}
-              size={20}
+            <MaterialCommunityIcons name="playlist-music" color={color} size={20}
             />
           ),
         }}

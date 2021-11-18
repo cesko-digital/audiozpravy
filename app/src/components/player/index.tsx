@@ -1,4 +1,4 @@
-import React, { FC, useState } from "react";
+import React, { FC, useState, useEffect } from "react";
 import { useMemo } from "react";
 import { StyleSheet, View, ViewProps } from "react-native";
 
@@ -8,6 +8,7 @@ import Description from "../typography/description";
 import Queue from "./queue";
 import Progress from "./progress";
 import PlaybackControls from "./playback-controls";
+import TrackPlayer, { useProgress, useTrackPlayerEvents, Event, State } from 'react-native-track-player';
 
 interface Props extends ViewProps {
   queue: Record[];
@@ -15,19 +16,22 @@ interface Props extends ViewProps {
   hideDescription?: boolean;
 }
 
-const emptyQueueRecord: Record = { description: "-", duration: 0 };
+const Player: FC<Props> = ({ style, hideQueue, hideDescription }) => {
+  const [currentTrack, setCurrentTrack] = useState(null);
+  const [currentRecordIndex, setCurrentRecordIndex] = useState(0);
+  const [recordsCount, setRecordsCount] = useState(0);
+  const progress = useProgress();
+  const [isPlaying, setPlaying] = useState(false);
 
-const Player: FC<Props> = ({ style, queue, hideQueue, hideDescription }) => {
-  const recordsCount = queue.length;
-  const [currentRecordIndex, setCurrentRecordIndex] = useState(
-    recordsCount ? 0 : -1
-  );
-  const record = useMemo(
-    () => queue[currentRecordIndex] || emptyQueueRecord,
-    [currentRecordIndex, queue]
-  );
-
-  const [currentTime, setCurrentTime] = useState(0);
+  useTrackPlayerEvents([Event.PlaybackState], async (event) => {
+    const queue = await TrackPlayer.getQueue()
+    const currentIndex = await TrackPlayer.getPosition()
+    const state = await TrackPlayer.getState();
+    setRecordsCount(queue.length)
+    setCurrentRecordIndex(currentIndex)
+    setCurrentTrack(TrackPlayer.getTrack(currentIndex))
+    setPlaying(state == State.Playing)
+  });
 
   return (
     <View
@@ -48,29 +52,30 @@ const Player: FC<Props> = ({ style, queue, hideQueue, hideDescription }) => {
           style={{ color: "white", marginTop: 16 }}
           numberOfLines={2}
         >
-          {record.description}
+          {currentTrack.title}
         </Description>
       )}
       <Progress
-        currentSecond={currentTime}
-        totalSeconds={record.duration}
+        currentSecond={progress.position}
+        totalSeconds={progress.duration / 1}
         onChange={(handlePos) => {
-          setCurrentTime(Math.floor(handlePos));
+          TrackPlayer.seekTo(Math.floor(handlePos));
         }}
         style={{ marginTop: 16 }}
       />
       <PlaybackControls
         onRewind={() => {
-          setCurrentTime(Math.max(currentTime - 10, 0));
+          TrackPlayer.seekTo(Math.floor(Math.max(progress.position - 10, 0)));
         }}
-        onPlayPause={() => {}}
+        onPlayPause={() => {
+          if (isPlaying) {
+            TrackPlayer.pause()
+          } else {
+            TrackPlayer.play()
+          }
+        }}
         onNext={() => {
-          setCurrentRecordIndex((index) => {
-            const nextIndex = index < recordsCount - 1 ? index + 1 : index;
-
-            return nextIndex;
-          });
-          setCurrentTime(0);
+          TrackPlayer.skipToNext()
         }}
         style={{ marginTop: 20 }}
       />
