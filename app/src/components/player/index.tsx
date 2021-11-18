@@ -11,7 +11,6 @@ import PlaybackControls from "./playback-controls";
 import TrackPlayer, { useProgress, useTrackPlayerEvents, Event, State } from 'react-native-track-player';
 
 interface Props extends ViewProps {
-  queue: Record[];
   hideQueue?: boolean;
   hideDescription?: boolean;
 }
