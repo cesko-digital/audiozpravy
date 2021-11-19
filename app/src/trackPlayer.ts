@@ -61,14 +61,12 @@ class TrackPlayer {
         const queue = await RNTrackPlayer.getQueue()
         console.info(queue)
         const existingTracks = queue.filter((t) => t.id == track.id)
-        //console.warn(existingTracks)
         if (existingTracks.length > 0) {
-            console.warn('Track with id ' + track.id + ' already in queue.')
+            console.warn('Track with id ' + track.id + ' is already in queue.')
             return
         }
         track['isPlaying'] = false
         RNTrackPlayer.add([track])
-        //console.warn(queue)
     }
 
     public async resetPlayer() {
