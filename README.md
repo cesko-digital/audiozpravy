@@ -8,7 +8,7 @@ Oficiální repozitář týmu Audiozpráv v projeku #run-inovace-zpravodajskeho-
 
 **/app** - mobilní aplikace Audiozpráv
 
-**/backend** - API / BE aplikace (rekomendační systém)
+**/backend** - API / backend aplikace (rekomendační systém)
 
 **/infrastructure** - Terraform definice cloudové infrastruktury
 
@@ -44,7 +44,7 @@ Oficiální repozitář týmu Audiozpráv v projeku #run-inovace-zpravodajskeho-
 
 `yarn start` - spuštění dev prostředí
 
-## 🏛 Struktura BE aplikace
+## 🏛 Struktura backend aplikace
 
 ![](services.svg)
 

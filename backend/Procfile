@@ -1,0 +1,2 @@
+release: python BE/manage.py migrate
+web: gunicorn --chdir API API.wsgi --log-file -
