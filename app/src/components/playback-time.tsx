@@ -32,5 +32,6 @@ function getMinutesWithSeconds(durationInSeconds: number) {
 }
 
 function formatToTwoDecimals(number: number) {
-  return number < 10 ? `0${number}` : `${number}`;
+  const _number = Math.round(number)
+  return _number < 10 ? `0${_number}` : `${_number}`;
 }

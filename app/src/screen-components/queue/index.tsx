@@ -1,56 +1,18 @@
-import React from "react";
-import { Text, View, StyleSheet, SectionList, TouchableOpacity, Image } from "react-native";
+import React, { useState, useEffect } from "react";
+import { Text, View, StyleSheet, SectionList, FlatList, TouchableOpacity, Image } from "react-native";
 import Player from "../../components/player";
 import useFonts from "../../theme/fonts";
 import { useTheme } from '../../theme'
 import Color from "../../theme/colors";
 import AppStatusBar from "../../components/statusBar"
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import TrackPlayer, { useTrackPlayerEvents, Event, State } from 'react-native-track-player';
+import { useIsFocused } from '@react-navigation/native';
+import { initialPlayerState, createPlayerState } from "../../trackPlayer";
 
-const DATA = [
-  {
-    title: "Přehráno",
-    id: "played",
-    data: [
-      {
-        id: 1,
-        img: "https://placekitten.com/200/139",
-        title: "Královská síla. Zázračný příběh Leicesteru, soupeře Slavie"
-      }
-    ]
-  },
-  {
-    title: "Právě hraje",
-    id: "playing",
-    data: [
-      {
-        id: 2,
-        img: "https://placekitten.com/200/139",
-        title: "Jedna dávka vakcíny od Pfizeru nestačí. Aspoň na rok by nás měla ochránit, ..."
-      }
-    ]
-  },
-  {
-    title: "Pokračuje",
-    id: "next",
-    data: [
-      {
-        id: 3,
-        img: "https://placekitten.com/200/139",
-        title: "Místo v Dubaji budeme prý lyžovat na jižním svahu v Chuchli, i v létě a ..."
-      },
-      {
-        id: 4,
-        img: "https://placekitten.com/200/139",
-        title: "Nový šéf ÚOHS sliboval obnovu důvěry. Ve funkci nechává zástupkyni ..."
-      }
-    ]
-  }
-];
-
-const Item = ({ item, isPlaying }) => {
+const Item = ({ item, isSelected, isPlaying, onPress, onIconPress }) => {
   const theme = useTheme();
-  const fonts = useFonts(theme);
+  const fonts = useFonts();
 
   return (<View style={{ alignItems: "center" }}>
     <View
@@ -61,10 +23,10 @@ const Item = ({ item, isPlaying }) => {
         paddingEnd: 16,
         paddingBottom: 8,
         paddingTop: 16,
-        backgroundColor: isPlaying ? theme.colors.primary : "transparent"
+        backgroundColor: isSelected ? theme.colors.primary : "transparent"
       }}
     >
-      <View style={{ width: 56, height: 42 }}>
+      <TouchableOpacity style={{ width: 56, height: 42 }} onPress={onIconPress}>
         <Image
           style={{
             width: "100%",
@@ -90,9 +52,10 @@ const Item = ({ item, isPlaying }) => {
         >
           <MaterialCommunityIcons name={isPlaying ? "pause" : "play"} color="white" size={24} />
         </View>
-      </View>
+      </TouchableOpacity>
+
       <TouchableOpacity
-        onPress={() => alert("Chci prehrat zpravu!")}
+        onPress={onPress}
         style={{
           flex: 1,
           marginStart: 16,
@@ -121,10 +84,49 @@ const Item = ({ item, isPlaying }) => {
   </View>)
 };
 
-
 const QueueScreen = ({ navigation }) => {
   const theme = useTheme();
   const fonts = useFonts();
+  const isFocused = useIsFocused();
+
+  const [state, setState] = useState(initialPlayerState)
+  const [queue, setQueue] = useState([])
+
+  // async function groupedQueue() {
+  //   console.warn('groupedQueue')
+  //   const queue = await TrackPlayer.getQueue()
+  //   const playingIndex = await TrackPlayer.getCurrentTrack()
+  //   const notPlaying = queue.filter((item, index) => index != playingIndex)
+  //   const data = DATA
+  //   if (playingIndex != null) {
+  //     const track = queue[playingIndex]
+  //     data[1].data = [track]
+  //   }
+  //   data[2].data = notPlaying
+  //   return data
+  // }
+
+
+  useEffect(() => {
+    TrackPlayer.getQueue().then(async (queue) => {
+      setQueue(queue)
+    })
+  }, [isFocused])
+
+  useTrackPlayerEvents([Event.PlaybackState, Event.PlaybackTrackChanged, Event.PlaybackError], async (event) => {
+    const newState = await createPlayerState(event)
+    setState(newState)
+    setQueue(queue)
+
+    if (event.type == Event.PlaybackTrackChanged) {
+      const prevTrack = event.track
+      if (prevTrack != null) {
+        const prevTrackPosition = event.position
+        console.info("Previous track position = " + prevTrackPosition)
+      }
+      const nextTrack = event.nextTrack
+    }
+  })
 
   const styles = StyleSheet.create({
     container: {
@@ -149,30 +151,42 @@ const QueueScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <AppStatusBar barStyle="light-content" backgroundColor={Color["black-88"]} />
-      <SectionList
-        stickySectionHeadersEnabled={false}
-        sections={DATA}
+      <FlatList
+        data={queue}
+        extraData={state.currentIndex}
         ItemSeparatorComponent={
           ({ highlighted }) => (
             <View style={styles.separator}></View>
           )
         }
         keyExtractor={(item, index) => String(item.id)}
-        renderItem={({ item, section }) => <Item item={item} isPlaying={section.id == "playing"} />}
-        renderSectionHeader={({ section: { title } }) => (
-          <Text style={styles.header}>{title}:</Text>
-        )}
+        renderItem={({ item, index }) => <Item
+          item={item}
+          isSelected={index == state.currentIndex}
+          isPlaying={index == state.currentIndex && state.isPlaying}
+          onPress={() => TrackPlayer.skip(index)}
+          onIconPress={() => {
+            if (index == state.currentIndex) {
+              if (state.isPlaying) {
+                TrackPlayer.pause()
+              } else {
+                TrackPlayer.play()
+              }
+            } else {
+              TrackPlayer.skip(index)
+            }
+          }}
+        />}
       />
 
       <Player
-        queue={[]}
         style={{ position: "absolute", bottom: 0 }}
         hideDescription
         hideQueue
       ></Player>
     </View>
-    //</SafeAreaView>
   );
 };
 
-export default QueueScreen;
+export default QueueScreen
+

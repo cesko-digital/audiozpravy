@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Text, View, StyleSheet } from "react-native";
 import NewsList from "../news/news-list";
-import Fonts from "../../theme/fonts";
+import useFonts from "../../theme/fonts";
 import { useTheme } from '../../theme'
 import NewsFilter from "./news-filter";
 import AppStatusBar from "../../components/statusBar"
 
 const UserNewsScreen = ({ route, navigation }) => {
   const theme = useTheme();
-  const fonts = Fonts(theme);
+  const fonts = useFonts();
+
   const [selectedCategories, setCategories] = useState([]);
   const [selectedTimeRanges, setTimeRanges] = useState([]);
   const [selectedTypes, setTypes] = useState([]);

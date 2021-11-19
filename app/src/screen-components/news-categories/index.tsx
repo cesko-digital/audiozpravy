@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, View, StyleSheet, ViewStyle, StyleProp, TextStyle } from "react-native";
+import { Text, View, StyleSheet } from "react-native";
 import TabViewNews from "./news-tabview";
 import useFonts from "../../theme/fonts";
 import { useTheme } from '@react-navigation/native';
