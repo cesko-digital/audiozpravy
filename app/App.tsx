@@ -37,7 +37,7 @@ export default function App() {
   useEffect(() => {
     TrackPlayer.registerService()
     TrackPlayer.resetPlayer()
-  })
+  }, [])
 
   if (!fontsLoaded) {
     return <AppLoading />;

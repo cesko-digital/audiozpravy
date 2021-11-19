@@ -8,6 +8,7 @@ import AppStatusBar from "../../components/statusBar"
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import TrackPlayer, { useTrackPlayerEvents, Event, State } from 'react-native-track-player';
 import { useIsFocused } from '@react-navigation/native';
+import { initialPlayerState, createPlayerState } from "../../trackPlayer";
 
 const Item = ({ item, isSelected, isPlaying, onPress, onIconPress }) => {
   const theme = useTheme();
@@ -87,9 +88,9 @@ const QueueScreen = ({ navigation }) => {
   const theme = useTheme();
   const fonts = useFonts();
   const isFocused = useIsFocused();
+
+  const [state, setState] = useState(initialPlayerState)
   const [queue, setQueue] = useState([])
-  const [currentIndex, setCurrIndex] = useState(-1)
-  const [isPlaying, setIsPalying] = useState(false)
 
   // async function groupedQueue() {
   //   console.warn('groupedQueue')
@@ -113,12 +114,10 @@ const QueueScreen = ({ navigation }) => {
   }, [isFocused])
 
   useTrackPlayerEvents([Event.PlaybackState, Event.PlaybackTrackChanged, Event.PlaybackError], async (event) => {
-    const queue = await TrackPlayer.getQueue()
-    const playingIndex = await TrackPlayer.getCurrentTrack()
-    const state = await TrackPlayer.getState()
-    setIsPalying(state == State.Playing)
-    setCurrIndex(playingIndex)
+    const newState = await createPlayerState(event)
+    setState(newState)
     setQueue(queue)
+
     if (event.type == Event.PlaybackTrackChanged) {
       const prevTrack = event.track
       if (prevTrack != null) {
@@ -154,7 +153,7 @@ const QueueScreen = ({ navigation }) => {
       <AppStatusBar barStyle="light-content" backgroundColor={Color["black-88"]} />
       <FlatList
         data={queue}
-        extraData={currentIndex}
+        extraData={state.currentIndex}
         ItemSeparatorComponent={
           ({ highlighted }) => (
             <View style={styles.separator}></View>
@@ -163,12 +162,12 @@ const QueueScreen = ({ navigation }) => {
         keyExtractor={(item, index) => String(item.id)}
         renderItem={({ item, index }) => <Item
           item={item}
-          isSelected={index == currentIndex}
-          isPlaying={index == currentIndex && isPlaying}
+          isSelected={index == state.currentIndex}
+          isPlaying={index == state.currentIndex && state.isPlaying}
           onPress={() => TrackPlayer.skip(index)}
           onIconPress={() => {
-            if (index == currentIndex) {
-              if (isPlaying) {
+            if (index == state.currentIndex) {
+              if (state.isPlaying) {
                 TrackPlayer.pause()
               } else {
                 TrackPlayer.play()
@@ -181,7 +180,6 @@ const QueueScreen = ({ navigation }) => {
       />
 
       <Player
-        queue={[]}
         style={{ position: "absolute", bottom: 0 }}
         hideDescription
         hideQueue

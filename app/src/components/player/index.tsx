@@ -1,14 +1,13 @@
-import React, { FC, useState, useEffect } from "react";
-import { useMemo } from "react";
+import React, { FC, useState } from "react";
 import { StyleSheet, View, ViewProps } from "react-native";
 
 import Color from "../../theme/colors";
-import { Record } from "../../shared/types";
 import Description from "../typography/description";
 import Queue from "./queue";
 import Progress from "./progress";
 import PlaybackControls from "./playback-controls";
 import TrackPlayer, { useProgress, useTrackPlayerEvents, Event, State } from 'react-native-track-player';
+import { initialPlayerState, createPlayerState } from "../../trackPlayer";
 
 interface Props extends ViewProps {
   hideQueue?: boolean;
@@ -16,20 +15,12 @@ interface Props extends ViewProps {
 }
 
 const Player: FC<Props> = ({ style, hideQueue, hideDescription }) => {
-  const [currentTrack, setCurrentTrack] = useState(null);
-  const [currentRecordIndex, setCurrentRecordIndex] = useState(0);
-  const [recordsCount, setRecordsCount] = useState(0);
+  const [playerState, setPlayerState] = useState(initialPlayerState)
   const progress = useProgress();
-  const [isPlaying, setPlaying] = useState(false);
 
-  useTrackPlayerEvents([Event.PlaybackState], async (event) => {
-    const queue = await TrackPlayer.getQueue()
-    const currentIndex = await TrackPlayer.getPosition()
-    const state = await TrackPlayer.getState();
-    setRecordsCount(queue.length)
-    setCurrentRecordIndex(currentIndex)
-    setCurrentTrack(TrackPlayer.getTrack(currentIndex))
-    setPlaying(state == State.Playing)
+  useTrackPlayerEvents([Event.PlaybackState, Event.PlaybackTrackChanged, Event.PlaybackError], async (event) => {
+    const newState = await createPlayerState(event)
+    setPlayerState(newState)
   });
 
   return (
@@ -44,19 +35,20 @@ const Player: FC<Props> = ({ style, hideQueue, hideDescription }) => {
       )}
     >
       {hideQueue ? null : (
-        <Queue size={recordsCount} currentIndexZeroBased={currentRecordIndex} />
+        <Queue size={playerState.recordsCount}
+          currentIndexZeroBased={playerState.currentIndex} />
       )}
       {hideDescription ? null : (
         <Description
           style={{ color: "white", marginTop: 16 }}
           numberOfLines={2}
         >
-          {currentTrack.title}
+          {playerState.currentTrack.title}
         </Description>
       )}
       <Progress
         currentSecond={progress.position}
-        totalSeconds={progress.duration / 1}
+        totalSeconds={progress.duration}
         onChange={(handlePos) => {
           TrackPlayer.seekTo(Math.floor(handlePos));
         }}
@@ -67,7 +59,7 @@ const Player: FC<Props> = ({ style, hideQueue, hideDescription }) => {
           TrackPlayer.seekTo(Math.floor(Math.max(progress.position - 10, 0)));
         }}
         onPlayPause={() => {
-          if (isPlaying) {
+          if (playerState.isPlaying) {
             TrackPlayer.pause()
           } else {
             TrackPlayer.play()
