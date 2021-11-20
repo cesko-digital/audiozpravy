@@ -26,7 +26,7 @@ const ImageGrid: FC<GridProps> = ({ images }) => {
 
   const imageOpacity = useRef(new Animated.Value(0)).current
   const [showImages, setShowImages] = useState(false)
-  var loadingState = [false, false, false, false, false, false, false, false, false]
+  const loadingState = useRef(Array(9).fill(false)).current
 
   useEffect(() => {
     if (showImages) {
@@ -59,14 +59,14 @@ const ImageGrid: FC<GridProps> = ({ images }) => {
     container: {
       width: 42,
       height: 30,
-      borderRadius: 10,
+      borderRadius: 8,
       backgroundColor: theme.colors.skeletonLight,
       marginStart: 4,
     },
     image: {
       width: 42,
       height: 30,
-      borderRadius: 10,
+      borderRadius: 8,
       position: 'absolute',
       resizeMode: 'contain'
     }
@@ -74,21 +74,16 @@ const ImageGrid: FC<GridProps> = ({ images }) => {
 
   return (
     <View style={{ alignItems: 'flex-start', marginEnd: 24 }}>
-      <View style={{ flexDirection: 'row' }}>
-        <View style={style.container}><Animated.Image style={[style.image, { opacity: imageOpacity }]} source={{ uri: images[0] }} onLoad={onLoad(0)} onError={onError(0)}></Animated.Image></View>
-        <View style={style.container}><Animated.Image style={[style.image, { opacity: imageOpacity }]} source={{ uri: images[1] }} onLoad={onLoad(1)} onError={onError(1)}></Animated.Image></View>
-        <View style={style.container}><Animated.Image style={[style.image, { opacity: imageOpacity }]} source={{ uri: images[2] }} onLoad={onLoad(2)} onError={onError(2)}></Animated.Image></View>
-      </View>
-      <View style={{ flexDirection: 'row', marginTop: 4 }}>
-        <View style={style.container}><Animated.Image style={[style.image, { opacity: imageOpacity }]} source={{ uri: images[3] }} onLoad={onLoad(3)} onError={onError(3)}></Animated.Image></View>
-        <View style={style.container}><Animated.Image style={[style.image, { opacity: imageOpacity }]} source={{ uri: images[4] }} onLoad={onLoad(4)} onError={onError(4)}></Animated.Image></View>
-        <View style={style.container}><Animated.Image style={[style.image, { opacity: imageOpacity }]} source={{ uri: images[5] }} onLoad={onLoad(5)} onError={onError(5)}></Animated.Image></View>
-      </View>
-      <View style={{ flexDirection: 'row', marginTop: 4 }}>
-        <View style={style.container}><Animated.Image style={[style.image, { opacity: imageOpacity }]} source={{ uri: images[6] }} onLoad={onLoad(6)} onError={onError(6)}></Animated.Image></View>
-        <View style={style.container}><Animated.Image style={[style.image, { opacity: imageOpacity }]} source={{ uri: images[7] }} onLoad={onLoad(7)} onError={onError(7)}></Animated.Image></View>
-        <View style={style.container}><Animated.Image style={[style.image, { opacity: imageOpacity }]} source={{ uri: images[8] }} onLoad={onLoad(8)} onError={onError(8)}></Animated.Image></View>
-      </View>
+      {Array(3).fill(null).map((value, row) => (
+        <View style={{ flexDirection: 'row', marginTop: row > 0 ? 4 : 0 }}>
+          {Array(3).fill(null).map((value, column) => {
+            const imagePosition = (row * 3) + column
+            return (
+              <View style={style.container}><Animated.Image style={[style.image, { opacity: imageOpacity }]} source={{ uri: images[imagePosition] }} onLoad={onLoad(imagePosition)} onError={onError(imagePosition)}></Animated.Image></View>
+            )
+          })}
+        </View>
+      ))}
     </View>
   )
 }
@@ -118,7 +113,7 @@ const GradientCard: FC<Props> = ({ item, weekNumber, images }) => {
           alert('playlist added to queue')
         }}
       >
-        <LinearGradient colors={item.colors} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={{ borderRadius: 20 }}>
+        <LinearGradient colors={item.colors} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={{ borderRadius: 8 }}>
           {(item.image != null) &&
             <Image source={item.image} style={{ width: '100%', height: 124, position: 'absolute', opacity: 0.25 }} />
           }
