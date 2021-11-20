@@ -5,6 +5,7 @@ import { StyleProp, StyleSheet, TextStyle, ViewStyle } from 'react-native'
 import { useTheme, Theme } from '@react-navigation/native';
 
 enum FontSize {
+  'xsmall' = 12,
   'small' = 14,
   'regular' = 16,
   'large' = 24,
@@ -17,6 +18,10 @@ export interface FontsTheme {
 export default function useFonts(): FontsTheme {
   const theme = useTheme()
   return StyleSheet.create({
+    textXSmall: {
+      fontSize: FontSize.xsmall,
+      color: theme.colors.text,
+    },
     textSmall: {
       fontSize: FontSize.small,
       color: theme.colors.text,
@@ -27,6 +32,11 @@ export default function useFonts(): FontsTheme {
     },
     textLarge: {
       fontSize: FontSize.large,
+      color: theme.colors.text,
+    },
+    titleXSmall: {
+      fontSize: FontSize.xsmall,
+      fontWeight: '700',
       color: theme.colors.text,
     },
     titleSmall: {

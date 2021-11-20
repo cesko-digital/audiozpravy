@@ -16,6 +16,7 @@ export type AppTheme = {
         textLight: string;
         textSemiLight: string;
         textInverse: string;
+        skeletonLight: string;
     };
 };
 
@@ -29,7 +30,8 @@ export const AppLightTheme: AppTheme = {
         primaryLight: '#1745C014',
         textLight: '#868588',
         textSemiLight: '#565459',
-        textInverse: '#FFFFFF'
+        textInverse: '#FFFFFF',
+        skeletonLight: '#c2c2c3'
     },
 };
 
@@ -42,7 +44,8 @@ export const AppDarkTheme: AppTheme = {
         primaryLight: '#1745C014',
         textLight: '#868588',
         textSemiLight: '#565459',
-        textInverse: '#FFFFFF'
+        textInverse: '#FFFFFF',
+        skeletonLight: '#c2c2c3'
     },
 };
 
