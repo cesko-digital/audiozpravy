@@ -75,11 +75,11 @@ const ImageGrid: FC<GridProps> = ({ images }) => {
   return (
     <View style={{ alignItems: 'flex-start', marginEnd: 24 }}>
       {Array(3).fill(null).map((value, row) => (
-        <View style={{ flexDirection: 'row', marginTop: row > 0 ? 4 : 0 }}>
+        <View key={'r' + row} style={{ flexDirection: 'row', marginTop: row > 0 ? 4 : 0 }}>
           {Array(3).fill(null).map((value, column) => {
             const imagePosition = (row * 3) + column
             return (
-              <View style={style.container}><Animated.Image style={[style.image, { opacity: imageOpacity }]} source={{ uri: images[imagePosition] }} onLoad={onLoad(imagePosition)} onError={onError(imagePosition)}></Animated.Image></View>
+              <View key={'i' + imagePosition} style={style.container}><Animated.Image style={[style.image, { opacity: imageOpacity }]} source={{ uri: images[imagePosition] }} onLoad={onLoad(imagePosition)} onError={onError(imagePosition)}></Animated.Image></View>
             )
           })}
         </View>
