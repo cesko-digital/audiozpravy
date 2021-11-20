@@ -1,3 +1,5 @@
+import json
+import logging
 import sqlite3
 
 import numpy as np
@@ -9,13 +11,39 @@ from recommender.utils import get_all_articles, get_embeddings
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 
 
-
 class PersonalRecommender:
-    def __init__(self, user_id: int, model_path = 's3_input/doc2vec_articles.model', user_last_days: int = 100000):
+    def __init__(
+            self, user_id: int, model_path = 's3_input/doc2vec_articles.model', user_last_days: int = 100000,
+            embed_vector_path = None
+    ):
         self.user_id = user_id
         self.con = sqlite3.connect("db.sqlite3")
         self.user_history = self._get_user_articles(user_last_days, self.con)
         self.doc2vec = Doc2Vec.load(model_path)
+        self.embed_vectors_path = embed_vector_path
+        self.logger = logging.getLogger('Personal Evaluations')
+
+
+    def _get_embeddings(self, articles: pd.DataFrame, id_column: str = 'id'):
+        ''' get embeddings for given dataframe. If the embeddings are not already calculated -> create them'''
+        if not self.embed_vectors_path:
+            self.logger.info('Predicting embeddings')
+            articles_embeddings = get_embeddings(
+                articles.perex.apply(lambda x: x.split()).tolist(), self.doc2vec
+            )
+        else:
+            self.logger.info(f'Getting embeddings from file {self.embed_vectors_path}')
+
+            articles_embeddings = []
+            all_embed_json = json.load(open(self.embed_vectors_path, 'r'))
+            for _, article in articles.iterrows():
+                if str(article[id_column]) not in all_embed_json:
+                    logging.warning(f'Embedding vector for article {article.title} and id {article.id} '
+                                    f'not yet calculated. Predicting vector ...')
+                    articles_embeddings.append(self.doc2vec.infer_vector(article.perex.split()))
+                    continue
+                articles_embeddings.append(all_embed_json[str(article[id_column])])
+        return articles_embeddings
 
 
     def recommend(self, n_of_past_days: int):
@@ -23,12 +51,8 @@ class PersonalRecommender:
         all_articles = get_all_articles(last_n_of_days=n_of_past_days, con=self.con)
         all_articles_filtered = self._remove_visited_articles(all_articles)
 
-        user_history_embeddings = get_embeddings(
-            self.user_history.perex.apply(lambda x: x.split()).tolist(), self.doc2vec
-        )
-        all_history_embeddings = get_embeddings(
-            all_articles_filtered.perex.apply(lambda x: x.split()).tolist(), self.doc2vec
-        )
+        user_history_embeddings = self._get_embeddings(self.user_history, id_column='article_id')
+        all_history_embeddings = self._get_embeddings(all_articles_filtered, id_column='id')
 
         cosine_similarity = sklearn.metrics.pairwise.cosine_similarity(
             user_history_embeddings, all_history_embeddings
@@ -66,5 +90,5 @@ class PersonalRecommender:
         pass
 
 
-recommender = PersonalRecommender(user_id=2)
+recommender = PersonalRecommender(user_id=2, embed_vector_path='s3_input/articles_embeddings.json')
 articles_sorted = recommender.recommend(n_of_past_days=90000)
