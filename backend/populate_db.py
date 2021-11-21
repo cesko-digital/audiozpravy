@@ -11,7 +11,6 @@ import pandas as pd
 
 from audionews.models import Provider, Category, Article, Listener, Playlist, Play
 
-
 if __name__ == '__main__':
     """ Add data from pandas df into sqlite database"""
     # articles = pd.read_csv('s3_input/articles.csv')

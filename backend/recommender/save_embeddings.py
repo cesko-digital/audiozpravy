@@ -34,6 +34,7 @@ def calculate_doc2vec_vectors(model_path: str, vectors_path: str) -> None:
 
 
 if __name__ == '__main__':
+    """ Script for calculating embeddings for all articles and saving them into specific file"""
     args = argparse.ArgumentParser()
     args.add_argument('--doc2vec-path', default='s3_input/doc2vec_articles.model')
     args.add_argument('--vectors-path', default='s3_input/articles_embeddings.json')
