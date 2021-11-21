@@ -8,7 +8,7 @@ from classes.trend_watcher import TrendWatcher
 from classes import MetricEnum
 ARTICLE_PROPS = ["title", "link", "summary", "published", "category", "audio"]
 
-class Prioritizer:
+class Recommender:
     def __init__(self, metric: MetricEnum):
         METRICS = {
             MetricEnum.FRECENCY: self.frecency,
@@ -18,7 +18,7 @@ class Prioritizer:
         self.method = METRICS[metric]
         self.age_limit_in_secs = 4 * 3600
 
-    def recommend(self, articles: pd.DataFrame):
+    def prioritize_articles(self, articles: pd.DataFrame):
         articles_age = calculate_age_in_secs(articles)
         article_popularity = self.popularity(articles, words_in_article)
 

@@ -1,7 +1,7 @@
 import datetime
 
 from django.db.models.query import QuerySet
-from graphene import Field, Int, List, NonNull
+from graphene import Field, Int, List, NonNull, Date, String
 from graphene.relay import Connection, Node
 from graphene_django import DjangoConnectionField, DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
@@ -17,8 +17,8 @@ from .article import ArticleNode
 
 class PlaylistNode(DjangoObjectType):
     articles = List(NonNull(ArticleNode), required=True)
+    articles_for_category = List(NonNull(ArticleNode), for_date=Date, category_name=String)
     category = NonNull(CategoryNode)
-    articles_trending = List(NonNull(ArticleNode))
 
     class Meta:
         model = Playlist
@@ -29,22 +29,25 @@ class PlaylistNode(DjangoObjectType):
         }
 
     def resolve_articles(root, info, **kwargs):
-        return Playlist.objects.get(id=root.id).articles_for_feed_df
+        return Playlist.objects.get(id=root.id).articles.all()
 
     def resolve_category(root, info, **kwargs):
         return Playlist.objects.get(id=root.id).category
 
-    #TODO: GET articles from db and rewrite the algorithm to get articles from db
-    def resolve_articles_trending(root, info, **kwargs):
-        """ Get articles based on current google trends """
-        category, created = Category.objects.get_or_create(name="daily_trend")
-        playlist, created = Playlist.objects.get_or_create(
-            prepared_for_date=datetime.date(datetime.now()),
-            category=category
+    def resolve_articles_for_category(root, info, for_date: Date, category_name: str):
+        playlist = Playlist.objects.filter(
+            prepared_for_date=for_date,
+            category__name=category_name
         )
-        if not created:
-            return playlist.articles.all()
-        else:
+        return playlist.articles.all()
+
+    def resolve_articles_recommended(self, info, **kwargs):
+        """ Recommend articles based on user history"""
+        #TODO
+        pass
+
+
+"""
 
             recommendation_df = recommend_by_google_trends(n_of_recommendations=10)
             for index, row in recommendation_df.iterrows():
@@ -61,9 +64,4 @@ class PlaylistNode(DjangoObjectType):
                 )
                 playlist.articles.add(article)
             return playlist.articles.all()
-
-
-    def resolve_articles_recommended(self, info, **kwargs):
-        """ Recommend articles based on user history"""
-        #TODO
-        pass
+            """
