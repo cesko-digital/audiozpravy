@@ -1,6 +1,6 @@
-class QueueFiller:
-    def __init__(self):
-        pass
+from typing import List
 
-    def recommend_articles(self):
+class QueueFiller:
+
+    def recommend_articles(self, played_articles, article_history) -> List[int]:
         pass

@@ -7,7 +7,7 @@ from graphene_django import DjangoConnectionField, DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
 from graphql.execution.base import ResolveInfo
 from promise.promise import Promise
-
+from classes.queue_filler import QueueFiller
 from recommender.recommend import recommend_by_google_trends
 from ..models import Article, Listener, Play, Provider, Playlist, Category
 from .play import PlayNode
@@ -42,6 +42,7 @@ class PlaylistNode(DjangoObjectType):
         return playlist.articles.all()
 
     def resolve_articles_recommended(self, info, **kwargs):
+        queue = QueueFiller()
         """ Recommend articles based on user history"""
         #TODO
         pass
