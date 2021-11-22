@@ -1,84 +1,111 @@
-import React, { FC } from "react";
+import React, { FC, useState, useRef, useEffect } from "react";
 import {
   Text,
   View,
   FlatList,
   Image,
   TouchableOpacity,
-  ImageSourcePropType
+  StyleSheet,
+  Animated,
+  Easing
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { FontAwesome5 } from "@expo/vector-icons";
 import { LinearGradient } from 'expo-linear-gradient';
-import Asset from "../../theme/images"
-import { useNavigation } from '@react-navigation/native';
+import categories, { ArticleCategory } from '../../shared/categories'
+import { useTheme } from "../../theme";
+import useFonts from "../../theme/fonts";
 
-const categories = [
-  {
-    id: 4,
-    title: 'Zprávy',
-    colors: ['#231557', '#44107A', '#FF1361'],
-    image: Asset.category_zpravy
-  },
-  {
-    id: 1,
-    title: 'Sport',
-    colors: ['#16A085', '#F4D03F'],
-    image: Asset.category_sport
-  },
-  {
-    id: 2,
-    title: '5minutovka na míru',
-    colors: ['#FF5858', '#F09819']
-  },
-  {
-    id: 3,
-    title: 'Finance',
-    colors: ['#0C3483', '#6B8CCE'],
-    image: Asset.category_finance
-  },
-  {
-    id: 5,
-    title: 'Zprávy',
-    colors: ['#231557', '#44107A', '#FF1361'],
-    image: Asset.category_zpravy
-  },
-  {
-    id: 6,
-    title: 'Sport',
-    colors: ['#16A085', '#F4D03F'],
-    image: Asset.category_sport
-  },
-  {
-    id: 7,
-    title: '5minutovka na míru',
-    colors: ['#FF5858', '#F09819']
-  },
-  {
-    id: 8,
-    title: 'Finance',
-    colors: ['#0C3483', '#6B8CCE'],
-    image: Asset.category_finance
-  },
-];
 
-interface Props {
-  id: string;
-  title: string;
-  gradientColors: string[];
-  image: ImageSourcePropType;
+interface GridProps {
+  images: string[]
 }
 
-const GradientCard: FC<Props> = ({ id, title, gradientColors, image }) => {
-  const navigation = useNavigation();
+const ImageGrid: FC<GridProps> = ({ images }) => {
+  const theme = useTheme();
+
+  const imageOpacity = useRef(new Animated.Value(0)).current
+  const [showImages, setShowImages] = useState(false)
+  const loadingState = useRef(Array(9).fill(false)).current
+
+  useEffect(() => {
+    if (showImages) {
+      Animated.timing(imageOpacity, {
+        duration: 300,
+        toValue: 1,
+        easing: Easing.cubic,
+        useNativeDriver: false
+      }).start();
+    }
+  }, [showImages])
+
+  const onLoad = (index: number) => {
+    return () => {
+      loadingState[index] = true
+      var isLoaded = loadingState.every(Boolean)
+      if (isLoaded) {
+        setShowImages(true)
+      }
+    }
+  }
+
+  const onError = (index: number) => {
+    return (error) => {
+      console.error(error)
+    }
+  }
+
+  const style = StyleSheet.create({
+    container: {
+      width: 42,
+      height: 30,
+      borderRadius: 8,
+      backgroundColor: theme.colors.skeletonLight,
+      marginStart: 4,
+    },
+    image: {
+      width: 42,
+      height: 30,
+      borderRadius: 8,
+      position: 'absolute',
+      resizeMode: 'contain'
+    }
+  })
+
+  return (
+    <View style={{ alignItems: 'flex-start', marginEnd: 24 }}>
+      {Array(3).fill(null).map((value, row) => (
+        <View key={'r' + row} style={{ flexDirection: 'row', marginTop: row > 0 ? 4 : 0 }}>
+          {Array(3).fill(null).map((value, column) => {
+            const imagePosition = (row * 3) + column
+            return (
+              <View key={'i' + imagePosition} style={style.container}><Animated.Image style={[style.image, { opacity: imageOpacity }]} source={{ uri: images[imagePosition] }} onLoad={onLoad(imagePosition)} onError={onError(imagePosition)}></Animated.Image></View>
+            )
+          })}
+        </View>
+      ))}
+    </View>
+  )
+}
+
+interface Props {
+  item: ArticleCategory
+  weekNumber: number,
+  images: string[]
+}
+
+const GradientCard: FC<Props> = ({ item, weekNumber, images }) => {
+  const fonts = useFonts()
+  const theme = useTheme();
 
   return (
     <View
-    style={{
-      paddingTop: 12,
-      paddingBottom: 12,
-      paddingStart: 16,
-      paddingEnd: 16,
-    }}>
+      style={{
+        paddingTop: 12,
+        paddingBottom: 12,
+        paddingStart: 16,
+        paddingEnd: 16,
+      }}>
 
       <TouchableOpacity
         style={{}}
@@ -86,13 +113,14 @@ const GradientCard: FC<Props> = ({ id, title, gradientColors, image }) => {
           alert('playlist added to queue')
         }}
       >
-        <LinearGradient colors={gradientColors} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={{ borderRadius: 20 }}>
-          {(image != null) &&
-            <Image source={image} style={{ width: '100%', height: 124, position: 'absolute', opacity: 0.25 }} />
+        <LinearGradient colors={item.colors} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={{ borderRadius: 8 }}>
+          {(item.image != null) &&
+            <Image source={item.image} style={{ width: '100%', height: 124, position: 'absolute', opacity: 0.25 }} />
           }
-          <View style={{ height: 124, justifyContent: 'center', flex: 1 }}>
+          <View style={{ height: (item.image != null) ? 124 : 74, justifyContent: 'center', flex: 1 }}>
 
-            <View style={{ flexDirection: 'row', paddingStart: 16 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', paddingStart: 16 }}>
+
               <View
                 style={{
                   backgroundColor: "white",
@@ -107,19 +135,22 @@ const GradientCard: FC<Props> = ({ id, title, gradientColors, image }) => {
                 <MaterialCommunityIcons name="play" color="black" size={24} />
               </View>
 
-              
-              <Text
-                key={'category-title-' + id}
-                style={{
-                  fontSize: 24,
-                  fontWeight: '700',
-                  //fontFamily: 'Roboto',
-                  color: '#fff',
-                  paddingStart: 8,
-                  // paddingTop: 45
-                }}>
-                {title}
-              </Text>
+              <View style={{ alignItems: 'flex-start', marginStart: 8, flex: 1 }}>
+                <Text
+                  key={'category-title-' + item.id}
+                  style={StyleSheet.compose(fonts.titleLarge, { color: theme.colors.textInverse })}>
+                  {item.title}
+                </Text>
+                <View style={{ flexDirection: 'row', backgroundColor: item.colors[0], paddingHorizontal: 4, paddingVertical: 3 }}>
+                  <FontAwesome5 name="clock" color='#FFF4B9' size={15} />
+                  <Text style={StyleSheet.compose(fonts.titleXSmall, { marginStart: 4, color: '#FFF4B9' })}>{weekNumber != null ? weekNumber + '.týden' : 'DNES'}</Text>
+                </View>
+              </View>
+
+              {(item.image != null) &&
+                <ImageGrid images={images}></ImageGrid>
+              }
+
             </View>
           </View>
         </LinearGradient>
@@ -128,22 +159,35 @@ const GradientCard: FC<Props> = ({ id, title, gradientColors, image }) => {
   );
 };
 
-const Item = ({ id, title, colors, image }) => (
+const Item = ({ item, weekNumber, images }) => (
   <View style={{}}>
-    <GradientCard id={id} gradientColors={colors} title={title} image={image} />
+    <GradientCard item={item} weekNumber={weekNumber} images={images} />
   </View>
 );
 
-const NewsNavList = ({ topic }) => {
-  const renderItem = ({ item }) => (
-    <Item id={item.id} title={item.title} colors={item.colors} image={item.image} />
-  );
+const NewsNavList = ({ topicID }) => {
+  const renderItem = ({ item }) => {
+    // sample data
+    const weekNumber = (topicID == 'week') ? 59 : null
+    const timestamp = topicID + item.key //Date.now()
+    const sampleImages = [
+      'http://lorempixel.com/126/90/?a' + timestamp,
+      'http://lorempixel.com/126/90/?b' + timestamp,
+      'http://lorempixel.com/126/90/?c' + timestamp,
+      'http://lorempixel.com/126/90/?d' + timestamp,
+      'http://lorempixel.com/126/90/?e' + timestamp,
+      'http://lorempixel.com/126/90/?f' + timestamp,
+      'http://lorempixel.com/126/90/?g' + timestamp,
+      'http://lorempixel.com/126/90/?h' + timestamp,
+      'http://lorempixel.com/126/90/?i' + timestamp
+    ]
+    return (<Item item={item} weekNumber={weekNumber} images={sampleImages} />)
+  };
   return (
     <FlatList
       data={categories}
       renderItem={renderItem}
-      keyExtractor={(item) => String(item.id)
-      
+      keyExtractor={(item) => String('topicID-' + item.id)
       }
       style={{}}
     />

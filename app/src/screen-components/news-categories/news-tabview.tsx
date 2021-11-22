@@ -5,10 +5,11 @@ import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import NewsNavList from "./news-list";
 import Fonts from "../../theme/fonts";
 import { useTheme } from "../../theme";
+import useFonts from "../../theme/fonts";
 
 const renderTabBar = (props) => {
   const theme = useTheme();
-  const fonts = Fonts(theme);
+  const fonts = useFonts();
 
   return (
     <TabBar
@@ -45,8 +46,8 @@ const renderTabBar = (props) => {
 const initialLayout = { width: Dimensions.get("window").width };
 
 const renderScene = SceneMap({
-  today: () => <NewsNavList topic="Dnes" />,
-  thisWeek: () => <NewsNavList topic="Tento týden" />,
+  today: () => <NewsNavList topicID="today" />,
+  thisWeek: () => <NewsNavList topicID="week" />,
 });
 
 export default function TabViewNews() {
