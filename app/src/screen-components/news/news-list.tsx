@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React, { FC, useContext } from "react";
 import {
   Text,
   View,
@@ -6,18 +6,28 @@ import {
   Image,
   TextStyle,
   TouchableOpacity,
-  GestureResponderEvent
+  GestureResponderEvent,
+  StyleSheet
 } from "react-native";
 import Color from "../../theme/colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import TrackPlayer from "../../trackPlayer"
 import { Track } from "react-native-track-player";
+import PlayerContextProvider, { PlayerContext, usePlayer } from "../../trackPlayerContext";
+import useFonts from "../../theme/fonts";
+import { useTheme } from '../../theme'
 
-const articles = [
+
+interface Item extends Track {
+  img: string
+  published: string
+}
+
+const articles: Item[] = [
   {
     id: 1,
     title: "Nový šéf ÚOHS sliboval obnovu důvěry. Ve funkci nechává klid",
-    img: "https://placekitten.com/200/139",
+    img: "http://lorempixel.com/200/140/?a",
     url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
     artist: "au",
     published: "DNES 15:30",
@@ -26,7 +36,7 @@ const articles = [
     id: 2,
     title:
       "Tři největší obavy z očkování: šťavnatým soustem pro konspirátory je...",
-    img: "https://placekitten.com/200/139",
+    img: "http://lorempixel.com/200/140/?b",
     url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
     artist: "au",
     published: "DNES 14:35",
@@ -35,7 +45,7 @@ const articles = [
     id: 3,
     title:
       "Babiš se odmítl omluvit Pirátům za výrok, že chtějí k lidem nastěhovat migranty.",
-    img: "https://placekitten.com/200/139",
+    img: "http://lorempixel.com/200/140/?c",
     url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
     artist: "au",
     published: "DNES 13:10",
@@ -44,7 +54,7 @@ const articles = [
     id: 4,
     title:
       "Lidice si připomněly 79 let od vyhlazení obce nacisty, věnce položili také politici",
-    img: "https://placekitten.com/200/139",
+    img: "http://lorempixel.com/200/140/?d",
     url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
     artist: "au",
     published: "DNES 12:55",
@@ -52,17 +62,18 @@ const articles = [
   {
     id: 5,
     title: "Přes dva miliony lidí má v Česku ukončené očkování...",
-    img: "https://placekitten.com/200/139",
+    img: "http://lorempixel.com/200/140/?e",
     url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3",
     artist: "au",
     published: "DNES 12:39",
-  },
-];
+  }
+]
 
 interface Props {
   style?: TextStyle;
   onPress: (event: GestureResponderEvent) => void
 }
+
 
 const PlusIcon: FC<Props> = ({ style, onPress }) => (
   <TouchableOpacity
@@ -77,20 +88,19 @@ const PlusIcon: FC<Props> = ({ style, onPress }) => (
   >
     <MaterialCommunityIcons name="plus" color={Color["black-32"]} size={24} />
   </TouchableOpacity>
-);
-
-interface Item extends Track {
-  title: string
-  img: string
-  published: string
-}
+)
 
 interface ItemProps {
   item: Item
+  onPress: (item: Item) => void
+  onPlusPress: (item: Item) => void
 }
 
-const Item: FC<ItemProps> = ({ item }) => (
-  <View style={{ alignItems: "center" }}>
+const Item: FC<ItemProps> = ({ item, onPress, onPlusPress }) => {
+  const theme = useTheme();
+  const fonts = useFonts();
+
+  return (<View style={{ alignItems: "center" }}>
     <View
       style={{
         flexDirection: "row",
@@ -98,9 +108,7 @@ const Item: FC<ItemProps> = ({ item }) => (
         paddingStart: 16,
         paddingEnd: 16,
         paddingBottom: 14,
-        paddingTop: 14,
-        borderBottomColor: Color["grey"],
-        borderBottomWidth: 1,
+        paddingTop: 14
       }}
     >
       <View style={{ width: 68, height: 50 }}>
@@ -116,7 +124,7 @@ const Item: FC<ItemProps> = ({ item }) => (
         />
       </View>
       <TouchableOpacity
-        onPress={() => alert("Chci zobrazit zprávu!")}
+        onPress={() => { onPress(item) }}
         style={{
           flex: 1,
           marginStart: 16,
@@ -124,43 +132,60 @@ const Item: FC<ItemProps> = ({ item }) => (
         }}
       >
         <View style={{}}>
-          <Text
-            style={{ fontWeight: '700', fontSize: 14, lineHeight: 20 }}
-            numberOfLines={2}
-          >
+          <Text style={fonts.titleSmall} numberOfLines={2} >
             {item.title}
           </Text>
-          <Text
-            style={{
-              fontWeight: "400",
-              fontSize: 10,
-              lineHeight: 16,
-              color: Color["black-24"],
-            }}
-          >
+          <Text style={StyleSheet.compose(fonts.textXSmall, { color: theme.colors.textLight })} >
             {item.published}
           </Text>
         </View>
       </TouchableOpacity>
-      <PlusIcon onPress={() => {
-        TrackPlayer.addTrackToQueue(item)
-      }} />
+      <PlusIcon onPress={() => { onPlusPress(item) }} />
     </View>
-  </View>
-);
+  </View>)
+}
 
 const NewsNavList = ({ topic }) => {
+  const theme = useTheme();
+  const fonts = useFonts();
+  const { state, setQueue } = usePlayer()
+
+  const addToQueue = (item: Item) => {
+    TrackPlayer.addTrackToQueue(item)
+      .then((queue) => {
+        setQueue(queue)
+      })
+  }
+
+  const onItemPress = (item: Item) => addToQueue(item)
+  const onPlusPress = (item: Item) => addToQueue(item)
+
   const renderItem = ({ item }) => (
-    <Item item={item} />
-  );
+    <Item item={item} onPlusPress={onPlusPress} onPress={onItemPress} />
+  )
+
+  const styles = StyleSheet.create({
+    separator: {
+      height: 1,
+      backgroundColor: theme.colors.separator,
+      marginStart: 16,
+      marginEnd: 16
+    }
+  })
+
   return (
     <FlatList
       data={articles}
       renderItem={renderItem}
-      keyExtractor={(item) => item.title}
+      keyExtractor={(item) => item.id}
       style={{ flex: 1 }}
+      ItemSeparatorComponent={
+        ({ highlighted }) => (
+          <View style={styles.separator}></View>
+        )
+      }
     />
-  );
-};
+  )
+}
 
-export default NewsNavList;
+export default NewsNavList

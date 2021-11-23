@@ -1,4 +1,4 @@
-import React, { FC, useState } from "react";
+import React, { FC, useState, useContext, useEffect } from "react";
 import { StyleSheet, View, ViewProps } from "react-native";
 
 import Color from "../../theme/colors";
@@ -8,6 +8,8 @@ import Progress from "./progress";
 import PlaybackControls from "./playback-controls";
 import TrackPlayer, { useProgress, useTrackPlayerEvents, Event, State } from 'react-native-track-player';
 import { initialPlayerState, createPlayerState } from "../../trackPlayer";
+import { useIsFocused } from '@react-navigation/native';
+import PlayerContextProvider, { PlayerContext, usePlayer } from "../../trackPlayerContext";
 
 interface Props extends ViewProps {
   hideQueue?: boolean;
@@ -15,13 +17,8 @@ interface Props extends ViewProps {
 }
 
 const Player: FC<Props> = ({ style, hideQueue, hideDescription }) => {
-  const [playerState, setPlayerState] = useState(initialPlayerState)
-  const progress = useProgress();
-
-  useTrackPlayerEvents([Event.PlaybackState, Event.PlaybackTrackChanged, Event.PlaybackError], async (event) => {
-    const newState = await createPlayerState(event)
-    setPlayerState(newState)
-  });
+  const progress = useProgress()
+  const { state, setState, setQueue } = usePlayer()
 
   return (
     <View
@@ -35,15 +32,15 @@ const Player: FC<Props> = ({ style, hideQueue, hideDescription }) => {
       )}
     >
       {hideQueue ? null : (
-        <Queue size={playerState.recordsCount}
-          currentIndexZeroBased={playerState.currentIndex} />
+        <Queue size={state.recordsCount}
+          currentIndexZeroBased={state.currentIndex} />
       )}
       {hideDescription ? null : (
         <Description
           style={{ color: "white", marginTop: 16 }}
           numberOfLines={2}
         >
-          {playerState.currentTrack.title}
+          {state?.currentTrack?.title}
         </Description>
       )}
       <Progress
@@ -59,7 +56,7 @@ const Player: FC<Props> = ({ style, hideQueue, hideDescription }) => {
           TrackPlayer.seekTo(Math.floor(Math.max(progress.position - 10, 0)));
         }}
         onPlayPause={() => {
-          if (playerState.isPlaying) {
+          if (state.isPlaying) {
             TrackPlayer.pause()
           } else {
             TrackPlayer.play()
@@ -71,7 +68,7 @@ const Player: FC<Props> = ({ style, hideQueue, hideDescription }) => {
         style={{ marginTop: 20 }}
       />
     </View>
-  );
-};
+  )
+}
 
-export default Player;
+export default Player

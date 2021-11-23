@@ -51,7 +51,7 @@ const ImageGrid: FC<GridProps> = ({ images }) => {
 
   const onError = (index: number) => {
     return (error) => {
-      console.error(error)
+      console.error('failed to load image')
     }
   }
 
@@ -171,15 +171,15 @@ const NewsNavList = ({ topicID }) => {
     const weekNumber = (topicID == 'week') ? 59 : null
     const timestamp = topicID + item.key //Date.now()
     const sampleImages = [
-      'http://lorempixel.com/126/90/?a' + timestamp,
-      'http://lorempixel.com/126/90/?b' + timestamp,
-      'http://lorempixel.com/126/90/?c' + timestamp,
-      'http://lorempixel.com/126/90/?d' + timestamp,
-      'http://lorempixel.com/126/90/?e' + timestamp,
-      'http://lorempixel.com/126/90/?f' + timestamp,
-      'http://lorempixel.com/126/90/?g' + timestamp,
-      'http://lorempixel.com/126/90/?h' + timestamp,
-      'http://lorempixel.com/126/90/?i' + timestamp
+      'https://picsum.photos/126/90/?a' + timestamp,
+      'https://picsum.photos/126/90/?b' + timestamp,
+      'https://picsum.photos/126/90/?c' + timestamp,
+      'https://picsum.photos/126/90/?d' + timestamp,
+      'https://picsum.photos/126/90/?e' + timestamp,
+      'https://picsum.photos/126/90/?f' + timestamp,
+      'https://picsum.photos/126/90/?g' + timestamp,
+      'https://picsum.photos/126/90/?h' + timestamp,
+      'https://picsum.photos/126/90/?i' + timestamp
     ]
     return (<Item item={item} weekNumber={weekNumber} images={sampleImages} />)
   };

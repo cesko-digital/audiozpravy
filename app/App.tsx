@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -19,6 +19,7 @@ import { AppDarkTheme, AppLightTheme } from './src/theme'
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import TrackPlayer from './src/trackPlayer'
+import PlayerContextProvider from "./src/trackPlayerContext";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -32,11 +33,9 @@ export default function App() {
 
   const scheme = useColorScheme()
   const theme = scheme === 'dark' ? AppDarkTheme : AppLightTheme
-  const [bgColor, setBgColor] = useState("#ffffff")
 
   useEffect(() => {
     TrackPlayer.registerService()
-    TrackPlayer.resetPlayer()
   }, [])
 
   if (!fontsLoaded) {
@@ -44,31 +43,33 @@ export default function App() {
   } else {
     return (
       <SafeAreaProvider>
-        <NavigationContainer theme={theme}>
-          <Stack.Navigator>
-            <Stack.Screen
-              name={Screens.onboarding}
-              component={OnboardingScreen}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name={Screens.topics}
-              component={TopicsScreen}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name={Screens.home}
-              component={HomeTabs}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name={Screens.detail}
-              component={NewsListScreen}
-              options={{ headerShown: false, headerTitle: null }}
-            />
-          </Stack.Navigator>
-        </NavigationContainer>
-        <StatusBar style={scheme === 'dark' ? 'auto' : 'dark'} />
+        <PlayerContextProvider>
+          <NavigationContainer theme={theme}>
+            <Stack.Navigator>
+              <Stack.Screen
+                name={Screens.onboarding}
+                component={OnboardingScreen}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name={Screens.topics}
+                component={TopicsScreen}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name={Screens.home}
+                component={HomeTabs}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name={Screens.detail}
+                component={NewsListScreen}
+                options={{ headerShown: false, headerTitle: null }}
+              />
+            </Stack.Navigator>
+          </NavigationContainer>
+          <StatusBar style={scheme === 'dark' ? 'auto' : 'dark'} />
+        </PlayerContextProvider>
       </SafeAreaProvider>
     );
   }
