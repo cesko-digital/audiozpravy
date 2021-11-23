@@ -28,7 +28,7 @@ class ListenerNode(DjangoObjectType):
     def resolve_plays(root, info, **kwargs):
         return Play.objects.filter(listener_id=root.id).all()
 
-    def resolve_queue(root, info, played_article_ids: List[int]):
+    def resolve_queue(root, info, played_article_ids: List(int)):
         history = Listener.objects.get(id=root.id).plays.all()
         articles_from_history = [play.article for play in history]
         played_articles = Article.objects.filter(id__in=played_article_ids)

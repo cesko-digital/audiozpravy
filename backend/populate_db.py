@@ -1,22 +1,44 @@
-import os
-from datetime import datetime
-from audionews.models import Provider, Play, Playlist, Listener, Category, Article
+import datetime
+from collections import namedtuple
+from random import random
 import django
+import os
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "API.settings")
+django.setup()
+
+import recommender.recommend
+import pandas as pd
+
+from audionews.models import Provider, Category, Article, Listener, Playlist, Play
 
 
 if __name__ == '__main__':
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "API.settings")
+    """ Add data from pandas df into sqlite database"""
+    # articles = pd.read_csv('s3_input/articles.csv')
+    articles_new = pd.read_csv("s3_input/articles.csv", parse_dates=["published"])
+    articles_new['published'] = articles_new.published.apply(recommender.recommend.to_timestamp)
     django.setup()
-    provider, created = Provider.objects.get_or_create(name="čtidoma", website_url="ctidoma.cz")
+
     listener, created = Listener.objects.get_or_create(device_id="1")
-    category, created = Category.objects.get_or_create(name="Politika")
-    article, created = Article.objects.get_or_create(category=category,
-                                  title="Babiš prohrál",
-                                  perex="Změna je tu",
-                                  pub_date=datetime.today(),
-                                  url="ctidoma.cz/babis",
-                                  provider=provider
-    )
-    playlist, created = Playlist.objects.get_or_create(category=category)
-    playlist.articles_for_feed_df.add(article)
-    play, created = Play.objects.get_or_create(article=article, listener=listener)
+
+    for index, row in articles_new.iterrows():
+        provider, create = Provider.objects.get_or_create(name=row.source)
+        category, create = Category.objects.get_or_create(name=row.category)
+        article = Article.objects.create(
+            category=category,
+            title=row.title,
+            perex=row.summary,
+            recording_created_at=datetime.datetime.now(),
+            pub_date=datetime.datetime.fromtimestamp(row.published),
+            url=str(row.link),
+            provider=provider,
+            text=row.lemmatized_text
+        )
+        playlist, created = Playlist.objects.get_or_create(category=category)
+        playlist.articles_for_feed_df.add(article)
+
+        if random() > 0.5:
+            play, created = Play.objects.get_or_create(article=article, listener=listener)
+
+
+

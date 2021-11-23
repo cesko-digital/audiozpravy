@@ -8,10 +8,7 @@ from graphene_django.filter import DjangoFilterConnectionField
 from graphql.execution.base import ResolveInfo
 from promise.promise import Promise
 from classes.queue_filler import QueueFiller
-
-
 from recommender.personal_recommend import PersonalRecommender
-
 from recommender.recommend import recommend_by_google_trends
 from ..models import Article, Listener, Play, Provider, Playlist, Category
 from .play import PlayNode
@@ -45,27 +42,9 @@ class PlaylistNode(DjangoObjectType):
         )
         return playlist.articles.all()
 
-"""
-
-            recommendation_df = recommend_by_google_trends(n_of_recommendations=10)
-            for index, row in recommendation_df.iterrows():
-                provider, created = Provider.objects.get_or_create(name="Unknown", website_url="unknown")
-                category_article, created = Category.objects.get_or_create(name=row.category)
-                article, created = Article.objects.get_or_create(
-                    category=category_article,
-                    title = row.title,
-                    perex=row.summary,
-                    recording_created_at=datetime.datetime.now(),
-                    pub_date=datetime.datetime.fromtimestamp(row.published),
-                    url=str(row.link),
-                    provider=provider
-                )
-                playlist.articles.add(article)
-            return playlist.articles.all()
-        """
 
 
-    def resolve_articles_recommended(root, info, n_of_past_days: int = 1000, n_of_recommendations: int = 30 **kwargs):
+    def resolve_articles_recommended(root, info, n_of_past_days: int = 1000, n_of_recommendations: int = 30, **kwargs):
         """ Recommend articles based on user history"""
 
         category, _ = Category.objects.get_or_create(name="recommended")
@@ -94,3 +73,21 @@ class PlaylistNode(DjangoObjectType):
 
         return playlist
 
+
+"""
+            recommendation_df = recommend_by_google_trends(n_of_recommendations=10)
+            for index, row in recommendation_df.iterrows():
+                provider, created = Provider.objects.get_or_create(name="Unknown", website_url="unknown")
+                category_article, created = Category.objects.get_or_create(name=row.category)
+                article, created = Article.objects.get_or_create(
+                    category=category_article,
+                    title = row.title,
+                    perex=row.summary,
+                    recording_created_at=datetime.datetime.now(),
+                    pub_date=datetime.datetime.fromtimestamp(row.published),
+                    url=str(row.link),
+                    provider=provider
+                )
+                playlist.articles.add(article)
+            return playlist.articles.all()
+        """
