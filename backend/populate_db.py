@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from collections import namedtuple
 from random import random
 import django
@@ -28,17 +28,24 @@ if __name__ == '__main__':
             category=category,
             title=row.title,
             perex=row.summary,
-            recording_created_at=datetime.datetime.now(),
-            pub_date=datetime.datetime.fromtimestamp(row.published),
+            recording_created_at=datetime.now(),
+            pub_date=datetime.fromtimestamp(row.published),
             url=str(row.link),
             provider=provider,
             text=row.lemmatized_text
         )
-        playlist, created = Playlist.objects.get_or_create(category=category)
-        playlist.articles_for_feed_df.add(article)
+        playlist, created = Playlist.objects.get_or_create(
+            category=category,
+            prepared_for_date = datetime.today(),
+            type="Day"
+        )
+        playlist.articles.add(article)
 
         if random() > 0.5:
-            play, created = Play.objects.get_or_create(article=article, listener=listener)
+            play, created = Play.objects.get_or_create(
+                article=article,
+                listener=listener
+            )
 
 
 
