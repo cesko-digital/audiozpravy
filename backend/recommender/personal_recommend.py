@@ -13,10 +13,10 @@ from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 
 class PersonalRecommender:
     def __init__(
-            self, user_id: int, model_path = 's3_input/doc2vec_articles.model', user_last_days: int = 100000,
+            self, user_device_id: int, model_path ='s3_input/doc2vec_articles.model', user_last_days: int = 100000,
             embed_vector_path = None
     ):
-        self.user_id = user_id
+        self.user_device_id = user_device_id
         self.con = sqlite3.connect("db.sqlite3")
         self.user_history = self._get_user_articles(user_last_days, self.con)
         self.doc2vec = Doc2Vec.load(model_path)
@@ -79,7 +79,8 @@ class PersonalRecommender:
             f"""
                 SELECT * FROM a_article
                 INNER JOIN a_play ON a_article.id= a_play.article_id
-                WHERE a_play.listener_id = {self.user_id} AND a_play.played_at > datetime('now', '-{last_n_days} days')
+                INNER JOIN a_listener ON a_listener.user_ptr_id = a_play.listener_id
+                WHERE a_listener.device_id = {self.user_device_id} AND a_play.played_at > datetime('now', '-{last_n_days} days')
                 """,
             con)
         return user_articles
@@ -90,5 +91,5 @@ class PersonalRecommender:
         pass
 
 
-recommender = PersonalRecommender(user_id=2, embed_vector_path='s3_input/articles_embeddings.json')
+recommender = PersonalRecommender(user_device_id=2, embed_vector_path='s3_input/articles_embeddings.json')
 articles_sorted = recommender.recommend(n_of_past_days=90000)

@@ -44,8 +44,12 @@ class PlaylistNode(DjangoObjectType):
 
 
 
+
+
+
+"""
     def resolve_articles_recommended(root, info, n_of_past_days: int = 1000, n_of_recommendations: int = 30, **kwargs):
-        """ Recommend articles based on user history"""
+        Recommend articles based on user history
 
         category, _ = Category.objects.get_or_create(name="recommended")
         playlist, playlist_created = Playlist.objects.get_or_create(
@@ -53,7 +57,7 @@ class PlaylistNode(DjangoObjectType):
             category=category
         )
         if not playlist_created:
-            recommender = PersonalRecommender(user_id=root.id, embed_vector_path='s3_input/articles_embeddings.json')
+            recommender = PersonalRecommender(user_device_id=1, embed_vector_path='s3_input/articles_embeddings.json')
             recommendations_df = recommender.recommend(n_of_past_days=n_of_past_days)
             for i, (_, row) in recommendations_df.iterrows():
                 provider, created = Provider.objects.get_or_create(name="Unknown", website_url="unknown")
@@ -72,9 +76,7 @@ class PlaylistNode(DjangoObjectType):
                     break
 
         return playlist
-
-
-"""
+        
             recommendation_df = recommend_by_google_trends(n_of_recommendations=10)
             for index, row in recommendation_df.iterrows():
                 provider, created = Provider.objects.get_or_create(name="Unknown", website_url="unknown")
