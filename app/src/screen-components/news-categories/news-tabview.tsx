@@ -6,6 +6,7 @@ import NewsNavList from "./news-list";
 import Fonts from "../../theme/fonts";
 import { useTheme } from "../../theme";
 import useFonts from "../../theme/fonts";
+import { useEffect } from "react";
 
 const renderTabBar = (props) => {
   const theme = useTheme();
@@ -52,10 +53,16 @@ const renderScene = SceneMap({
 
 export default function TabViewNews() {
   const [index, setIndex] = useState(0);
-  const [routes] = useState([
-    { key: "today", title: "Dnes" },
-    { key: "thisWeek", title: "Tento týden" }
-  ]);
+
+  const getRoutes = () => {
+    const dayNumber = new Date().getDay()
+    return [
+      { key: "today", title: "Dnes" },
+      { key: "thisWeek", title: dayNumber == 0 ? 'Minulý týden' : 'Tento týden' }
+    ]
+  }
+
+  const [routes, setRoutes] = useState(getRoutes());
 
   return (
     <TabView

@@ -1,4 +1,4 @@
-import React, { FC, useState, useRef, useEffect } from "react";
+import React, { FC, useState, useRef, useEffect } from "react"
 import {
   Text,
   View,
@@ -8,13 +8,13 @@ import {
   StyleSheet,
   Animated,
   Easing
-} from "react-native";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { FontAwesome5 } from "@expo/vector-icons";
-import { LinearGradient } from 'expo-linear-gradient';
+} from "react-native"
+import { MaterialCommunityIcons } from "@expo/vector-icons"
+import { FontAwesome5 } from "@expo/vector-icons"
+import { LinearGradient } from 'expo-linear-gradient'
 import categories, { ArticleCategory } from '../../shared/categories'
-import { useTheme } from "../../theme";
-import useFonts from "../../theme/fonts";
+import { useTheme } from "../../theme"
+import useFonts from "../../theme/fonts"
 
 
 interface GridProps {
@@ -22,7 +22,7 @@ interface GridProps {
 }
 
 const ImageGrid: FC<GridProps> = ({ images }) => {
-  const theme = useTheme();
+  const theme = useTheme()
 
   const imageOpacity = useRef(new Animated.Value(0)).current
   const [showImages, setShowImages] = useState(false)
@@ -35,7 +35,7 @@ const ImageGrid: FC<GridProps> = ({ images }) => {
         toValue: 1,
         easing: Easing.cubic,
         useNativeDriver: false
-      }).start();
+      }).start()
     }
   }, [showImages])
 
@@ -96,7 +96,7 @@ interface Props {
 
 const GradientCard: FC<Props> = ({ item, weekNumber, images }) => {
   const fonts = useFonts()
-  const theme = useTheme();
+  const theme = useTheme()
 
   return (
     <View
@@ -143,7 +143,7 @@ const GradientCard: FC<Props> = ({ item, weekNumber, images }) => {
                 </Text>
                 <View style={{ flexDirection: 'row', backgroundColor: item.colors[0], paddingHorizontal: 4, paddingVertical: 3 }}>
                   <FontAwesome5 name="clock" color='#FFF4B9' size={15} />
-                  <Text style={StyleSheet.compose(fonts.titleXSmall, { marginStart: 4, color: '#FFF4B9' })}>{weekNumber != null ? weekNumber + '.týden' : 'DNES'}</Text>
+                  <Text style={StyleSheet.compose(fonts.titleXSmall, { marginStart: 4, color: '#FFF4B9' })}>{weekNumber != null ? weekNumber : 'DNES'}</Text>
                 </View>
               </View>
 
@@ -156,33 +156,35 @@ const GradientCard: FC<Props> = ({ item, weekNumber, images }) => {
         </LinearGradient>
       </TouchableOpacity>
     </View>
-  );
-};
+  )
+}
 
 const Item = ({ item, weekNumber, images }) => (
   <View style={{}}>
     <GradientCard item={item} weekNumber={weekNumber} images={images} />
   </View>
-);
+)
 
 const NewsNavList = ({ topicID }) => {
   const renderItem = ({ item }) => {
     // sample data
-    const weekNumber = (topicID == 'week') ? 59 : null
-    const timestamp = topicID + item.key //Date.now()
+    const dayNumber = new Date().getDay()
+    const weekLabel = dayNumber == 0 ? 'Minulý týden' : 'Tento týden'
+    const weekNumber = (topicID == 'week') ? weekLabel + ' (' + dayNumber + ')' : null
+    const timestamp = topicID + item.key
     const sampleImages = [
-      'https://picsum.photos/126/90/?a' + timestamp,
-      'https://picsum.photos/126/90/?b' + timestamp,
-      'https://picsum.photos/126/90/?c' + timestamp,
-      'https://picsum.photos/126/90/?d' + timestamp,
-      'https://picsum.photos/126/90/?e' + timestamp,
-      'https://picsum.photos/126/90/?f' + timestamp,
-      'https://picsum.photos/126/90/?g' + timestamp,
-      'https://picsum.photos/126/90/?h' + timestamp,
-      'https://picsum.photos/126/90/?i' + timestamp
+      // 'https://picsum.photos/126/90/?a' + timestamp,
+      // 'https://picsum.photos/126/90/?b' + timestamp,
+      // 'https://picsum.photos/126/90/?c' + timestamp,
+      // 'https://picsum.photos/126/90/?d' + timestamp,
+      // 'https://picsum.photos/126/90/?e' + timestamp,
+      // 'https://picsum.photos/126/90/?f' + timestamp,
+      // 'https://picsum.photos/126/90/?g' + timestamp,
+      // 'https://picsum.photos/126/90/?h' + timestamp,
+      // 'https://picsum.photos/126/90/?i' + timestamp
     ]
     return (<Item item={item} weekNumber={weekNumber} images={sampleImages} />)
-  };
+  }
   return (
     <FlatList
       data={categories}
@@ -191,7 +193,7 @@ const NewsNavList = ({ topicID }) => {
       }
       style={{}}
     />
-  );
-};
+  )
+}
 
-export default NewsNavList;
+export default NewsNavList

@@ -41,20 +41,20 @@ export default function useFonts(): FontsTheme {
     },
     titleSmall: {
       fontSize: FontSize.small,
-      fontFamily: 'RobotoBold',
+      //fontFamily: 'RobotoBold',
       fontWeight: '700',
       color: theme.colors.text,
     },
     titleRegular: {
       fontSize: FontSize.regular,
-      fontFamily: 'RobotoBold',
+      //fontFamily: 'RobotoBold',
       fontWeight: '700',
       color: theme.colors.text,
     },
     titleLarge: {
       fontSize: FontSize.large,
       fontWeight: '700',
-      fontFamily: 'RobotoBold',
+      //fontFamily: 'RobotoBold',
       color: theme.colors.text,
     },
     textCenter: {

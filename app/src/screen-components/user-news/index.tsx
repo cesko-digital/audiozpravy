@@ -17,11 +17,9 @@ const UserNewsScreen = ({ route, navigation }) => {
   const [expanded, setExpanded] = useState(false);
 
   const onFilterChange = (selectedCategories: number[], selectedTimeRanges: number[], selectedTypes: number[]) => {
-    console.log('onFilterChange')
     setCategories(selectedCategories)
     setTimeRanges(selectedTimeRanges)
     setTypes(selectedTypes)
-
     console.log("selectedCategories: " + selectedCategories)
   }
 

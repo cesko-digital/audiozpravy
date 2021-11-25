@@ -5,14 +5,15 @@ import useFonts from "../../theme/fonts";
 import { useTheme } from '@react-navigation/native';
 import AppStatusBar from "../../components/statusBar"
 import Player from "../../components/player";
+import { AppDarkTheme } from "../../theme"
 
 const NewsScreen = ({ navigation }) => {
-  const theme = useTheme();
-  const fonts = useFonts();
+  const theme = useTheme()
+  const fonts = useFonts()
 
   return (
     <View style={{ flex: 1 }} >
-      <AppStatusBar barStyle="dark-content" backgroundColor={theme.colors.background} />
+      <AppStatusBar barStyle={theme == AppDarkTheme ? 'light-content' : 'dark-content'} backgroundColor={theme.colors.background} />
       <View
         style={{
           paddingStart: 16,
