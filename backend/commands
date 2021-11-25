@@ -1,0 +1,1 @@
+pipenv install feedparser --skip-lock

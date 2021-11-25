@@ -1,3 +1,5 @@
+from collections import namedtuple
+
 import pytz
 from datetime import datetime
 import time
@@ -8,6 +10,44 @@ import pandas as pd
 
 import feedparser
 import numpy as np
+
+FeedparserTime = namedtuple(
+    "FeedparserTime",
+    [
+        "tm_year",
+        "tm_mon",
+        "tm_mday",
+        "tm_hour",
+        "tm_min",
+        "tm_sec",
+        "tm_wday",
+        "tm_yday",
+        "tm_isdst",
+    ],
+)
+
+
+def to_timestamp(value: str):
+    """ Translates FeedparserTime string into datetime.timestamp format"""
+    x: FeedparserTime = eval(value)
+    datetime_value = datetime(year=x.tm_year, month=x.tm_mon, day=x.tm_mday, hour=x.tm_hour)
+    return datetime.timestamp(datetime_value)
+
+
+def recommend_by_google_trends(n_of_recommendations: int = 20) -> pd.DataFrame:
+    """ Recommend articles based on current google trends.
+    Returns dataframe with fields: ['title', 'link', 'summary', 'published', 'category', 'audio', 'badges'"""
+
+    #TODO: add all articles to s3 and remove the dependency on pandas df
+    articles_new = pd.read_csv("s3_input/articles.csv", parse_dates=["published"])
+    articles_new['published'] = articles_new.published.apply(to_timestamp)
+
+    #TODO: calculate vectors from w2v on the go and remove the dependency on saved x matrix
+    X_new = np.load("s3_input/X.npy", allow_pickle=True).tolist()
+    words_new = np.load("s3_input/words.npy", allow_pickle=True)
+
+    results = recommend(articles_new, X_new, words_new, n_of_recommendations)
+    return results
 
 
 def get_relevant_words(tf_idf_matrix, words, row_id):
@@ -75,7 +115,8 @@ def estimate_popularity(daily_trends, X, words):
     return popularity
 
 
-def recommend(articles, X, words):
+
+def recommend(articles, X, words, n_of_recommendations = 20):
     print("getting daily trends")
     daily_trends = get_daily_google_trends()
     popularity = estimate_popularity(daily_trends, X, words) + 1
@@ -85,8 +126,8 @@ def recommend(articles, X, words):
     age = now_timestamp - articles.published.values.astype(np.int64) / 1e9
 
     frecency = np.squeeze(np.asarray(calculate_frecency(popularity.T, age)))
-    top_ids = frecency.argsort()[::-1][:20]
-    result = articles.iloc[top_ids[:20], :][
+    top_ids = frecency.argsort()[::-1][:n_of_recommendations]
+    result = articles.iloc[top_ids[:n_of_recommendations], :][
         ["title", "link", "summary", "published", "category", "audio"]
     ]
     result["badges"] = "x"
@@ -116,3 +157,5 @@ def select_based_on_recency(articles: pd.DataFrame) -> List[Dict]:
         ["title", "link", "summary", "published", "category", "audio"]
     ]
     return selected_articles
+
+

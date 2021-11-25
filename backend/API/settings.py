@@ -9,6 +9,7 @@ from sentry_sdk.integrations.logging import ignore_logger
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+SILENCED_SYSTEM_CHECKS = ["models.E017"]
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
