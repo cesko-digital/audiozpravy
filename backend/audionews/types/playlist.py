@@ -8,7 +8,7 @@ from graphene_django.filter import DjangoFilterConnectionField
 from graphql.execution.base import ResolveInfo
 from promise.promise import Promise
 from classes.queue_filler import QueueFiller
-from recommender.personal_recommend import PersonalRecommender
+#from recommender.personal_recommend import PersonalRecommender
 from recommender.recommend import recommend_by_google_trends
 from ..models import Article, Listener, Play, Provider, Playlist, Category
 from .play import PlayNode
@@ -18,7 +18,7 @@ from .article import ArticleNode
 
 class PlaylistNode(DjangoObjectType):
     articles = List(NonNull(ArticleNode), required=True)
-    articles_for_category = List(NonNull(ArticleNode), for_date=Date, category_name=String)
+    articles_for_category = List(NonNull(ArticleNode), for_date=Date(), category_name=String())
     category = NonNull(CategoryNode)
 
     class Meta:
