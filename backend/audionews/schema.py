@@ -4,13 +4,13 @@ from graphene import Field, Int, List, String
 from graphene_django.filter import DjangoFilterConnectionField
 from datetime import datetime
 
-from .mutations import CreateListener
+from .mutations import RegisterListener
 from .types import ArticleNode, ListenerNode, PlayNode, ProviderNode, PlaylistNode
 from .models import Article, Listener, Play, Provider, Playlist
 
 
 class Mutation(ObjectType):
-    create_listener = CreateListener.Field(description='Create a single Listener.')
+    register_listener = RegisterListener.Field(description='Create a single Listener.')
 
 
 class Query(ObjectType):
@@ -23,16 +23,16 @@ class Query(ObjectType):
     playlists_for_today = List(PlaylistNode, required=True)
     playlists_for_this_week = List(PlaylistNode, required=True)
 
-    def resolve_articles(root, info):
+    def resolve_articles(root, info, **kwargs):
         return Article.objects.all()
 
     def resolve_providers(root, info):
         return Provider.objects.all()
 
-    def resolve_listeners(root, info):
+    def resolve_listeners(root, info, **kwargs):
         return Listener.objects.all()
 
-    def resolve_playlists(root, info):
+    def resolve_playlists(root, info, **kwargs):
         return Playlist.objects.all()
 
     def resolve_playlists_for_today(root, info):

@@ -22,7 +22,8 @@ class ArticleNode(DjangoObjectType):
             "perex": ["exact", "icontains", "istartswith"],
             "text": ["icontains", "istartswith"],
             "pub_date": ["gte", "lte"],
-            "recording_url": ["isnull"]
+            "recording_url": ["isnull"],
+            "category__name": ["exact"]
         }
 
     def resolve_provider(root, info, **kwargs):
