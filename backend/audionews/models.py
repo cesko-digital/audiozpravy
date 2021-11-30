@@ -73,8 +73,9 @@ class Playlist(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     type = models.CharField(max_length=256)
 
+
     def __str__(self) -> str:
-        return f"{self.listener.username}-{self.article.title}"
+        return f"Playlist: {self.category.name}-{self.prepared_for_date}"
 
     class Meta:
         ordering = ['created_at']

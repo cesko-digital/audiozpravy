@@ -8,10 +8,11 @@ from promise.promise import Promise
 from ..models import Article, Listener, Play, Provider
 from .play import PlayNode
 from .article import ArticleNode
+from classes.queue_filler import QueueFiller
 
 class ListenerNode(DjangoObjectType):
     plays = List(NonNull(PlayNode), required=True)
-    queue = List(NonNull(ArticleNode), article_ids=List(Int))
+    #queue = List(NonNull(ArticleNode), played_article_ids=List(Int))
 
     class Meta:
         model = Listener
@@ -27,9 +28,13 @@ class ListenerNode(DjangoObjectType):
     def resolve_plays(root, info, **kwargs):
         return Play.objects.filter(listener_id=root.id).all()
 
-    def resolve_queue(root, info, **kwargs):
-        print(info)
-        print(kwargs)
-        return Article.objects.all()
-        #TODO: Napojit na recommendation engine
+    """
+    def resolve_queue(root, info, played_article_ids: List(int)):
+        history = Listener.objects.get(id=root.id).plays.all()
+        articles_from_history = [play.article for play in history]
+        played_articles = Article.objects.filter(id__in=played_article_ids)
+        #vyzobrat articles ze play history
+        recommended_article_ids =  QueueFiller.recommend_articles(played_articles=played_articles, article_history=articles_from_history)
+        return Article.objects.filter(id__in=recommended_article_ids)
+    """
 

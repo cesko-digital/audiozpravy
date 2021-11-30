@@ -27,6 +27,11 @@ dj-static = "*"
 sentry-sdk = "*"
 django-extensions = "*"
 django-silk = "*"
+cachetools = "*"
+pandas = "*"
+feedparser = "*"
+sklearn = "*"
+gensim = "*"
 
 [requires]
 python_version = "3.8"
