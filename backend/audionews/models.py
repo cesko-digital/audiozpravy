@@ -2,17 +2,6 @@ from django.contrib.auth.models import User
 from django.db import models
 
 
-class Listener(User):
-    device_id = models.CharField(max_length=256)
-
-    class Meta:
-        ordering = ['device_id']
-        db_table="a_listener"
-
-    def __str__(self) -> str:
-        return self.device_id
-
-
 class Provider(models.Model):
     name = models.CharField(max_length=256)
     website_url = models.CharField(max_length=256)
@@ -54,6 +43,18 @@ class Article(models.Model):
         return self.title
 
 
+class Listener(User):
+    device_id = models.CharField(max_length=256)
+    preferred_categories = models.ManyToManyField(Category, related_name='listeners')
+
+    class Meta:
+        ordering = ['device_id']
+        db_table="a_listener"
+
+    def __str__(self) -> str:
+        return self.device_id
+
+
 class Play(models.Model):
     listener = models.ForeignKey(Listener, on_delete=models.CASCADE, related_name='plays')
     article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='plays')
@@ -80,6 +81,3 @@ class Playlist(models.Model):
     class Meta:
         ordering = ['created_at']
         db_table="a_playlist"
-
-
-

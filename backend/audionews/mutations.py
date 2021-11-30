@@ -3,7 +3,7 @@ from graphene import ID, ClientIDMutation, Field, ResolveInfo, String, Int
 from graphql import GraphQLError
 from graphql_jwt.decorators import login_required, permission_required, staff_member_required
 from graphql_relay import from_global_id
-
+from uuid import uuid4
 from .models import Article, Listener, Play, Provider, Playlist, Category
 from .types import ArticleNode, ListenerNode, PlayNode, ProviderNode, PlaylistNode
 
@@ -20,7 +20,8 @@ class RegisterListener(ClientIDMutation):
         device_id = input['device_id']
 
         listener, created = Listener.objects.get_or_create(
-            device_id=device_id
+            device_id=device_id,
+            username=uuid4(),
         )
 
         permission = Permission.objects.get(name='Can change user')
