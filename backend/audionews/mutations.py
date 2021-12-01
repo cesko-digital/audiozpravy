@@ -8,6 +8,8 @@ from .models import Article, Listener, Play, Provider, Playlist, Category
 from .types import ArticleNode, ListenerNode, PlayNode, ProviderNode, PlaylistNode
 from graphql_jwt.shortcuts import get_token
 from django.contrib.auth.models import User
+from graphql_auth.schema import UserQuery, MeQuery
+
 
 class RegisterListener(ClientIDMutation):
     listener = Field(ListenerNode)
@@ -21,24 +23,20 @@ class RegisterListener(ClientIDMutation):
     def mutate_and_get_payload(cls, root, info: ResolveInfo, **input) -> 'RegisterListener':
         device_id = input['device_id']
 
-        user, created = User.objects.get_or_create(
-            username=device_id,
-        )
-
         listener, created = Listener.objects.get_or_create(
             device_id=device_id,
-            user=user
+            username=device_id
         )
+        token = get_token(listener)
 
-        token = get_token(user)
         if not created:
             return RegisterListener(listener=listener, token=token)
 
         permission = Permission.objects.get(name='Can change user')
-        user.user_permissions.add(permission)
+        listener.user_permissions.add(permission)
 
-        user.set_password(device_id)
-        user.save()
+        listener.set_password(device_id)
+        listener.save()
 
         return RegisterListener(listener=listener, token=token)
 

@@ -31,8 +31,8 @@ class Article(models.Model):
     url = models.CharField(max_length=256)
     text = models.CharField(max_length=10000)
     pub_date = models.DateField()
-    recording_created_at = models.DateTimeField()
-    recording_url = models.CharField(max_length=256)
+    recording_created_at = models.DateTimeField(default=None, null=True)
+    recording_url = models.CharField(max_length=256, null=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='articles')
 
     class Meta:
@@ -45,7 +45,6 @@ class Article(models.Model):
 
 class Listener(User):
     device_id = models.CharField(max_length=256)
-    preferred_categories = models.ManyToManyField(Category, related_name='listeners')
 
     class Meta:
         ordering = ['device_id']
@@ -53,6 +52,11 @@ class Listener(User):
 
     def __str__(self) -> str:
         return self.device_id
+
+
+class ListenerSettings(models.Model):
+    listener = models.OneToOneField(Listener, on_delete=models.CASCADE)
+    preferred_categories = models.ManyToManyField(Category, related_name='settings')
 
 
 class Play(models.Model):

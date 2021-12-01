@@ -6,13 +6,14 @@ from graphql_jwt import JSONWebTokenMutation, Verify, Refresh
 from audionews.models import Listener
 from audionews.types import ListenerNode
 from audionews import schema
-
+from graphql_auth import mutations
+from graphql_auth.schema import MeQuery
 
 logger = logging.getLogger(__name__)
 
 
 class ObtainJSONWebToken(JSONWebTokenMutation):
-    listener = Field(ListenerNode, description='Reporter node of the current user.')
+    listener = Field(ListenerNode, description='Listener node of the current user.')
 
     @classmethod
     def resolve(cls, root, info, **kwargs):
@@ -33,8 +34,12 @@ class Mutation(
     ObjectType,
 ):
     token_auth = ObtainJSONWebToken.Field()
-    verify_token = Verify.Field()
-    refresh_token = Refresh.Field()
+    verify_token = mutations.VerifyToken.Field()
+    refresh_token = mutations.RefreshToken.Field()
+    revoke_token = mutations.RevokeToken.Field()
+
+
+#https://django-graphql-auth.readthedocs.io/en/latest/installation/
 
 
 schema = Schema(query=Query, mutation=Mutation)
