@@ -5,6 +5,7 @@ import useFonts from "../../theme/fonts";
 import { useTheme } from '../../theme'
 import NewsFilter from "./news-filter";
 import AppStatusBar from "../../components/statusBar"
+import Player from "../../components/player";
 
 const UserNewsScreen = ({ route, navigation }) => {
   const theme = useTheme();
@@ -45,9 +46,13 @@ const UserNewsScreen = ({ route, navigation }) => {
         onExpadedChange={(isExpanded) => { setExpanded(isExpanded) }} />
 
       <NewsList topic={null} />
+
+      <Player
+        style={{}}
+      ></Player>
     </View>
-  );
-};
+  )
+}
 
 
-export default UserNewsScreen;
+export default UserNewsScreen

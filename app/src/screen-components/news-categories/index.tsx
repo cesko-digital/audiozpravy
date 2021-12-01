@@ -4,6 +4,7 @@ import TabViewNews from "./news-tabview";
 import useFonts from "../../theme/fonts";
 import { useTheme } from '@react-navigation/native';
 import AppStatusBar from "../../components/statusBar"
+import Player from "../../components/player";
 
 const NewsScreen = ({ navigation }) => {
   const theme = useTheme();
@@ -24,6 +25,9 @@ const NewsScreen = ({ navigation }) => {
         </Text>
       </View>
       <TabViewNews />
+      <Player
+        style={{}}
+      ></Player>
     </View>
   );
 };

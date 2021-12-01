@@ -1,14 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Text, View, StyleSheet, SectionList, FlatList, TouchableOpacity, Image } from "react-native";
 import Player from "../../components/player";
 import useFonts from "../../theme/fonts";
 import { useTheme } from '../../theme'
 import Color from "../../theme/colors";
 import AppStatusBar from "../../components/statusBar"
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import TrackPlayer, { useTrackPlayerEvents, Event, State } from 'react-native-track-player';
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import TrackPlayer, { useTrackPlayerEvents, Event, State, Track } from 'react-native-track-player';
 import { useIsFocused } from '@react-navigation/native';
 import { initialPlayerState, createPlayerState } from "../../trackPlayer";
+import { usePlayer } from "../../trackPlayerContext";
 
 const Item = ({ item, isSelected, isPlaying, onPress, onIconPress }) => {
   const theme = useTheme();
@@ -88,45 +89,14 @@ const QueueScreen = ({ navigation }) => {
   const theme = useTheme();
   const fonts = useFonts();
   const isFocused = useIsFocused();
-
-  const [state, setState] = useState(initialPlayerState)
   const [queue, setQueue] = useState([])
-
-  // async function groupedQueue() {
-  //   console.warn('groupedQueue')
-  //   const queue = await TrackPlayer.getQueue()
-  //   const playingIndex = await TrackPlayer.getCurrentTrack()
-  //   const notPlaying = queue.filter((item, index) => index != playingIndex)
-  //   const data = DATA
-  //   if (playingIndex != null) {
-  //     const track = queue[playingIndex]
-  //     data[1].data = [track]
-  //   }
-  //   data[2].data = notPlaying
-  //   return data
-  // }
-
+  const { state, setState } = usePlayer()
 
   useEffect(() => {
     TrackPlayer.getQueue().then(async (queue) => {
       setQueue(queue)
     })
   }, [isFocused])
-
-  useTrackPlayerEvents([Event.PlaybackState, Event.PlaybackTrackChanged, Event.PlaybackError], async (event) => {
-    const newState = await createPlayerState(event)
-    setState(newState)
-    setQueue(queue)
-
-    if (event.type == Event.PlaybackTrackChanged) {
-      const prevTrack = event.track
-      if (prevTrack != null) {
-        const prevTrackPosition = event.position
-        console.info("Previous track position = " + prevTrackPosition)
-      }
-      const nextTrack = event.nextTrack
-    }
-  })
 
   const styles = StyleSheet.create({
     container: {
@@ -142,11 +112,30 @@ const QueueScreen = ({ navigation }) => {
     },
     separator: {
       height: 1,
-      backgroundColor: theme.colors.background,
+      backgroundColor: theme.colors.separator,
       marginStart: 16,
       marginEnd: 16
     }
   });
+
+  const onIconPress = (item: Track, index: number) => {
+    if (index == state.currentIndex) {
+      if (state.isPlaying) {
+        TrackPlayer.pause()
+      } else {
+        TrackPlayer.play()
+      }
+    } else {
+      TrackPlayer.skip(index)
+    }
+  }
+
+  const emptyView = () => (
+    <View style={{ alignSelf: 'center', justifyContent: 'center', alignItems: 'center' }}>
+      <Ionicons size={48} name='volume-mute-outline' style={{}} color={theme.colors.textLight} />
+      <Text style={StyleSheet.compose(fonts.textReguar, { color: theme.colors.textLight })}>Ve frontě nic nic není :(</Text>
+    </View>
+  )
 
   return (
     <View style={styles.container}>
@@ -160,27 +149,21 @@ const QueueScreen = ({ navigation }) => {
           )
         }
         keyExtractor={(item, index) => String(item.id)}
+
         renderItem={({ item, index }) => <Item
           item={item}
           isSelected={index == state.currentIndex}
           isPlaying={index == state.currentIndex && state.isPlaying}
           onPress={() => TrackPlayer.skip(index)}
-          onIconPress={() => {
-            if (index == state.currentIndex) {
-              if (state.isPlaying) {
-                TrackPlayer.pause()
-              } else {
-                TrackPlayer.play()
-              }
-            } else {
-              TrackPlayer.skip(index)
-            }
-          }}
+          onIconPress={() => { onIconPress(item, index) }}
         />}
+
+        contentContainerStyle={[{ flexGrow: 1 }, queue.length ? null : { justifyContent: 'center' }]}
+        ListEmptyComponent={emptyView}
       />
 
       <Player
-        style={{ position: "absolute", bottom: 0 }}
+        style={{}}
         hideDescription
         hideQueue
       ></Player>
