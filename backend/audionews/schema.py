@@ -5,26 +5,25 @@ from graphene_django.filter import DjangoFilterConnectionField
 from datetime import datetime
 import graphql_jwt
 
-from .mutations import RegisterListener
+from .mutations import RegisterListener, PlayArticle
 from .types import ArticleNode, ListenerNode, PlayNode, ProviderNode, PlaylistNode, CategoryNode
 from .models import Article, Listener, Play, Provider, Playlist, Category
 
 
 class Mutation(ObjectType):
-    register_listener = RegisterListener.Field(description='Create a single Listener.')
-    token_auth = graphql_jwt.ObtainJSONWebToken.Field()
-    verify_token = graphql_jwt.Verify.Field()
-    refresh_token = graphql_jwt.Refresh.Field()
+    register_listener = RegisterListener.Field(description='Create a single listener.')
+    play_article = PlayArticle.Field(description='Record a play of an article.')
 
 class Query(ObjectType):
-    me = Node.Field(ListenerNode)
-    article = Node.Field(ArticleNode, description='Retrieve a single Article node.')
-    articles = DjangoFilterConnectionField(ArticleNode, description='Return list of Articles.')
-    categories = List(CategoryNode, description="Return list of Articles.")
-    listener = Node.Field(ListenerNode, description='Retrieve a single Listener node.')
-    listeners = DjangoFilterConnectionField(ListenerNode, description='Return list of Listeners.')
-    providers = List(ProviderNode, description='Return list of Providers.')
-    playlists = DjangoFilterConnectionField(PlaylistNode, description='Return list of Playlists.')
+    me = Field(ListenerNode)
+    article = Node.Field(ArticleNode, description='Retrieve a single article node.')
+    articles = DjangoFilterConnectionField(ArticleNode, description='Return list of articles.')
+    my_articles = DjangoFilterConnectionField(ArticleNode, description='Return list of my unheard articles.')
+    categories = List(CategoryNode, description="Return list of articles.")
+    listener = Node.Field(ListenerNode, description='Retrieve a single listener node.')
+    listeners = DjangoFilterConnectionField(ListenerNode, description='Return list of listeners.')
+    providers = List(ProviderNode, description='Return list of providers.')
+    playlists = DjangoFilterConnectionField(PlaylistNode, description='Return list of playlists.')
     playlists_for_today = List(PlaylistNode, required=True)
     playlists_for_this_week = List(PlaylistNode, required=True)
 
@@ -33,6 +32,9 @@ class Query(ObjectType):
         if user.is_anonymous:
             raise Exception('Please login!')
         return user
+
+    def resolve_my_articles(root, info, **kwargs):
+        return Article.objects.filter(plays__listener__username=info.context.user.username).all()
 
     def resolve_articles(root, info, **kwargs):
         return Article.objects.all()

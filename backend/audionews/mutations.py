@@ -6,11 +6,13 @@ from graphql_relay import from_global_id
 from uuid import uuid4
 from .models import Article, Listener, Play, Provider, Playlist, Category
 from .types import ArticleNode, ListenerNode, PlayNode, ProviderNode, PlaylistNode
-
-
+from graphql_jwt.shortcuts import get_token
+from django.contrib.auth.models import User
 
 class RegisterListener(ClientIDMutation):
     listener = Field(ListenerNode)
+    token = String()
+    refresh_token = String()
 
     class Input:
         device_id = String(required=True)
@@ -19,20 +21,26 @@ class RegisterListener(ClientIDMutation):
     def mutate_and_get_payload(cls, root, info: ResolveInfo, **input) -> 'RegisterListener':
         device_id = input['device_id']
 
-        listener, created = Listener.objects.get_or_create(
-            device_id=device_id,
-            username=uuid4(),
+        user, created = User.objects.get_or_create(
+            username=device_id,
         )
 
-        permission = Permission.objects.get(name='Can change user')
-        listener.user_permissions.add(permission)
+        listener, created = Listener.objects.get_or_create(
+            device_id=device_id,
+            user=user
+        )
 
-        listener.save()
-
+        token = get_token(user)
         if not created:
-            raise GraphQLError('Reporter already exist!')
+            return RegisterListener(listener=listener, token=token)
 
-        return RegisterListener(listener=listener)
+        permission = Permission.objects.get(name='Can change user')
+        user.user_permissions.add(permission)
+
+        user.set_password(device_id)
+        user.save()
+
+        return RegisterListener(listener=listener, token=token)
 
 
 class PlayArticle(ClientIDMutation):
@@ -40,15 +48,13 @@ class PlayArticle(ClientIDMutation):
 
     class Input:
         article_id = Int(required=True)
-        device_id = String(required=True)
 
     @classmethod
     def mutate_and_get_payload(cls, root, info: ResolveInfo, **input) -> 'PlayArticle':
         article_id = input['article_id']
-        device_id = input['device_id']
 
-        listener = Listener.objects.filter(device_id=device_id).first()
-        play = Play.objects.create(listener=listener, article_id=article_id)
+        listener = Listener.objects.filter(user__username=info.context.user.username).first()
+        play = Play.objects.create(listener=listener, article__id=article_id)
 
         return PlayArticle(play=play)
 
