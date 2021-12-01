@@ -1,6 +1,13 @@
 import RNTrackPlayer, { Track, Capability, Event, State } from 'react-native-track-player'
 
-export const initialPlayerState = {
+export type PlayerState = {
+    currentTrack: Track,
+    currentIndex: number,
+    recordsCount: number,
+    isPlaying: boolean
+}
+
+export const initialPlayerState: PlayerState = {
     currentTrack: null,
     currentIndex: null,
     recordsCount: 0,
@@ -54,25 +61,27 @@ class TrackPlayer {
     }
 
     public registerService() {
+        console.info('TrackPlayer.registerService()')
         RNTrackPlayer.registerPlaybackService(() => require('./services/audio'))
     }
 
     public async addTrackToQueue(track: Track) {
         const queue = await RNTrackPlayer.getQueue()
-        console.info(queue)
         const existingTracks = queue.filter((t) => t.id == track.id)
         if (existingTracks.length > 0) {
             console.warn('Track with id ' + track.id + ' is already in queue.')
-            return
+            return queue
         }
         track['isPlaying'] = false
         RNTrackPlayer.add([track])
+        return RNTrackPlayer.getQueue()
     }
 
     public async resetPlayer() {
+        console.info('TrackPlayer.resetPlayer()')
         await RNTrackPlayer.reset()
     }
 }
-const playerInstance = TrackPlayer.getInstance()
 
+const playerInstance = TrackPlayer.getInstance()
 export default playerInstance

@@ -12,7 +12,7 @@ const Queue: FC<{
   size: number;
   currentIndexZeroBased: number;
 }> = ({ size, currentIndexZeroBased }) => {
-  const currentItemNumber = currentIndexZeroBased + 1;
+  const currentItemNumber = (size > 0) ? currentIndexZeroBased + 1 : 0;
 
   return (
     <View
@@ -33,9 +33,8 @@ const Queue: FC<{
 export default Queue;
 
 const OpenQueue: FC<TouchableOpacityProps> = (props) => {
-  const { navigate } = useNavigation();
-  const navigateToNestedScreen = () =>
-    navigate(Screens.home, { screen: Screens.queue });
+  const { navigate } = useNavigation()
+  const navigateToNestedScreen = () => navigate(Screens.home, { screen: Screens.queue })
 
   return (
     <TouchableOpacity
@@ -53,5 +52,5 @@ const OpenQueue: FC<TouchableOpacityProps> = (props) => {
     >
       <FontAwesome5 name="chevron-right" size={12} color={Color["black-100"]} />
     </TouchableOpacity>
-  );
-};
+  )
+}

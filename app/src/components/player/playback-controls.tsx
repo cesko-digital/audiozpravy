@@ -1,4 +1,4 @@
-import React, { FC, useState } from "react";
+import React, { FC, useState, useContext } from "react";
 import {
   StyleSheet,
   TouchableOpacity,
@@ -10,6 +10,7 @@ import Svg, { Path } from "react-native-svg";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Color from "../../theme/colors";
 import TrackPlayer, { useProgress, useTrackPlayerEvents, Event, State } from 'react-native-track-player';
+import { usePlayer } from "../../trackPlayerContext";
 
 interface Props extends ViewProps {
   onRewind(): void;
@@ -24,12 +25,7 @@ const PlaybackControls: FC<Props> = ({
   style,
 }) => {
 
-  const [isPlaying, setPlaying] = useState(false);
-
-  useTrackPlayerEvents([Event.PlaybackState], async (event) => {
-    const state = await TrackPlayer.getState();
-    setPlaying(state == State.Playing)
-  });
+  const { state, setQueue, setState } = usePlayer()
 
   return (
     <View
@@ -59,7 +55,7 @@ const PlaybackControls: FC<Props> = ({
         }}
       >
         <MaterialCommunityIcons
-          name={isPlaying ? "pause" : "play"}
+          name={state.isPlaying ? "pause" : "play"}
           color={Color["black-100"]}
           size={46}
         />
@@ -67,6 +63,7 @@ const PlaybackControls: FC<Props> = ({
       <TouchableOpacity
         onPress={onNext}
         style={{ ...buttonStyle, height: 40, width: 40 }}
+        disabled={state.currentIndex + 1 >= state.recordsCount}
       >
         <MaterialCommunityIcons
           name="skip-next"
@@ -75,10 +72,10 @@ const PlaybackControls: FC<Props> = ({
         />
       </TouchableOpacity>
     </View>
-  );
-};
+  )
+}
 
-export default PlaybackControls;
+export default PlaybackControls
 
 const buttonStyle: ViewStyle = {
   backgroundColor: "white",
@@ -86,7 +83,7 @@ const buttonStyle: ViewStyle = {
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
-};
+}
 
 const RewindBackIcon = ({ color, size }) => (
   <Svg width={size} height={size} viewBox="0 0 20 25" fill="none">
