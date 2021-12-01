@@ -25,8 +25,30 @@ import SettingsScreen from "./src/screen-components/settings"
 
 // Initialize Apollo Client
 const client = new ApolloClient({
-  uri: 'localhost:4000/graphql',
-  cache: new InMemoryCache()
+  uri: 'http://127.0.0.1:8000/graphql/',
+  cache: new InMemoryCache({
+    typePolicies: {
+      Query: {
+        fields: {
+          articles: {
+            keyArgs: [],
+            merge(existing, incoming, { args }) {
+              const merged = existing ? existing.edges : []
+              const { pageInfo } = incoming
+              const newEdges = [
+                ...merged,
+                ...incoming.edges
+              ]
+              return {
+                pageInfo: pageInfo,
+                edges: newEdges
+              }
+            },
+          },
+        },
+      },
+    },
+  })
 })
 
 const Tab = createBottomTabNavigator()

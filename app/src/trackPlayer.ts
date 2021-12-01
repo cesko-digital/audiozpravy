@@ -14,22 +14,7 @@ export const initialPlayerState: PlayerState = {
     isPlaying: false
 }
 
-export async function createPlayerState(event: {
-    type: Event;
-    [key: string]: any;
-}) {
-    const queue = await RNTrackPlayer.getQueue()
-    const currentIndex = await RNTrackPlayer.getCurrentTrack()
-    const state = await RNTrackPlayer.getState();
-    const track = await RNTrackPlayer.getTrack(currentIndex)
 
-    return {
-        currentTrack: track,
-        currentIndex: currentIndex,
-        recordsCount: queue.length,
-        isPlaying: state == State.Playing
-    }
-}
 
 class TrackPlayer {
     private static instance: TrackPlayer

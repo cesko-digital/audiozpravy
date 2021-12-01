@@ -7,23 +7,24 @@ import {
   TextStyle,
   TouchableOpacity,
   GestureResponderEvent,
-  StyleSheet
+  StyleSheet,
+  RefreshControl,
+  ViewProps,
+  Dimensions
 } from "react-native";
 import Color from "../../theme/colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import TrackPlayer from "../../trackPlayer"
-import { Track } from "react-native-track-player";
+import RNTrackPlayer, { Track } from "react-native-track-player";
 import PlayerContextProvider, { PlayerContext, usePlayer } from "../../trackPlayerContext";
 import useFonts from "../../theme/fonts";
 import { useTheme } from '../../theme'
+import { Article } from "../../shared/article";
+import { gql, useQuery, NetworkStatus } from "@apollo/client";
+import { useEffect } from "react";
+import { useState } from "react";
 
-
-interface Item extends Track {
-  img: string
-  published: string
-}
-
-const articles: Item[] = [
+const articles: Article[] = [
   {
     id: 1,
     title: "Nový šéf ÚOHS sliboval obnovu důvěry. Ve funkci nechává klid",
@@ -69,13 +70,13 @@ const articles: Item[] = [
   }
 ]
 
-interface Props {
-  style?: TextStyle;
+interface Props extends ViewProps {
+  selected: boolean
   onPress: (event: GestureResponderEvent) => void
 }
 
 
-const PlusIcon: FC<Props> = ({ style, onPress }) => (
+const PlusIcon: FC<Props> = ({ style, selected, onPress }) => (
   <TouchableOpacity
     onPress={onPress}
     style={{
@@ -86,19 +87,33 @@ const PlusIcon: FC<Props> = ({ style, onPress }) => (
       alignSelf: "center",
     }}
   >
-    <MaterialCommunityIcons name="plus" color={Color["black-32"]} size={24} />
+    <MaterialCommunityIcons name={selected ? 'check' : 'plus'} color={Color["black-32"]} size={24} />
   </TouchableOpacity>
 )
 
 interface ItemProps {
-  item: Item
-  onPress: (item: Item) => void
-  onPlusPress: (item: Item) => void
+  item: Article
+  onPress: (item: Article) => void
+  onPlusPress: (item: Article) => void
 }
 
 const Item: FC<ItemProps> = ({ item, onPress, onPlusPress }) => {
-  const theme = useTheme();
-  const fonts = useFonts();
+  const theme = useTheme()
+  const fonts = useFonts()
+  const { state } = usePlayer()
+
+  const [inQueue, setInQueue] = useState(false)
+
+  useEffect(() => {
+    const queue = RNTrackPlayer.getQueue().then((queue) => {
+      const filtered = queue.filter((value, index, array) => {
+        return value.id == item.id
+      })
+      setInQueue(filtered.length > 0)
+    })
+
+  }, [state])
+
 
   return (<View style={{ alignItems: "center" }}>
     <View
@@ -116,7 +131,8 @@ const Item: FC<ItemProps> = ({ item, onPress, onPlusPress }) => {
           style={{
             width: "100%",
             height: "100%",
-            borderRadius: 10
+            borderRadius: 10,
+            backgroundColor: 'gray'
           }}
           source={{
             uri: item.img,
@@ -140,29 +156,79 @@ const Item: FC<ItemProps> = ({ item, onPress, onPlusPress }) => {
           </Text>
         </View>
       </TouchableOpacity>
-      <PlusIcon onPress={() => { onPlusPress(item) }} />
+      <PlusIcon onPress={() => { onPlusPress(item) }} selected={inQueue} />
     </View>
   </View>)
 }
 
-const NewsNavList = ({ topic }) => {
+const QUERY = gql`
+query Articles($first: Int, $after: String) {
+	articles(first: $first, after: $after) {
+    pageInfo{
+      hasNextPage,
+      endCursor
+    },
+    edges{
+      node {
+        id,
+        title,
+        url: recordingUrl,
+        published: pubDate,
+        provider {
+          name
+        }
+      }
+    }
+  }
+}
+`
+
+interface NewsList extends ViewProps {
+  topic: string
+}
+
+const NewsNavList: FC<NewsList> = ({ style, topic }) => {
   const theme = useTheme();
   const fonts = useFonts();
   const { state, setQueue } = usePlayer()
+  const { data, loading, error, refetch, networkStatus, fetchMore } = useQuery(QUERY, {
+    variables: {
+      first: 30,
+      after: ''
+    }
+  })
+  const [enrichedData, setEnrichedData] = useState([])
 
-  const addToQueue = (item: Item) => {
+  const addToQueue = (item: Article) => {
     TrackPlayer.addTrackToQueue(item)
       .then((queue) => {
         setQueue(queue)
+        if (queue.length == 1) {
+          RNTrackPlayer.play()
+        }
       })
   }
 
-  const onItemPress = (item: Item) => addToQueue(item)
-  const onPlusPress = (item: Item) => addToQueue(item)
+  const onItemPress = (item: Article) => addToQueue(item)
+  const onPlusPress = (item: Article) => addToQueue(item)
 
-  const renderItem = ({ item }) => (
-    <Item item={item} onPlusPress={onPlusPress} onPress={onItemPress} />
-  )
+  const renderItem = ({ item }) => {
+    return (<Item item={item} onPlusPress={onPlusPress} onPress={onItemPress} />)
+  }
+
+  useEffect(() => {
+    if (data == undefined) { return }
+    const enriched = data.articles.edges.map((item, index) => {
+      const randomTrackNumber = Math.floor((Math.random() * 15) + 1);
+      return {
+        ...item.node,
+        img: 'https://picsum.photos/200/140/?id' + item.node.id,
+        url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-' + randomTrackNumber + '.mp3',
+        artist: item.node.provider.name
+      }
+    })
+    setEnrichedData(enriched)
+  }, [data])
 
   const styles = StyleSheet.create({
     separator: {
@@ -173,17 +239,43 @@ const NewsNavList = ({ topic }) => {
     }
   })
 
+  if (loading) {
+    return (<Text>Loading....</Text>)
+  }
+
+  if (error) {
+    return (<Text>Error {error.message}</Text>)
+  }
+
   return (
     <FlatList
-      data={articles}
+      data={enrichedData}
       renderItem={renderItem}
       keyExtractor={(item) => item.id}
-      style={{ flex: 1 }}
       ItemSeparatorComponent={
         ({ highlighted }) => (
           <View style={styles.separator}></View>
         )
       }
+      refreshControl={
+        <RefreshControl
+          refreshing={networkStatus === NetworkStatus.refetch}
+          onRefresh={() => {
+            console.log('on refresh')
+            refetch()
+          }}
+        />
+      }
+      onEndReached={() => {
+        console.info('onEndReached, fetchMore', 'endCursor', data.articles.pageInfo.endCursor)
+        fetchMore({
+          variables: {
+            first: 30,
+            after: data.articles.pageInfo.endCursor
+          }
+        })
+      }}
+      onEndReachedThreshold={0.1}
     />
   )
 }

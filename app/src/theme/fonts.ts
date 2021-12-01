@@ -18,6 +18,11 @@ export interface FontsTheme {
 export default function useFonts(): FontsTheme {
   const theme = useTheme()
   return StyleSheet.create({
+    textLightSmall: {
+      fontFamily: 'RobotoLight',
+      fontSize: FontSize.small,
+      color: theme.colors.text,
+    },
     textXSmall: {
       fontSize: FontSize.xsmall,
       color: theme.colors.text,

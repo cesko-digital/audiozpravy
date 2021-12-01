@@ -6,9 +6,8 @@ import { useTheme } from '../../theme'
 import Color from "../../theme/colors";
 import AppStatusBar from "../../components/statusBar"
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import TrackPlayer, { useTrackPlayerEvents, Event, State, Track } from 'react-native-track-player';
+import TrackPlayer, { Track } from 'react-native-track-player';
 import { useIsFocused } from '@react-navigation/native';
-import { initialPlayerState, createPlayerState } from "../../trackPlayer";
 import { usePlayer } from "../../trackPlayerContext";
 
 const Item = ({ item, isSelected, isPlaying, onPress, onIconPress }) => {
@@ -162,11 +161,7 @@ const QueueScreen = ({ navigation }) => {
         ListEmptyComponent={emptyView}
       />
 
-      <Player
-        style={{}}
-        hideDescription
-        hideQueue
-      ></Player>
+      <Player></Player>
     </View>
   );
 };

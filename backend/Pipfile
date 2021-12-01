@@ -32,6 +32,7 @@ pandas = "*"
 feedparser = "*"
 sklearn = "*"
 gensim = "*"
+cython = "*"
 
 [requires]
 python_version = "3.8"

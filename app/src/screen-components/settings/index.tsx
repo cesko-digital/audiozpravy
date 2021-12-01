@@ -6,6 +6,8 @@ import { useTheme } from '../../theme'
 import { ScrollView } from "react-native-gesture-handler";
 import { usePreferences, savePreferredTopics } from "../../securePreferences";
 import { useState } from "react";
+import { usePlayer } from "../../trackPlayerContext";
+import TrackPlayer from "react-native-track-player";
 
 
 interface RowProps {
@@ -28,6 +30,7 @@ const SettingsScreen = ({ navigation }) => {
   const theme = useTheme()
   const fonts = useFonts()
   const [preferences, setPreferences] = useState(null)
+  const { setQueue } = usePlayer()
 
 
   useEffect(() => {
@@ -35,6 +38,19 @@ const SettingsScreen = ({ navigation }) => {
       setPreferences(preferences)
     })
   }, [])
+
+  const clearQueue = async () => {
+    TrackPlayer.stop()
+    const queue = await TrackPlayer.getQueue()
+
+    var indexesToRemove = new Array(queue.length)
+    for (let i = 0; i < queue.length; i++) indexesToRemove[i] = queue.length - 1 - i
+    //debugger
+    for (const id of indexesToRemove) {
+      await TrackPlayer.remove([id])
+    }
+    setQueue([])
+  }
 
   return (
     <View style={{ flex: 1 }}>
@@ -52,11 +68,20 @@ const SettingsScreen = ({ navigation }) => {
       </View>
       <ScrollView style={{ marginTop: 24 }}>
         <Row title='Preferované kategorie:' value={preferences?.preferredTopics.join(', ')}></Row>
+
         <View style={{ paddingVertical: 8, paddingHorizontal: 24 }}>
           <TouchableOpacity onPress={() => {
             savePreferredTopics([])
           }}>
             <Text style={{ color: theme.colors.primary }}>🛠 Smazat preferované kategorie</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={{ paddingVertical: 8, paddingHorizontal: 24 }}>
+          <TouchableOpacity onPress={() => {
+            clearQueue()
+          }}>
+            <Text style={{ color: theme.colors.primary }}>🥞 Smazat frontu přehrávače</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

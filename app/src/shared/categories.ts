@@ -1,4 +1,5 @@
 import { ImageSourcePropType } from "react-native"
+import { Article } from "./article"
 
 export interface ArticleCategory {
     id: number
@@ -15,14 +16,14 @@ const categories: ArticleCategory[] = [
         title: 'Domov',
         key: 'domov',
         colors: ['#231557', '#44107A', '#FF1361'],
-        image: require('../../assets/images/categories/domov.jpg')
+        image: require('../../assets/images/categories/domov.jpg'),
     },
     {
         id: 2,
         title: 'Sport',
         key: 'sport',
         colors: ['#16A085', '#F4D03F'],
-        image: require('../../assets/images/categories/sport.jpg')
+        image: require('../../assets/images/categories/sport.jpg'),
     },
     {
         id: 3,

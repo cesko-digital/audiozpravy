@@ -7,7 +7,8 @@ import {
   TouchableOpacity,
   StyleSheet,
   Animated,
-  Easing
+  Easing,
+  RefreshControl
 } from "react-native"
 import { MaterialCommunityIcons } from "@expo/vector-icons"
 import { FontAwesome5 } from "@expo/vector-icons"
@@ -15,7 +16,31 @@ import { LinearGradient } from 'expo-linear-gradient'
 import categories, { ArticleCategory } from '../../shared/categories'
 import { useTheme } from "../../theme"
 import useFonts from "../../theme/fonts"
+import { gql, useQuery, NetworkStatus } from '@apollo/client'
 
+const CATEGORIES_TODAY = gql`
+{
+ playlistsForToday {
+  category { name, id},
+  articles { recordingUrl, title, id },
+  preparedForDate, createdAt, type
+	}
+}`
+
+const CATEGORIES_WEEK = gql`
+{
+ playlistsForThisWeek {
+  category { name, id},
+  articles { recordingUrl, title },
+  preparedForDate, createdAt, type
+	}
+}`
+
+
+export enum ScreenVariant {
+  today,
+  week
+}
 
 interface GridProps {
   images: string[]
@@ -90,11 +115,12 @@ const ImageGrid: FC<GridProps> = ({ images }) => {
 
 interface Props {
   item: ArticleCategory
-  weekNumber: number,
-  images: string[]
+  weekNumber: string,
+  images: string[],
+  onPress: (item: ArticleCategory) => void
 }
 
-const GradientCard: FC<Props> = ({ item, weekNumber, images }) => {
+const GradientCard: FC<Props> = ({ item, weekNumber, images, onPress }) => {
   const fonts = useFonts()
   const theme = useTheme()
 
@@ -110,7 +136,8 @@ const GradientCard: FC<Props> = ({ item, weekNumber, images }) => {
       <TouchableOpacity
         style={{}}
         onPress={() => {
-          alert('playlist added to queue')
+          onPress(item)
+          //alert('playlist added to queue')
         }}
       >
         <LinearGradient colors={item.colors} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={{ borderRadius: 8 }}>
@@ -159,19 +186,53 @@ const GradientCard: FC<Props> = ({ item, weekNumber, images }) => {
   )
 }
 
-const Item = ({ item, weekNumber, images }) => (
+const Item: FC<Props> = ({ item, weekNumber, images, onPress }) => (
   <View style={{}}>
-    <GradientCard item={item} weekNumber={weekNumber} images={images} />
+    <GradientCard item={item} weekNumber={weekNumber} images={images} onPress={onPress} />
   </View>
 )
 
-const NewsNavList = ({ topicID }) => {
+interface NavListProps {
+  variant: ScreenVariant
+}
+
+const NewsNavList: FC<NavListProps> = ({ variant }) => {
+  const query = variant == ScreenVariant.today ? CATEGORIES_TODAY : CATEGORIES_WEEK
+  const { data, loading, error, refetch, networkStatus } = useQuery(query, {
+    fetchPolicy: 'no-cache',
+    nextFetchPolicy: 'no-cache'
+  })
+  const [enrichedData, setEnrichedData] = useState([])
+
+  useEffect(() => {
+    setEnrichedData(enrichData(data))
+  }, [data])
+
+  const enrichData = (data) => {
+    const dataCollection = variant == ScreenVariant.today ? data?.playlistsForToday : data?.playlistsForThisWeek
+    //console.log(data)
+    const enrichedData = dataCollection?.map((d, index) => {
+      //console.log(index, d.category.name)
+      const category = categories[index]
+      if (category) {
+        const enriched = { ...category, articles: d.articles.slice(0, 9) }
+        return enriched
+      }
+      return null
+    }).filter(n => n)
+    return enrichedData
+  }
+
+  const onItemPress = (item: ArticleCategory) => {
+    console.info('onItemPress', item.articles)
+  }
+
   const renderItem = ({ item }) => {
     // sample data
     const dayNumber = new Date().getDay()
     const weekLabel = dayNumber == 0 ? 'Minulý týden' : 'Tento týden'
-    const weekNumber = (topicID == 'week') ? weekLabel + ' (' + dayNumber + ')' : null
-    const timestamp = topicID + item.key
+    const weekNumber = (variant == ScreenVariant.week) ? weekLabel + ' (' + dayNumber + ')' : null
+    const timestamp = variant.toString + item.key
     const sampleImages = [
       // 'https://picsum.photos/126/90/?a' + timestamp,
       // 'https://picsum.photos/126/90/?b' + timestamp,
@@ -183,15 +244,32 @@ const NewsNavList = ({ topicID }) => {
       // 'https://picsum.photos/126/90/?h' + timestamp,
       // 'https://picsum.photos/126/90/?i' + timestamp
     ]
-    return (<Item item={item} weekNumber={weekNumber} images={sampleImages} />)
+    return (<Item item={item} weekNumber={weekNumber} images={sampleImages} onPress={onItemPress} />)
   }
+
+  if (loading) {
+    return (<Text>Loading....</Text>)
+  }
+
+  if (error) {
+    return (<Text>Error {error.message}</Text>)
+  }
+
   return (
     <FlatList
-      data={categories}
+      data={enrichedData}
       renderItem={renderItem}
-      keyExtractor={(item) => String('topicID-' + item.id)
-      }
+      keyExtractor={(item) => String('topicID-' + item.id)}
       style={{}}
+      refreshControl={
+        <RefreshControl
+          refreshing={networkStatus === NetworkStatus.refetch}
+          onRefresh={() => {
+            console.log('on refresh')
+            refetch()
+          }}
+        />
+      }
     />
   )
 }
