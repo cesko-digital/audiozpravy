@@ -6,8 +6,9 @@ class Category:
         self.key = key
 
 class CategoryEnum(Enum):
+    PETI_MIN = Category('5minutovka na míru', '5min')
     DOMOV = Category("Z domova", "domov")
-    ZAHRANICI = Category("Svět", "svet")
+    ZAHRANICI = Category("Zahraničí", "zahranici")
     SPORT = Category("Sport", "sport")
     BYZNYS = Category("Byznys", "byznys")
     KULTURA = Category("Kultura", "kultura")
@@ -16,7 +17,7 @@ class CategoryEnum(Enum):
     RELAX = Category("Relax", "relax")
     VEDA = Category("Věda", "veda")
     AUTO = Category("Auto", "auto")
-    ZIVOTNI_STYL = Category("Životní styl", "styl")
+    ZIVOTNI_STYL = Category("Životní styl", "zivotni-styl")
     HISTORIE = Category("Historie", "historie")
     UNKNOWN = Category("", "unknown")
 
