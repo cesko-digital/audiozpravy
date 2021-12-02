@@ -1,16 +1,19 @@
 from datetime import datetime
 from collections import namedtuple
 from random import random
-import django
 import os
+import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "API.settings")
 django.setup()
+from django.contrib.auth.models import Permission
 from collections import defaultdict
 import recommender.recommend
 import pandas as pd
 from classes.categorizer import parse_category
 from audionews.models import Provider, Category, Article, Listener, Playlist, Play
 
+
+DEVICE_ID = "abcd"
 if __name__ == '__main__':
     """ Add data from pandas df into sqlite database"""
     # articles = pd.read_csv('s3_input/articles.csv')
@@ -18,7 +21,11 @@ if __name__ == '__main__':
     articles_new['published'] = articles_new.published.apply(recommender.recommend.to_timestamp)
     django.setup()
 
-    listener, created = Listener.objects.get_or_create(device_id="1")
+    listener, created = Listener.objects.get_or_create(device_id=DEVICE_ID, username=DEVICE_ID)
+    permission = Permission.objects.get(name='Can change user')
+    listener.user_permissions.add(permission)
+    listener.set_password(DEVICE_ID)
+    listener.save()
 
     articles_for_category_count = defaultdict(lambda: 0)
     for index, row in articles_new.iterrows():
@@ -28,7 +35,6 @@ if __name__ == '__main__':
             category=category,
             title=row.title,
             perex=row.summary,
-            recording_created_at=datetime.now(),
             pub_date=datetime.fromtimestamp(row.published),
             url=str(row.link),
             provider=provider,
