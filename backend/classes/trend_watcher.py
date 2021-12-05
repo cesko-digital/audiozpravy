@@ -4,6 +4,7 @@ from typing import Dict, List
 import numpy as np
 
 class TrendWatcher:
+
     @classmethod
     @cached(cache=TTLCache(maxsize=2, ttl=1800))
     def get_daily_google_trends(cls) -> List[Dict]:

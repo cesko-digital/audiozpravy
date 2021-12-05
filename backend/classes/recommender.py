@@ -6,6 +6,8 @@ import numpy as np
 from classes.metrics import calculate_frecency, calculate_age_in_secs
 from classes.trend_watcher import TrendWatcher
 from classes import MetricEnum
+from pipeline.text_processing import fit_tf_idf
+
 ARTICLE_PROPS = ["title", "link", "summary", "published", "category", "audio"]
 
 class Recommender:
@@ -17,19 +19,17 @@ class Recommender:
         self.timezone = pytz.timezone("Europe/Prague")
         self.method = METRICS[metric]
         self.age_limit_in_secs = 4 * 3600
+        self.daily_trends = TrendWatcher.get_daily_google_trends()
 
-    def prioritize_articles(self, articles: pd.DataFrame):
+    def prioritize_articles(self, articles: pd.DataFrame, n_of_articles):
         articles_age = calculate_age_in_secs(articles)
-        article_popularity = self.popularity(articles, words_in_article)
+        tfidf_matrix, words = fit_tf_idf(articles["text"])
+
+        article_popularity = self.popularity(tfidf_matrix, words)
 
         top_articles = self.method(articles)
-        top_ids = top_articles.argsort()[::-1][:20]
-        return articles.iloc[top_ids[:20], :][ARTICLE_PROPS]
-
-        # recent defined as newer than 4 hours
-        recent = articles.index[articles_age < self.age_limit_in_secs]
-        # trending defined as roughly one std above average article popularity
-        trending = articles.index[article_popularity.T.squeeze() > 200]
+        top_ids = top_articles.argsort()[::-1][:n_of_articles]
+        return articles.iloc[top_ids[:n_of_articles], :][ARTICLE_PROPS]
 
     def get_relevant_words(self, tf_idf_matrix, words, row_id):
         row = tf_idf_matrix.getrow(row_id).toarray().squeeze()
@@ -39,7 +39,6 @@ class Recommender:
 
 
     def popularity(self, articles_words_matrix, words_in_article):
-        daily_trends = TrendWatcher.get_daily_google_trends()
         popularity = np.zeros((articles_words_matrix.shape[0], 1))
 
         for top_trend in self.daily_trends:

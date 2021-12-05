@@ -45,8 +45,8 @@ def category_mapper(keyword):
     keyword_to_category = {
         'Zprávy z domova': CategoryEnum.DOMOV.value,
         'Česko': CategoryEnum.DOMOV.value,
-        'Svět': CategoryEnum.SVET,
-        'Zprávy ze světa': CategoryEnum.SVET.value,
+        'Svět': CategoryEnum.ZAHRANICI,
+        'Zprávy ze světa': CategoryEnum.ZAHRANICI.value,
         'Sport': CategoryEnum.SPORT.value,
         'Kultura': CategoryEnum.KULTURA.value,
         'Zdraví': CategoryEnum.ZDRAVI.value,

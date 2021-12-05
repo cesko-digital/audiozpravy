@@ -2,7 +2,7 @@ from enum import Enum, auto
 
 class CategoryEnum(Enum):
     DOMOV = 'Zprávy z domova'
-    SVET = 'Zprávy ze světa',
+    ZAHRANICI = 'Zprávy ze světa'
     SPORT = "Sport"
     BYZNYS = 'Byznys zprávy'
     KULTURA = "Kultura"
@@ -10,7 +10,7 @@ class CategoryEnum(Enum):
     EKONOMIKA = "Ekonomika"
     CESTOVANI = "Cestování"
     RELAX ="relax"
-    VEDA = "'Věda a technologie'"
+    VEDA = "Věda a technologie"
     AUTO = "Auto"
     ZIVOTNI_STYL = 'Životní styl a společnost'
     HISTORIE = "historie"
