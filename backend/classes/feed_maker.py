@@ -1,14 +1,14 @@
 from classes.logger import Logger
 from datetime import datetime
 from audionews.models import Article
-from classes.prioritizer import Prioritizer
+from classes.recommender import Recommender
 from classes import CategoryEnum, MetricEnum
 import pandas as pd
 
 class FeedMaker:
     def __init__(self, metric: MetricEnum):
         self.metric = metric
-        self.prioritizer = Prioritizer(metric)
+        self.prioritizer = Recommender(metric)
         self.logger = Logger("feed_maker").logger
 
     def load_articles(self, date_from: datetime) -> pd.DataFrame:

@@ -1,7 +1,10 @@
+import logging
 from datetime import datetime, timedelta
 from babel.dates import format_timedelta, format_date
 from collections import namedtuple
 import pandas as pd
+
+from classes import CategoryEnum
 
 FeedparserTime = namedtuple(
     "FeedparserTime",
@@ -37,3 +40,28 @@ def format_articles(selected_articles: pd.DataFrame) -> pd.DataFrame:
     )
 
     return selected_articles
+
+def category_mapper(keyword):
+    keyword_to_category = {
+        'Zprávy z domova': CategoryEnum.DOMOV.value,
+        'Česko': CategoryEnum.DOMOV.value,
+        'Svět': CategoryEnum.SVET,
+        'Zprávy ze světa': CategoryEnum.SVET.value,
+        'Sport': CategoryEnum.SPORT.value,
+        'Kultura': CategoryEnum.KULTURA.value,
+        'Zdraví': CategoryEnum.ZDRAVI.value,
+        'Zajímavosti': CategoryEnum.ZAJIMAVOSTI.value,
+        'Ekonomika': CategoryEnum.EKONOMIKA.value,
+        'Životní styl a společnost': CategoryEnum.ZIVOTNI_STYL.value,
+        'Věda a technologie': CategoryEnum.VEDA.value,
+        'Byznys zprávy': CategoryEnum.BYZNYS.value,
+        'Věda': CategoryEnum.VEDA.value,
+        'Cestování': CategoryEnum.CESTOVANI.value,
+        'Auto': CategoryEnum.AUTO.value
+    }
+    if keyword in keyword_to_category:
+        return keyword_to_category[keyword]
+    else:
+        logging.Logger.info(f'Keyword {keyword} is not in a list of known keywords. Returning category: "ostatni"')
+        return CategoryEnum.OSTATNI.value
+
