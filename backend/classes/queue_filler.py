@@ -8,8 +8,9 @@ import sklearn.metrics
 from gensim.models import Doc2Vec
 
 class QueueFiller:
-    embed_vectors_path = 'backend/s3_input/articles_embeddings.json'
-    doc2vec_path = 'backend/s3_input/doc2vec_articles.model'
+    embed_vectors_path = 's3_input/articles_embeddings.json'
+    doc2vec_path = 's3_input/doc2vec_articles.model'
+    stop_words = 's3_input/stop_words.czech.json'
     all_article_vectors = json.load(open(embed_vectors_path, 'r'))
     doc2vec_model = Doc2Vec.load(doc2vec_path)
     logger = logging.getLogger('QueueFiller')
@@ -31,7 +32,7 @@ class QueueFiller:
         )
 
         # sort all_articles by cosine similarity values
-        articles_sum = cosine_similarity.sum(0)
+        articles_sum = cosine_similarity.sum(0)[::-1]
 
         sorted_articles_ids = np.argsort(articles_sum)
         return sorted_articles_ids
@@ -47,6 +48,9 @@ class QueueFiller:
             if str(article.id) not in QueueFiller.all_article_vectors:
                 QueueFiller.logger.warning(f'Embedding vector for article {article.title} and id {article.id} '
                                 f'not yet calculated. Predicting vector ...')
+
+                article.perex.split()
+
                 articles_embeddings.append(QueueFiller.doc2vec_model.infer_vector(article.perex.split()))
             else:
                 articles_embeddings.append(QueueFiller.all_article_vectors[str(article.id)])
