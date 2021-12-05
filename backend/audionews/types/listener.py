@@ -1,5 +1,6 @@
-from datetime import datetime
+import datetime
 
+import graphene
 from django.db.models.query import QuerySet
 from graphene import Field, Int, List, NonNull
 from graphene.relay import Connection, Node
@@ -14,7 +15,7 @@ from classes.queue_filler import QueueFiller
 
 class ListenerNode(DjangoObjectType):
     plays = List(NonNull(PlayNode), required=True)
-    queue = List(NonNull(ArticleNode), played_article_ids=List(Int))
+    queue = List(NonNull(ArticleNode), n_of_messages=graphene.Int(), last_articles_date=graphene.String())
 
     class Meta:
         model = Listener
@@ -31,16 +32,22 @@ class ListenerNode(DjangoObjectType):
         return Play.objects.filter(listener_id=root.id).all()
 
 
-    def resolve_queue(root, user_id, n_of_articles: int = 10):
-        user_plays = Listener.objects.get(user_ptr_id=user_id).plays.all()
+    def resolve_queue(root, info, n_of_messages: str = 10, last_articles_date: str = "2018-10-10"):
+        """
+        Get recommended articles for a given user
+
+        :param n_of_messages: number of messages to display
+        :param last_articles_dat: date of the last article to recommend as string in format YYYY-MM-DD
+        """
+        user_plays = Listener.objects.get(user_ptr_id=root.id).plays.all()
 
         user_articles_ids = [play.article.id for play in user_plays]
         user_articles = Article.objects.filter(id__in=user_articles_ids)
 
         # get user history articles
-        our_date = datetime.datetime(2018, 10, 10)
+        our_date = datetime.datetime.strptime(last_articles_date, "%Y-%m-%d")
         all_articles = Article.objects.filter(pub_date__gte=our_date)
 
         recommended_ids = QueueFiller.recommend_articles(user_articles, all_articles)
-        recommended_articles_queue = Article.objects.filter(id__in=recommended_ids[:n_of_articles])
+        recommended_articles_queue = Article.objects.filter(id__in=recommended_ids[:n_of_messages])
         return recommended_articles_queue

@@ -13,6 +13,7 @@ class CategoryEnum(Enum):
     AUTO = "auto"
     ZIVOTNI_STYL = "zivotni_styl"
     HISTORIE = "historie"
+    OSTATNI = "ostatni"
 
 
 class MetricEnum(Enum):
