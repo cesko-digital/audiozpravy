@@ -19,37 +19,11 @@ import { StatusBar } from "expo-status-bar"
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context'
 import TrackPlayer from './src/trackPlayer'
 import PlayerContextProvider from "./src/trackPlayerContext"
-import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client'
-import { usePreferences, AppPreferences } from "./src/securePreferences"
+import { ApolloProvider } from '@apollo/client'
+import { usePreferences } from "./src/securePreferences"
 import SettingsScreen from "./src/screen-components/settings"
-
-// Initialize Apollo Client
-const client = new ApolloClient({
-  uri: 'http://127.0.0.1:8000/graphql/',
-  cache: new InMemoryCache({
-    typePolicies: {
-      Query: {
-        fields: {
-          articles: {
-            keyArgs: [],
-            merge(existing, incoming, { args }) {
-              const merged = existing ? existing.edges : []
-              const { pageInfo } = incoming
-              const newEdges = [
-                ...merged,
-                ...incoming.edges
-              ]
-              return {
-                pageInfo: pageInfo,
-                edges: newEdges
-              }
-            },
-          },
-        },
-      },
-    },
-  })
-})
+import { REGISTER_USER } from "./src/shared/queries"
+import { client, setAccessToken } from "./src/apiClient"
 
 const Tab = createBottomTabNavigator()
 const Stack = createStackNavigator()
@@ -70,7 +44,20 @@ export default function App() {
     TrackPlayer.registerService()
 
     usePreferences().then((preferences) => {
+      console.info('setPreferences')
       setPreferences(preferences)
+
+      client.mutate({ mutation: REGISTER_USER, variables: { deviceID: preferences.userUUID } })
+        .catch((error) => {
+          console.error(error)
+        })
+        .then((result) => {
+          const token = result.data.registerListener.token
+          if (token) {
+            setAccessToken(token)
+          }
+          console.info('access token', token)
+        })
     })
 
     Appearance.addChangeListener(({ colorScheme }) => {

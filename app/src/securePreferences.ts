@@ -28,6 +28,8 @@ export const usePreferences = async (): Promise<AppPreferences> => {
         console.info('🧵 preferredTopics=', preferredTopics)
     }
 
+    var strPreferredTopics = await SecureStore.getItemAsync(PREFERRED_TOPICS)
+
     return {
         userUUID: userUUID,
         preferredTopics: preferredTopics
