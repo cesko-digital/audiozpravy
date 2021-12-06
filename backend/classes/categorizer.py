@@ -61,18 +61,17 @@ def parse_denikn_category(url):
     return mapping[url]
 
 def parse_category(url):
-    def get_category(url):
-        try:
-            if "denikn.cz" in url:
-                return CategoryEnum.DOMOV
-                #return parse_denikn_category(url)
-            if "irozhlas.cz" in url:
-                return parse_irozhlas_category(url)
-            if "lidovky.cz" in url:
-                return parse_lidovky_category(url)
-            if "ctidoma.cz" in url:
-                return parse_ctidoma_category(url)
-        except KeyError:
-            return CategoryEnum.UNKNOWN
-    return get_category(url).value
+    try:
+        if "denikn.cz" in url:
+            return CategoryEnum.DOMOV
+            #return parse_denikn_category(url)
+        if "irozhlas.cz" in url:
+            return parse_irozhlas_category(url)
+        if "lidovky.cz" in url:
+            return parse_lidovky_category(url)
+        if "ctidoma.cz" in url:
+            return parse_ctidoma_category(url)
+    except KeyError:
+        return CategoryEnum.UNKNOWN
+
 

@@ -30,7 +30,8 @@ if __name__ == '__main__':
     articles_for_category_count = defaultdict(lambda: 0)
     for index, row in articles_new.iterrows():
         provider, create = Provider.objects.get_or_create(name=row.source)
-        category, create = Category.objects.get_or_create(name=parse_category(str(row.link)))
+        cat = parse_category(str(row.link))
+        category, create = Category.objects.get_or_create(name=cat.value.name, key=cat.value.key)
         article = Article.objects.create(
             category=category,
             title=row.title,
@@ -46,7 +47,7 @@ if __name__ == '__main__':
             prepared_for_date = datetime.today(),
             type="Day"
         )
-        if articles_for_category_count[row.category] <= 8:
+        if articles_for_category_count[row.category] <= 9:
             playlist.articles.add(article)
         playlist, created = Playlist.objects.get_or_create(
             category=category,
