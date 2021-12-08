@@ -13,14 +13,14 @@ pipenv sync --dev
 
 ```sh
 # Database migration
-pipenv run python3 backend/manage.py makemigrations
-pipenv run python3 backend/manage.py migrate
+pipenv run python3 manage.py makemigrations
+pipenv run python3 manage.py migrate
 
 #Populate DB
-pipenv run python3 backend/populate_db.py
+pipenv run python3 populate_db.py
 
 # Run GraphQL server at localhost:8000 by default
-pipenv run python3 backend/manage.py runserver
+pipenv run python3 manage.py runserver
 
 # Run GraphQL server with gunicorn
 gunicorn --chdir backend API.wsgi
