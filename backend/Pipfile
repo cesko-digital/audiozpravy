@@ -32,6 +32,7 @@ pandas = "*"
 feedparser = "*"
 sklearn = "*"
 gensim = "*"
+django-graphql-auth = "*"
 
 [requires]
 python_version = "3.8"
