@@ -1,34 +1,41 @@
 import argparse
 import json
+import logging
 import os.path
 import sqlite3
 
-from recommender.utils import get_embeddings, get_all_articles
+import django
+import os
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "API.settings")
+django.setup()
+
+from audionews.models import Article
+from recommender.utils import get_embeddings
 from gensim.models.doc2vec import Doc2Vec
+
 
 def calculate_doc2vec_vectors(model_path: str, vectors_path: str) -> None:
     ''' Calculates embeddings for all available articles that are missing from "vectors_path" file and save it into
     this file'''
 
     doc2vec_model = Doc2Vec.load(model_path)
-    all_articles = get_all_articles(
-        last_n_of_days=10000,
-        con=sqlite3.connect('db.sqlite3')
-    )
 
+    all_articles = Article.objects.all()
     if os.path.exists(vectors_path):
         article_embeddings = json.load(open(vectors_path, 'r'))
     else:
         article_embeddings = {}
 
-    new_articles = set(all_articles['id']) - set(list(map(int, article_embeddings.keys())))
-    all_articles_subset = all_articles.loc[all_articles.id.isin(new_articles)]
+    article_ids = [article.id for article in all_articles]
+    new_articles = set(article_ids) - set(list(map(int, article_embeddings.keys())))
+
     all_articles_emb = get_embeddings(
-        all_articles_subset.perex.apply(lambda x: x.split()).tolist(), doc2vec_model
+        articles=[article.perex for article in all_articles if article.id in new_articles],
+        doc2vec_model=doc2vec_model
     )
 
-    for article_id, emb_vecotr in zip(all_articles['id'].values, all_articles_emb):
-        article_embeddings[str(article_id)] = list(emb_vecotr)
+    for new_article_id, emb_vecotr in zip(new_articles, all_articles_emb):
+        article_embeddings[str(new_article_id)] = list(emb_vecotr)
 
     json.dump(article_embeddings, open(vectors_path, 'w'))
 
@@ -40,5 +47,7 @@ if __name__ == '__main__':
     args.add_argument('--vectors-path', default='s3_input/articles_embeddings.json')
     cfg = args.parse_args()
     calculate_doc2vec_vectors(cfg.doc2vec_path, cfg.vectors_path)
+
+
 
 
