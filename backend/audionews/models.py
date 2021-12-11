@@ -16,7 +16,7 @@ class Provider(models.Model):
 
 class Category(models.Model):
     name = models.CharField(max_length=256)
-    key = models.CharField(max_length=50)
+    key = models.CharField(max_length=50, primary_key=True)
 
     def __str__(self) -> str:
         return self.name
