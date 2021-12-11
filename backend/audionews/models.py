@@ -34,6 +34,7 @@ class Article(models.Model):
     pub_date = models.DateField()
     recording_created_at = models.DateTimeField(default=None, null=True)
     recording_url = models.CharField(max_length=256, null=True)
+    picture_url = models.CharField(max_length=256, null=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='articles')
 
     class Meta:
