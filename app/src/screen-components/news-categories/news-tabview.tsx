@@ -5,6 +5,7 @@ import { TabView, SceneMap, TabBar } from "react-native-tab-view"
 import NewsNavList, { ScreenVariant } from "./news-list"
 import { useTheme } from "../../theme"
 import useFonts from "../../theme/fonts"
+import { useMemo } from "react"
 
 const renderTabBar = (props) => {
   const theme = useTheme();
@@ -49,19 +50,22 @@ const renderScene = SceneMap({
   thisWeek: () => <NewsNavList variant={ScreenVariant.week} />,
 });
 
+const todayDayNumber = (): number => {
+  return new Date().getDay()
+}
+
+const getRoutes = (dayNumber: number) => {
+  return [
+    { key: "today", title: "Dnes" },
+    { key: "thisWeek", title: dayNumber == 0 ? 'Minulý týden' : 'Tento týden' }
+  ]
+}
 
 const TabViewNews: FC<ViewProps> = ({ style }) => {
-  const [index, setIndex] = useState(0);
-
-  const getRoutes = () => {
-    const dayNumber = new Date().getDay()
-    return [
-      { key: "today", title: "Dnes" },
-      { key: "thisWeek", title: dayNumber == 0 ? 'Minulý týden' : 'Tento týden' }
-    ]
-  }
-
-  const [routes, setRoutes] = useState(getRoutes());
+  const [index, setIndex] = useState(0)
+  const routes = useMemo(() => {
+    return getRoutes(todayDayNumber())
+  }, [todayDayNumber])
 
   return (
     <TabView

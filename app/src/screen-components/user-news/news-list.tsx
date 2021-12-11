@@ -184,13 +184,12 @@ query Articles($first: Int, $after: String) {
 `
 
 interface NewsList extends ViewProps {
-  topic: string
+  categories: string[]
 }
 
-const NewsNavList: FC<NewsList> = ({ style, topic }) => {
+const NewsNavList: FC<NewsList> = ({ style, categories }) => {
   const theme = useTheme();
-  const fonts = useFonts();
-  const { state, setQueue } = usePlayer()
+  const { setQueue } = usePlayer()
   const { data, loading, error, refetch, networkStatus, fetchMore } = useQuery(QUERY, {
     variables: {
       first: 30,
@@ -219,7 +218,7 @@ const NewsNavList: FC<NewsList> = ({ style, topic }) => {
   useEffect(() => {
     if (data == undefined) { return }
     const enriched = data.articles.edges.map((item, index) => {
-      const randomTrackNumber = Math.floor((Math.random() * 15) + 1);
+      const randomTrackNumber = Math.floor((Math.random() * 15) + 1)
       return {
         ...item.node,
         img: 'https://picsum.photos/200/140/?id' + item.node.id,
@@ -252,6 +251,7 @@ const NewsNavList: FC<NewsList> = ({ style, topic }) => {
       data={enrichedData}
       renderItem={renderItem}
       keyExtractor={(item) => item.id}
+      style={StyleSheet.compose({ flex: 1 }, style)}
       ItemSeparatorComponent={
         ({ highlighted }) => (
           <View style={styles.separator}></View>
@@ -261,13 +261,12 @@ const NewsNavList: FC<NewsList> = ({ style, topic }) => {
         <RefreshControl
           refreshing={networkStatus === NetworkStatus.refetch}
           onRefresh={() => {
-            console.log('on refresh')
             refetch()
           }}
         />
       }
       onEndReached={() => {
-        console.info('onEndReached, fetchMore', 'endCursor', data.articles.pageInfo.endCursor)
+        //console.info('onEndReached, fetchMore', 'endCursor', data.articles.pageInfo.endCursor)
         fetchMore({
           variables: {
             first: 30,

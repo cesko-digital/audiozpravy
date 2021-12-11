@@ -17,12 +17,15 @@ import categories, { ArticleCategory } from '../../shared/categories'
 import { useTheme } from "../../theme"
 import useFonts from "../../theme/fonts"
 import { gql, useQuery, NetworkStatus } from '@apollo/client'
+import { Article } from "../../shared/article";
+import TrackPlayer, { } from "../../trackPlayer"
+import RNTrackPlayer from "react-native-track-player";
 
 const CATEGORIES_TODAY = gql`
 {
  playlistsForToday {
-  category { name, id},
-  articles { recordingUrl, title, id },
+  category { key },
+  articles { id, url: recordingUrl, title, artist: provider {name} },
   preparedForDate, createdAt, type
 	}
 }`
@@ -30,8 +33,8 @@ const CATEGORIES_TODAY = gql`
 const CATEGORIES_WEEK = gql`
 {
  playlistsForThisWeek {
-  category { name, id},
-  articles { recordingUrl, title },
+  category { key },
+  articles { id, url: recordingUrl, title, artist: provider {name} },
   preparedForDate, createdAt, type
 	}
 }`
@@ -213,9 +216,17 @@ const NewsNavList: FC<NavListProps> = ({ variant }) => {
     //console.log(data)
     const enrichedData = dataCollection?.map((d, index) => {
       //console.log(index, d.category.name)
-      const category = categories[index]
+      const category = categories.filter((c) => { return c.key == d.category.key })[0]
       if (category) {
-        const enriched = { ...category, articles: d.articles.slice(0, 9) }
+        var articles = d.articles.slice(0, 9).map((i) => {
+          const randomTrackNumber = Math.floor((Math.random() * 15) + 1)
+          return {
+            ...i,
+            artist: i.artist.name,
+            url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-' + randomTrackNumber + '.mp3',
+          }
+        })
+        const enriched = { ...category, articles: articles }
         return enriched
       }
       return null
@@ -223,7 +234,17 @@ const NewsNavList: FC<NavListProps> = ({ variant }) => {
     return enrichedData
   }
 
+  const addToQueue = (items: Article[]) => {
+    TrackPlayer.addTracksToQueue(items)
+      .then((queue) => {
+        //if (queue.length == items.length) {
+        RNTrackPlayer.play()
+        //r}
+      })
+  }
+
   const onItemPress = (item: ArticleCategory) => {
+    addToQueue(item.articles)
     console.info('onItemPress', item.articles)
   }
 
@@ -231,7 +252,7 @@ const NewsNavList: FC<NavListProps> = ({ variant }) => {
     // sample data
     const dayNumber = new Date().getDay()
     const weekLabel = dayNumber == 0 ? 'Minulý týden' : 'Tento týden'
-    const weekNumber = (variant == ScreenVariant.week) ? weekLabel + ' (' + dayNumber + ')' : null
+    const weekNumber = (variant == ScreenVariant.week) ? weekLabel : null
     const timestamp = variant.toString + item.key
     const sampleImages = [
       // 'https://picsum.photos/126/90/?a' + timestamp,

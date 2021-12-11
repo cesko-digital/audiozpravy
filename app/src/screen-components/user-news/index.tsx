@@ -1,32 +1,29 @@
 import React, { useState } from "react"
-import NewsList from "../news/news-list"
-import useFonts from "../../theme/fonts"
-import { useTheme } from '../../theme'
+import NewsList from "./news-list"
 import NewsFilter from "./news-filter"
 import ScreenWithMiniplayer from "../screenWithMiniplayer"
+import { usePlayer } from "../../trackPlayerContext"
 
 const UserNewsScreen = ({ route, navigation }) => {
   const [selectedCategories, setCategories] = useState([])
   const [selectedTimeRanges, setTimeRanges] = useState([])
-  const [selectedTypes, setTypes] = useState([])
   const [expanded, setExpanded] = useState(false)
+  const { state } = usePlayer()
 
-  const onFilterChange = (selectedCategories: number[], selectedTimeRanges: number[], selectedTypes: number[]) => {
+  const onFilterChange = (selectedCategories: number[], selectedTimeRanges: number[]) => {
     setCategories(selectedCategories)
     setTimeRanges(selectedTimeRanges)
-    setTypes(selectedTypes)
-    console.log("selectedCategories: " + selectedCategories)
   }
 
   return (
     <ScreenWithMiniplayer title='Vlastní výběr zpráv' >
 
-      <NewsFilter initialCategories={selectedCategories} initialTimeRanges={selectedTimeRanges} initialTypes={selectedTypes}
+      <NewsFilter initialCategories={selectedCategories} initialTimeRanges={selectedTimeRanges}
         isExpanded={expanded}
         onFilterChange={onFilterChange}
         onExpadedChange={(isExpanded) => { setExpanded(isExpanded) }} />
 
-      <NewsList topic={null} />
+      <NewsList categories={selectedCategories} style={{ marginBottom: state.recordsCount > 0 ? 88 : 0 }} />
 
     </ScreenWithMiniplayer>
   )
