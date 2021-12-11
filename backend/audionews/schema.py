@@ -27,6 +27,7 @@ class Query(ObjectType):
     playlists_for_today = List(PlaylistNode, required=True)
     playlists_for_this_week = List(PlaylistNode, required=True)
 
+
     def resolve_me(root, info, **kwargs):
         user = info.context.user
         if user.is_anonymous:
