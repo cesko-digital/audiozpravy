@@ -23,7 +23,8 @@ class ArticleNode(DjangoObjectType):
             "text": ["icontains", "istartswith"],
             "pub_date": ["gte", "lte"],
             "recording_url": ["isnull"],
-            "category__name": ["exact"]
+            "category__name": ["exact"],
+            "category__key": ["exact"],
         }
 
     def resolve_provider(root, info, **kwargs):
