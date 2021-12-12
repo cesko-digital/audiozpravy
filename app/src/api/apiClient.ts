@@ -1,24 +1,20 @@
 import { ApolloClient, createHttpLink, InMemoryCache } from "@apollo/client"
 import { setContext } from "@apollo/client/link/context"
-
-var inMemoryToken: string = null
+import { getAccessToken } from "../securePreferences"
 
 const httpLink = createHttpLink({
     uri: 'http://127.0.0.1:8000/graphql/',
 })
 
-const authLink = setContext((_, { headers }) => {
+const authLink = setContext(async (_, { headers }) => {
+    const accessToken = await getAccessToken()
     return {
         headers: {
             ...headers,
-            authorization: inMemoryToken ? `Bearer ${inMemoryToken}` : "",
+            authorization: accessToken ? `Bearer ${accessToken}` : "",
         }
     }
 })
-
-export const setAccessToken = (token: string) => {
-    inMemoryToken = token
-}
 
 export const client = new ApolloClient({
     link: authLink.concat(httpLink),

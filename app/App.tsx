@@ -3,7 +3,6 @@ import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import AppLoading from "expo-app-loading"
-import { useFonts } from "expo-font"
 import { MaterialCommunityIcons } from "@expo/vector-icons"
 
 import { Screens } from "./src/screens"
@@ -19,51 +18,33 @@ import { StatusBar } from "expo-status-bar"
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context'
 import TrackPlayer from './src/trackPlayer'
 import PlayerContextProvider from "./src/trackPlayerContext"
-import { ApolloProvider, gql } from '@apollo/client'
-import { usePreferences } from "./src/securePreferences"
+import { ApolloProvider } from '@apollo/client'
+import { getPreferredTopics, getUserUUID } from "./src/securePreferences"
 import SettingsScreen from "./src/screen-components/settings"
-import { client, setAccessToken } from "./src/apiClient"
-
-export const REGISTER_USER = gql`
-mutation RegisterListerner($deviceID: String!) {
-  registerListener(input: { deviceId:$deviceID }) {
-    token
-  }
-}`
+import { client } from "./src/api/apiClient"
+import { loadFonts } from "./src/theme/fonts"
+import { registerListener } from "./src/api/listener"
 
 const Tab = createBottomTabNavigator()
 const Stack = createStackNavigator()
 
 export default function App() {
-  let [preferences, setPreferences] = useState(null)
-
-  let [fontsLoaded] = useFonts({
-    MondaBold: require("./assets/fonts/Monda-Bold.ttf"),
-    RobotoLight: require("./assets/fonts/Roboto-Light.ttf"),
-    RobotoBold: require("./assets/fonts/Roboto-Bold.ttf"),
-  })
-
+  const [userUUID, setUserUUID] = useState(null)
+  const [preferredTopics, setPreferredTopics] = useState([])
+  const [fontsLoaded] = loadFonts()
   const colorScheme = useColorScheme()
   const [theme, setTheme] = useState(colorScheme === 'dark' ? AppDarkTheme : AppLightTheme)
 
   useEffect(() => {
     TrackPlayer.registerService()
 
-    usePreferences().then((preferences) => {
-      console.info('setPreferences')
-      setPreferences(preferences)
+    getUserUUID().then((userUUID) => {
+      setUserUUID(userUUID)
+      registerListener(userUUID)
+    })
 
-      client.mutate({ mutation: REGISTER_USER, variables: { deviceID: preferences.userUUID } })
-        .catch((error) => {
-          console.error(error)
-        })
-        .then((result) => {
-          const token = result.data.registerListener.token
-          if (token) {
-            setAccessToken(token)
-          }
-          console.info('access token', token)
-        })
+    getPreferredTopics().then((topics) => {
+      setPreferredTopics(topics)
     })
 
     Appearance.addChangeListener(({ colorScheme }) => {
@@ -72,7 +53,7 @@ export default function App() {
   }, [])
 
 
-  if (!fontsLoaded || preferences == null) {
+  if (!fontsLoaded || userUUID == null) {
     return <AppLoading />
   } else {
     return (
@@ -81,12 +62,12 @@ export default function App() {
           <PlayerContextProvider>
             <NavigationContainer theme={theme}>
               <Stack.Navigator>
-                {preferences.preferredTopics.length < 3 && <Stack.Screen
+                {preferredTopics.length < 3 && <Stack.Screen
                   name={Screens.onboarding}
                   component={OnboardingScreen}
                   options={{ headerShown: false }}
                 />}
-                {preferences.preferredTopics.length < 3 && <Stack.Screen
+                {preferredTopics.length < 3 && <Stack.Screen
                   name={Screens.topics}
                   component={TopicsScreen}
                   options={{ headerShown: false }}

@@ -3,6 +3,7 @@
  */
 import { StyleProp, StyleSheet, TextStyle, ViewStyle } from 'react-native'
 import { useTheme, Theme } from '@react-navigation/native';
+import { useFonts as expoUseFonts } from "expo-font"
 
 enum FontSize {
   'xsmall' = 12,
@@ -13,6 +14,14 @@ enum FontSize {
 
 export interface FontsTheme {
   [key: string]: StyleProp<TextStyle>;
+}
+
+export function loadFonts() {
+  return expoUseFonts({
+    MondaBold: require("../../assets/fonts/Monda-Bold.ttf"),
+    RobotoLight: require("../../assets/fonts/Roboto-Light.ttf"),
+    RobotoBold: require("../../assets/fonts/Roboto-Bold.ttf"),
+  })
 }
 
 export default function useFonts(): FontsTheme {
