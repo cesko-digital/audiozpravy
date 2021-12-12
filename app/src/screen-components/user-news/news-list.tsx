@@ -13,7 +13,7 @@ import {
   Dimensions
 } from "react-native";
 import Color from "../../theme/colors";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import TrackPlayer from "../../trackPlayer"
 import RNTrackPlayer, { Track } from "react-native-track-player";
 import PlayerContextProvider, { PlayerContext, usePlayer } from "../../trackPlayerContext";
@@ -162,8 +162,8 @@ const Item: FC<ItemProps> = ({ item, onPress, onPlusPress }) => {
 }
 
 const QUERY = gql`
-query Articles($first: Int, $after: String) {
-	articles(first: $first, after: $after) {
+query Articles($first: Int, $after: String, $category: String) {
+	articles(first: $first, after: $after, category_Key: $category) {
     pageInfo{
       hasNextPage,
       endCursor
@@ -188,15 +188,19 @@ interface NewsList extends ViewProps {
 }
 
 const NewsNavList: FC<NewsList> = ({ style, categories }) => {
-  const theme = useTheme();
+  const theme = useTheme()
+  const fonts = useFonts()
   const { setQueue } = usePlayer()
   const { data, loading, error, refetch, networkStatus, fetchMore } = useQuery(QUERY, {
     variables: {
       first: 30,
-      after: ''
+      after: '',
+      category: categories[0] ?? ''
     }
   })
   const [enrichedData, setEnrichedData] = useState([])
+
+  useEffect(() => { refetch() }, [categories])
 
   const addToQueue = (item: Article) => {
     TrackPlayer.addTrackToQueue(item)
@@ -238,6 +242,13 @@ const NewsNavList: FC<NewsList> = ({ style, categories }) => {
     }
   })
 
+  const emptyView = () => (
+    <View style={{ alignSelf: 'center', justifyContent: 'center', alignItems: 'center' }}>
+      <Ionicons size={48} name='sad-outline' style={{}} color={theme.colors.textLight} />
+      <Text style={StyleSheet.compose(fonts.textReguar, { color: theme.colors.textLight })}>Jsem tak prázdný :(</Text>
+    </View>
+  )
+
   if (loading) {
     return (<Text>Loading....</Text>)
   }
@@ -266,15 +277,19 @@ const NewsNavList: FC<NewsList> = ({ style, categories }) => {
         />
       }
       onEndReached={() => {
-        //console.info('onEndReached, fetchMore', 'endCursor', data.articles.pageInfo.endCursor)
         fetchMore({
           variables: {
             first: 30,
-            after: data.articles.pageInfo.endCursor
+            after: data.articles.pageInfo.endCursor,
+            category: categories[0] ?? ''
           }
         })
       }}
       onEndReachedThreshold={0.1}
+
+      contentContainerStyle={[{ flexGrow: 1 }, enrichedData.length ? null : { justifyContent: 'center' }]}
+      ListEmptyComponent={emptyView}
+
     />
   )
 }

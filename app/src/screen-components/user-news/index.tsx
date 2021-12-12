@@ -10,7 +10,7 @@ const UserNewsScreen = ({ route, navigation }) => {
   const [expanded, setExpanded] = useState(false)
   const { state } = usePlayer()
 
-  const onFilterChange = (selectedCategories: number[], selectedTimeRanges: number[]) => {
+  const onFilterChange = (selectedCategories: string[], selectedTimeRanges: number[]) => {
     setCategories(selectedCategories)
     setTimeRanges(selectedTimeRanges)
   }

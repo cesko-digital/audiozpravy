@@ -6,11 +6,11 @@ import CategoryButton from "../../components/buttons/category-button";
 import { Text, View, StyleSheet, ScrollView, Animated, TouchableWithoutFeedback, Easing } from "react-native";
 import categories from "../../shared/categories";
 
-type FilterChageCallback = (selectedCategories: number[], selectedTimeRanges: number[]) => void
+type FilterChageCallback = (selectedCategories: string[], selectedTimeRanges: number[]) => void
 
 interface INewsFilter {
     initialTimeRanges: number[]
-    initialCategories: number[]
+    initialCategories: string[]
     isExpanded: boolean
     onFilterChange: FilterChageCallback
     onExpadedChange: (isExpanded: boolean) => void
@@ -40,14 +40,6 @@ const NewsFilter: FC<INewsFilter> = ({ initialTimeRanges, initialCategories, isE
         { id: 3, name: "Dnes", active: true },
         { id: 4, name: "Tento týden", active: true },
         { id: 5, name: "Minulý týden", active: true }
-    ];
-
-
-    const articleTypes = [
-        { id: 1, name: "Rozhovor", active: false },
-        { id: 2, name: "Publicistika", active: false },
-        { id: 3, name: "Komentář", active: false },
-        { id: 4, name: "Nekrolog", active: false }
     ];
 
     useEffect(() => {
@@ -82,6 +74,14 @@ const NewsFilter: FC<INewsFilter> = ({ initialTimeRanges, initialCategories, isE
     }, [expanded]);
 
     const handleChange = (itemID: number, collection: number[], setter: React.Dispatch<React.SetStateAction<number[]>>) => {
+        if (collection.includes(itemID)) {
+            const filtered = collection.filter((id) => id !== itemID);
+            setter(filtered);
+        } else {
+            setter((array) => [...array, itemID]);
+        }
+    }
+    const handleCategoryChange = (itemID: string, collection: string[], setter: React.Dispatch<React.SetStateAction<string[]>>) => {
         if (collection.includes(itemID)) {
             const filtered = collection.filter((id) => id !== itemID);
             setter(filtered);
@@ -165,9 +165,9 @@ const NewsFilter: FC<INewsFilter> = ({ initialTimeRanges, initialCategories, isE
                                 <CategoryButton
                                     key={item.id}
                                     onPress={() => {
-                                        handleChange(item.id, selectedCategories, setCategories)
+                                        handleCategoryChange(item.key, selectedCategories, setCategories)
                                     }}
-                                    active={selectedCategories.includes(item.id)}
+                                    active={selectedCategories.includes(item.key)}
                                 >
                                     {item.title}
                                 </CategoryButton>

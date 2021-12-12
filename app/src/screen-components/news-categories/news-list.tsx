@@ -207,15 +207,15 @@ const NewsNavList: FC<NavListProps> = ({ variant }) => {
   })
   const [enrichedData, setEnrichedData] = useState([])
 
+  console.info('NewsNavList')
+
   useEffect(() => {
     setEnrichedData(enrichData(data))
   }, [data])
 
   const enrichData = (data) => {
     const dataCollection = variant == ScreenVariant.today ? data?.playlistsForToday : data?.playlistsForThisWeek
-    //console.log(data)
     const enrichedData = dataCollection?.map((d, index) => {
-      //console.log(index, d.category.name)
       const category = categories.filter((c) => { return c.key == d.category.key })[0]
       if (category) {
         var articles = d.articles.slice(0, 9).map((i) => {
@@ -237,9 +237,7 @@ const NewsNavList: FC<NavListProps> = ({ variant }) => {
   const addToQueue = (items: Article[]) => {
     TrackPlayer.addTracksToQueue(items)
       .then((queue) => {
-        //if (queue.length == items.length) {
         RNTrackPlayer.play()
-        //r}
       })
   }
 
@@ -280,7 +278,7 @@ const NewsNavList: FC<NavListProps> = ({ variant }) => {
     <FlatList
       data={enrichedData}
       renderItem={renderItem}
-      keyExtractor={(item) => String('topicID-' + item.id)}
+      keyExtractor={(item) => String('topicID-' + item.key + '-' + variant.toString())}
       style={{}}
       refreshControl={
         <RefreshControl
