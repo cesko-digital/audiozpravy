@@ -19,11 +19,17 @@ import { StatusBar } from "expo-status-bar"
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context'
 import TrackPlayer from './src/trackPlayer'
 import PlayerContextProvider from "./src/trackPlayerContext"
-import { ApolloProvider } from '@apollo/client'
+import { ApolloProvider, gql } from '@apollo/client'
 import { usePreferences } from "./src/securePreferences"
 import SettingsScreen from "./src/screen-components/settings"
-import { REGISTER_USER } from "./src/shared/queries"
 import { client, setAccessToken } from "./src/apiClient"
+
+export const REGISTER_USER = gql`
+mutation RegisterListerner($deviceID: String!) {
+  registerListener(input: { deviceId:$deviceID }) {
+    token
+  }
+}`
 
 const Tab = createBottomTabNavigator()
 const Stack = createStackNavigator()

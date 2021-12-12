@@ -24,57 +24,10 @@ import { gql, useQuery, NetworkStatus } from "@apollo/client";
 import { useEffect } from "react";
 import { useState } from "react";
 
-const articles: Article[] = [
-  {
-    id: 1,
-    title: "Nový šéf ÚOHS sliboval obnovu důvěry. Ve funkci nechává klid",
-    img: "http://lorempixel.com/200/140/?a",
-    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
-    artist: "au",
-    published: "DNES 15:30",
-  },
-  {
-    id: 2,
-    title:
-      "Tři největší obavy z očkování: šťavnatým soustem pro konspirátory je...",
-    img: "http://lorempixel.com/200/140/?b",
-    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
-    artist: "au",
-    published: "DNES 14:35",
-  },
-  {
-    id: 3,
-    title:
-      "Babiš se odmítl omluvit Pirátům za výrok, že chtějí k lidem nastěhovat migranty.",
-    img: "http://lorempixel.com/200/140/?c",
-    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
-    artist: "au",
-    published: "DNES 13:10",
-  },
-  {
-    id: 4,
-    title:
-      "Lidice si připomněly 79 let od vyhlazení obce nacisty, věnce položili také politici",
-    img: "http://lorempixel.com/200/140/?d",
-    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
-    artist: "au",
-    published: "DNES 12:55",
-  },
-  {
-    id: 5,
-    title: "Přes dva miliony lidí má v Česku ukončené očkování...",
-    img: "http://lorempixel.com/200/140/?e",
-    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3",
-    artist: "au",
-    published: "DNES 12:39",
-  }
-]
-
 interface Props extends ViewProps {
   selected: boolean
   onPress: (event: GestureResponderEvent) => void
 }
-
 
 const PlusIcon: FC<Props> = ({ style, selected, onPress }) => (
   <TouchableOpacity
@@ -162,8 +115,8 @@ const Item: FC<ItemProps> = ({ item, onPress, onPlusPress }) => {
 }
 
 const QUERY = gql`
-query Articles($first: Int, $after: String, $category: String) {
-	articles(first: $first, after: $after, category_Key: $category) {
+query Articles($first: Int, $after: String, $categories: [ID]) {
+	articles(first: $first, after: $after, category_Key_In: $categories) {
     pageInfo{
       hasNextPage,
       endCursor
@@ -195,7 +148,7 @@ const NewsNavList: FC<NewsList> = ({ style, categories }) => {
     variables: {
       first: 30,
       after: '',
-      category: categories[0] ?? ''
+      categories: categories
     }
   })
   const [enrichedData, setEnrichedData] = useState([])
@@ -281,7 +234,7 @@ const NewsNavList: FC<NewsList> = ({ style, categories }) => {
           variables: {
             first: 30,
             after: data.articles.pageInfo.endCursor,
-            category: categories[0] ?? ''
+            category: categories
           }
         })
       }}
