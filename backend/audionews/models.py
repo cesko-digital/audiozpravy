@@ -31,7 +31,7 @@ class Article(models.Model):
     provider = models.ForeignKey(Provider, on_delete=models.CASCADE, related_name='articles')
     url = models.CharField(max_length=256)
     text = models.CharField(max_length=10000)
-    pub_date = models.DateField()
+    pub_date = models.DateTimeField()
     recording_created_at = models.DateTimeField(default=None, null=True)
     recording_url = models.CharField(max_length=256, null=True)
     picture_url = models.CharField(max_length=256, null=True)
