@@ -6,24 +6,24 @@ import { usePlayer } from "../../trackPlayerContext"
 
 const UserNewsScreen = ({ route, navigation }) => {
   const [selectedCategories, setCategories] = useState([])
-  const [selectedTimeRanges, setTimeRanges] = useState([])
+  const [selectedTimeRange, setTimeRange] = useState(null)
   const [expanded, setExpanded] = useState(false)
   const { state } = usePlayer()
 
-  const onFilterChange = (selectedCategories: string[], selectedTimeRanges: number[]) => {
+  const onFilterChange = (selectedCategories: string[], selectedTimeRange: number) => {
     setCategories(selectedCategories)
-    setTimeRanges(selectedTimeRanges)
+    setTimeRange(selectedTimeRange)
   }
 
   return (
     <ScreenWithMiniplayer title='Vlastní výběr zpráv' >
 
-      <NewsFilter initialCategories={selectedCategories} initialTimeRanges={selectedTimeRanges}
+      <NewsFilter initialCategories={selectedCategories} initialTimeRange={selectedTimeRange}
         isExpanded={expanded}
         onFilterChange={onFilterChange}
         onExpadedChange={(isExpanded) => { setExpanded(isExpanded) }} />
 
-      <NewsList categories={selectedCategories} style={{ marginBottom: state.recordsCount > 0 ? 88 : 0 }} />
+      <NewsList categories={selectedCategories} timeRange={selectedTimeRange} style={{ marginBottom: state.recordsCount > 0 ? 88 : 0 }} />
 
     </ScreenWithMiniplayer>
   )

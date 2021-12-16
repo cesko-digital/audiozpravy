@@ -9,7 +9,7 @@ import CategoryButton from "../../components/buttons/category-button"
 
 import { FontAwesome5 } from "@expo/vector-icons"
 import categories from "../../shared/categories"
-import { savePreferredTopics } from "../../securePreferences";
+import { setPreferredTopics } from "../../securePreferences";
 
 const minialTopicsCount = 3
 
@@ -18,7 +18,7 @@ const TopicsScreen = ({ navigation }) => {
 
   const onSubmit = () => {
     if (active.length >= minialTopicsCount) {
-      savePreferredTopics(active).then(() => {
+      setPreferredTopics(active).then(() => {
         // send preferred topics to BE
         navigation.navigate(Screens.home)
       })

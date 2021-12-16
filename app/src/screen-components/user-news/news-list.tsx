@@ -1,28 +1,27 @@
-import React, { FC, useContext } from "react";
+import React, { FC, useMemo } from "react";
 import {
   Text,
   View,
   FlatList,
   Image,
-  TextStyle,
   TouchableOpacity,
   GestureResponderEvent,
   StyleSheet,
   RefreshControl,
-  ViewProps,
-  Dimensions
+  ViewProps
 } from "react-native";
 import Color from "../../theme/colors";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import TrackPlayer from "../../trackPlayer"
-import RNTrackPlayer, { Track } from "react-native-track-player";
-import PlayerContextProvider, { PlayerContext, usePlayer } from "../../trackPlayerContext";
+import RNTrackPlayer from "react-native-track-player";
+import { usePlayer } from "../../trackPlayerContext";
 import useFonts from "../../theme/fonts";
 import { useTheme } from '../../theme'
 import { Article } from "../../shared/article";
 import { gql, useQuery, NetworkStatus } from "@apollo/client";
 import { useEffect } from "react";
 import { useState } from "react";
+import { TimeRange, TimeRangeItem } from "./news-filter";
 
 interface Props extends ViewProps {
   selected: boolean
@@ -115,8 +114,8 @@ const Item: FC<ItemProps> = ({ item, onPress, onPlusPress }) => {
 }
 
 const QUERY = gql`
-query Articles($first: Int, $after: String, $categories: [ID]) {
-	articles(first: $first, after: $after, category_Key_In: $categories) {
+query Articles($first: Int, $after: String, $categories: [ID], $gteDate: Date, $lteDate: Date) {
+	articles(first: $first, after: $after, category_Key_In: $categories, pubDate_Gte: $gteDate, pubDate_Lte: $lteDate) {
     pageInfo{
       hasNextPage,
       endCursor
@@ -136,24 +135,72 @@ query Articles($first: Int, $after: String, $categories: [ID]) {
 }
 `
 
-interface NewsList extends ViewProps {
-  categories: string[]
+export const getTimeRange = (timeRange: TimeRangeItem): TimeRange => {
+  var gteDate = new Date()
+  switch (timeRange) {
+    case TimeRangeItem.now:
+      gteDate.setHours(gteDate.getHours() - 2)
+      break
+    case TimeRangeItem.today:
+      gteDate.setHours(gteDate.getHours() - 24)
+      break
+    case TimeRangeItem.week:
+      gteDate.setHours(gteDate.getHours() - 7 * 24)
+      break
+    case TimeRangeItem.month:
+      gteDate.setHours(gteDate.getHours() - (31 * 24))
+      break
+  }
+  return { gteDate: gteDate }
 }
 
-const NewsNavList: FC<NewsList> = ({ style, categories }) => {
+interface NewsList extends ViewProps {
+  categories: string[]
+  timeRange: TimeRangeItem
+}
+
+interface QueryVariables {
+  first: number
+  after: string
+  categories: string[]
+  gteDate?: string
+  lteDate?: string
+}
+
+const getQueryVariables = (categories: string[], timeRange: TimeRangeItem): QueryVariables => {
+  var params: QueryVariables = {
+    first: 30,
+    after: '',
+    categories: categories
+  }
+
+  if (timeRange != null) {
+    const selectedTimeRange = getTimeRange(timeRange)
+    if (selectedTimeRange.gteDate) {
+      params.gteDate = selectedTimeRange.gteDate?.toISOString().split('T')[0]
+    }
+    if (selectedTimeRange.lteDate) {
+      params.lteDate = selectedTimeRange.lteDate?.toISOString().split('T')[0]
+    }
+  }
+  return params
+}
+
+const NewsNavList: FC<NewsList> = ({ style, categories, timeRange }) => {
   const theme = useTheme()
   const fonts = useFonts()
   const { setQueue } = usePlayer()
-  const { data, loading, error, refetch, networkStatus, fetchMore } = useQuery(QUERY, {
-    variables: {
-      first: 30,
-      after: '',
-      categories: categories
-    }
-  })
+
+  const variables = useMemo(() => {
+    return getQueryVariables(categories, timeRange)
+  }, [categories, timeRange])
+
+  const { data, loading, error, refetch, networkStatus, fetchMore } = useQuery(QUERY, { variables: variables })
   const [enrichedData, setEnrichedData] = useState([])
 
-  useEffect(() => { refetch() }, [categories])
+  useEffect(() => {
+    refetch()
+  }, [variables])
 
   const addToQueue = (item: Article) => {
     TrackPlayer.addTrackToQueue(item)
@@ -207,7 +254,8 @@ const NewsNavList: FC<NewsList> = ({ style, categories }) => {
   }
 
   if (error) {
-    return (<Text>Error {error.message}</Text>)
+    console.warn(error.message)
+    return (<View style={{ flex: 1 }}>{emptyView()}</View>)
   }
 
   return (
@@ -232,9 +280,8 @@ const NewsNavList: FC<NewsList> = ({ style, categories }) => {
       onEndReached={() => {
         fetchMore({
           variables: {
-            first: 30,
-            after: data.articles.pageInfo.endCursor,
-            category: categories
+            ...variables,
+            after: data.articles.pageInfo.endCursor
           }
         })
       }}
