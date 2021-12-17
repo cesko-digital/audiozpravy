@@ -38,7 +38,7 @@ class Article(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='articles')
 
     class Meta:
-        ordering = ['pub_date']
+        ordering = ['-pub_date']
         db_table="a_article"
 
     def __str__(self) -> str:

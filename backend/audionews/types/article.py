@@ -28,7 +28,7 @@ class ArticleFilter(FilterSet):
             "title": ["exact", "icontains", "istartswith"],
             "perex": ["exact", "icontains", "istartswith"],
             "text": ["icontains", "istartswith"],
-            "pub_date": ["gte", "lte"],
+            "pub_date": ["gte", "lte", "isnull"],
             "recording_url": ["isnull"],
             "category__name": ["exact"],
             "category__key": ["in", "exact"],
