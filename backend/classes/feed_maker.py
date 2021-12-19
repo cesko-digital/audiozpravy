@@ -26,10 +26,11 @@ class FeedMaker:
         articles_df['category'] = articles_df['category_id'].apply(lambda x: category_mapping[x])
         return articles_df
 
-    def create_playlists(self, date_from: datetime):
+    def create_playlists(self, date_from: datetime.date):
         self.articles = self.load_articles(date_from)
         for category in CategoryEnum:
             self.fill_category_feed(category)
+
 
     def fill_category_feed(
             self, category: CategoryEnum
