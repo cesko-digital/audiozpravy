@@ -2,6 +2,7 @@ import argparse
 import datetime
 import json
 import logging
+import time
 
 import django
 import os
@@ -90,7 +91,7 @@ class JobRunner:
 
 
 if __name__ == '__main__':
-    "Regular jobs that run on a daily basis. Get new "
+    "Regular jobs that run on a daily basis. Script runs all the jobs 30 minutes after midnight each day "
     args = argparse.ArgumentParser()
     args.add_argument('--doc2vec-path', default='s3_input/doc2vec_articles.model')
     args.add_argument('--vectors-path', default='s3_input/articles_embeddings.json')
@@ -101,12 +102,20 @@ if __name__ == '__main__':
     cfg = args.parse_args()
     date_today = datetime.date(2021,12,24)
 
-    runner = JobRunner()
+    current_day = 88
+    while True:
 
-    runner.get_new_articles()
-    date_in_past = (datetime.datetime.now()-datetime.timedelta(days=cfg.n_past_days)).date()
-    runner.create_playlists(date_today, date_in_past)
-    runner.train_w2v_model(cfg.doc2vec_path)
-    runner.save_embeddings(cfg.doc2vec_path, cfg.vectors_path)
+        if datetime.datetime.now().day != current_day:
+            current_day = datetime.datetime.now().day
+            runner = JobRunner()
+
+            runner.get_new_articles()
+            date_in_past = (datetime.datetime.now() - datetime.timedelta(days=cfg.n_past_days)).date()
+            runner.create_playlists(date_today, date_in_past)
+            runner.train_w2v_model(cfg.doc2vec_path)
+            runner.save_embeddings(cfg.doc2vec_path, cfg.vectors_path)
+
+        # sleep for 30 minutes
+        time.sleep(30 * 60)
 
 
