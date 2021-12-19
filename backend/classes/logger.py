@@ -1,8 +1,11 @@
+import datetime
 import os
 import logging
 from logging.handlers import RotatingFileHandler
-from common.helper import now_as_string
 parent_directory = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+
+def now_as_string():
+    return str(datetime.datetime.now())
 
 class Logger:
     def __init__(self, name=""):
