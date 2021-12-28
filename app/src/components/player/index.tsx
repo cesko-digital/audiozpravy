@@ -4,12 +4,12 @@ import { StyleSheet, View, ViewProps } from "react-native";
 import Color from "../../theme/colors";
 import Progress from "./progress";
 import PlaybackControls from "./playback-controls";
-import TrackPlayer, { useProgress } from 'react-native-track-player';
+import TrackPlayer, { useProgress } from "react-native-track-player";
 import { usePlayer } from "../../trackPlayerContext";
 
 const Player: FC<ViewProps> = ({ style }) => {
-  const progress = useProgress()
-  const { state, setState, setQueue } = usePlayer()
+  const progress = useProgress();
+  const { state, setState, setQueue } = usePlayer();
 
   return (
     <View
@@ -36,21 +36,18 @@ const Player: FC<ViewProps> = ({ style }) => {
         }}
         onPlayPause={() => {
           if (state.isPlaying) {
-            TrackPlayer.pause()
+            TrackPlayer.pause();
           } else {
-            TrackPlayer.play()
+            TrackPlayer.play();
           }
         }}
         onNext={() => {
-          TrackPlayer.skipToNext()
+          TrackPlayer.skipToNext();
         }}
         style={{ marginTop: 20 }}
       />
     </View>
-  )
-}
+  );
+};
 
-
-
-
-export default Player
+export default Player;

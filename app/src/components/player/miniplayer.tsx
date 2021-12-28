@@ -1,40 +1,14 @@
-import React, { FC, useRef } from "react"
+import React, { FC } from "react"
 import { StyleSheet, View, ViewProps, TouchableOpacity, Text, Animated } from "react-native"
 
 import Color from "../../theme/colors"
-import TrackPlayer, { useProgress, useTrackPlayerEvents, Event, State } from 'react-native-track-player'
+import TrackPlayer, { useProgress } from 'react-native-track-player'
 import { usePlayer } from "../../trackPlayerContext"
 import { MaterialCommunityIcons } from "@expo/vector-icons"
 import { useTheme } from "../../theme"
 import useFonts from "../../theme/fonts"
-import { useMemo } from "react"
-import { useEffect } from "react"
+import { ProgressView } from "./progressView"
 
-
-interface Props extends ViewProps {
-    currentSecond: number
-    totalSeconds: number
-}
-
-const ProgressView: FC<Props> = ({ currentSecond, totalSeconds }) => {
-    const position = useRef(new Animated.Value(0)).current
-
-    const width = position.interpolate({
-        inputRange: [0, totalSeconds],
-        outputRange: ["0%", "100%"],
-        extrapolate: "clamp"
-    })
-    Animated.timing(position, {
-        toValue: currentSecond,
-        duration: 10,
-        useNativeDriver: false,
-    }).start()
-
-    return (<View style={{ height: 8, backgroundColor: Color["black-16"] }}>
-        <Animated.View
-            style={[StyleSheet.absoluteFill, { borderTopEndRadius: 4, borderBottomEndRadius: 4, backgroundColor: Color["black-64"], width }]}></Animated.View>
-    </View>)
-}
 
 const MiniPlayer: FC<ViewProps> = ({ style }) => {
     const progress = useProgress()
