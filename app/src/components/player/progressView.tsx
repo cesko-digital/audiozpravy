@@ -1,5 +1,11 @@
 import React, { FC, useRef } from "react";
-import { StyleSheet, View, ViewProps, Animated } from "react-native";
+import {
+  StyleSheet,
+  View,
+  ViewProps,
+  Animated,
+  useWindowDimensions,
+} from "react-native";
 import Color from "../../theme/colors";
 
 interface Props extends ViewProps {
@@ -9,16 +15,17 @@ interface Props extends ViewProps {
 
 export const ProgressView: FC<Props> = ({ currentSecond, totalSeconds }) => {
   const position = useRef(new Animated.Value(0)).current;
+  const { height, width } = useWindowDimensions();
 
-  const width = position.interpolate({
+  const translateX = position.interpolate({
     inputRange: [0, totalSeconds],
-    outputRange: ["0%", "100%"],
+    outputRange: [-width, 0],
     extrapolate: "clamp",
   });
   Animated.timing(position, {
     toValue: currentSecond,
     duration: 10,
-    useNativeDriver: false,
+    useNativeDriver: true,
   }).start();
 
   return (
@@ -30,7 +37,8 @@ export const ProgressView: FC<Props> = ({ currentSecond, totalSeconds }) => {
             borderTopEndRadius: 4,
             borderBottomEndRadius: 4,
             backgroundColor: Color["black-64"],
-            width,
+            width: "100%",
+            transform: [{ translateX: translateX }],
           },
         ]}
       ></Animated.View>
