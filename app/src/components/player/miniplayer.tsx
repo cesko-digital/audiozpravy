@@ -67,7 +67,7 @@ const MiniPlayer: FC<ViewProps> = ({ style }) => {
     TrackPlayer.skipToNext();
   };
 
-  var descriptionStyle = StyleSheet.compose(fonts.textLightSmall, {
+  const descriptionStyle = StyleSheet.compose(fonts.textLightSmall, {
     color: theme.colors.textInverse,
   });
 
