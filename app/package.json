@@ -8,21 +8,26 @@
     "prettier": "prettier 'src/**/*.ts*'"
   },
   "dependencies": {
+    "@apollo/client": "^3.5.5",
     "@react-native-community/masked-view": "0.1.10",
     "@react-native-community/slider": "4.1.7",
     "@react-navigation/bottom-tabs": "^5.11.11",
     "@react-navigation/native": "^5.9.4",
     "@react-navigation/stack": "^5.14.5",
+    "date-fns": "^2.27.0",
     "expo": "^43.0.3",
     "expo-app-loading": "~1.2.1",
     "expo-linear-gradient": "~10.0.3",
+    "expo-secure-store": "~11.0.3",
     "expo-splash-screen": "~0.13.5",
     "expo-status-bar": "~1.1.0",
     "expo-updates": "~0.10.13",
+    "graphql": "^16.0.1",
     "react": "17.0.1",
     "react-dom": "17.0.1",
     "react-native": "0.64.3",
     "react-native-gesture-handler": "~1.10.2",
+    "react-native-get-random-values": "^1.7.1",
     "react-native-pager-view": "5.4.6",
     "react-native-reanimated": "~2.2.0",
     "react-native-safe-area-context": "3.3.2",
@@ -31,7 +36,8 @@
     "react-native-svg": "12.1.1",
     "react-native-tab-view": "^3.0.1",
     "react-native-track-player": "^2.1.2",
-    "react-native-web": "0.17.1"
+    "react-native-web": "0.17.1",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

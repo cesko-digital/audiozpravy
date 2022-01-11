@@ -2,7 +2,6 @@ import React, { FC } from "react";
 import { View, ViewStyle } from "react-native";
 
 import Heading from "../../components/typography/heading";
-
 import Color from "../../theme/colors";
 
 const Title: FC<{ style?: ViewStyle }> = ({ style }) => {

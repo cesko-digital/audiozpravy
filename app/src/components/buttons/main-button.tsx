@@ -1,19 +1,23 @@
-import React, { FC } from "react";
-import { Text, TouchableOpacity, ViewStyle } from "react-native";
-import { FontAwesome5 } from "@expo/vector-icons";
-
-import Color from "../../theme/colors";
+import React, { FC } from "react"
+import { Text, TouchableOpacity, ViewStyle, StyleSheet } from "react-native"
+import { FontAwesome5 } from "@expo/vector-icons"
+import { useTheme } from "../../theme"
+import useFonts from "../../theme/fonts"
 
 interface Props {
-  style?: ViewStyle;
-  onPress(): void;
+  isEnabled: boolean
+  style?: ViewStyle
+  onPress(): void
 }
 
-const MainButton: FC<Props> = ({ style, onPress, children }) => {
+const MainButton: FC<Props> = ({ isEnabled = true, style, onPress, children }) => {
+  const theme = useTheme()
+  const fonts = useFonts()
+
   return (
     <TouchableOpacity
       style={{
-        backgroundColor: Color["black-100"],
+        backgroundColor: isEnabled ? theme.colors.primaryButton : theme.colors.primaryButtonDisabled,
         borderRadius: 40,
         flexDirection: "row",
         display: "flex",
@@ -22,22 +26,24 @@ const MainButton: FC<Props> = ({ style, onPress, children }) => {
         padding: 16,
         ...style,
       }}
-      onPress={onPress}
+      onPress={() => {
+        if (isEnabled) {
+          onPress()
+        }
+      }}
     >
       <Text
-        style={{
-          color: "white",
-          fontSize: 16,
+        style={StyleSheet.compose(fonts.titleRegular, {
+          color: theme.colors.primaryButtonLabel,
           lineHeight: 24,
-          marginRight: 8,
-          fontFamily: "RobotoBold",
-        }}
+          marginRight: 8
+        })}
       >
         {children}
       </Text>
-      <FontAwesome5 name="chevron-right" size={12} color="white" />
+      <FontAwesome5 name="chevron-right" size={12} color={theme.colors.primaryButtonLabel} />
     </TouchableOpacity>
-  );
-};
+  )
+}
 
-export default MainButton;
+export default MainButton

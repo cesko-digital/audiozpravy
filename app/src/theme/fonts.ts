@@ -3,6 +3,7 @@
  */
 import { StyleProp, StyleSheet, TextStyle, ViewStyle } from 'react-native'
 import { useTheme, Theme } from '@react-navigation/native';
+import { useFonts as expoUseFonts } from "expo-font"
 
 enum FontSize {
   'xsmall' = 12,
@@ -15,9 +16,22 @@ export interface FontsTheme {
   [key: string]: StyleProp<TextStyle>;
 }
 
+export function loadFonts() {
+  return expoUseFonts({
+    MondaBold: require("../../assets/fonts/Monda-Bold.ttf"),
+    RobotoLight: require("../../assets/fonts/Roboto-Light.ttf"),
+    RobotoBold: require("../../assets/fonts/Roboto-Bold.ttf"),
+  })
+}
+
 export default function useFonts(): FontsTheme {
   const theme = useTheme()
   return StyleSheet.create({
+    textLightSmall: {
+      fontFamily: 'RobotoLight',
+      fontSize: FontSize.small,
+      color: theme.colors.text,
+    },
     textXSmall: {
       fontSize: FontSize.xsmall,
       color: theme.colors.text,
@@ -41,20 +55,20 @@ export default function useFonts(): FontsTheme {
     },
     titleSmall: {
       fontSize: FontSize.small,
-      fontFamily: 'RobotoBold',
+      //fontFamily: 'RobotoBold',
       fontWeight: '700',
       color: theme.colors.text,
     },
     titleRegular: {
       fontSize: FontSize.regular,
-      fontFamily: 'RobotoBold',
+      //fontFamily: 'RobotoBold',
       fontWeight: '700',
       color: theme.colors.text,
     },
     titleLarge: {
       fontSize: FontSize.large,
       fontWeight: '700',
-      fontFamily: 'RobotoBold',
+      //fontFamily: 'RobotoBold',
       color: theme.colors.text,
     },
     textCenter: {

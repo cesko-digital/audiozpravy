@@ -14,22 +14,7 @@ export const initialPlayerState: PlayerState = {
     isPlaying: false
 }
 
-export async function createPlayerState(event: {
-    type: Event;
-    [key: string]: any;
-}) {
-    const queue = await RNTrackPlayer.getQueue()
-    const currentIndex = await RNTrackPlayer.getCurrentTrack()
-    const state = await RNTrackPlayer.getState();
-    const track = await RNTrackPlayer.getTrack(currentIndex)
 
-    return {
-        currentTrack: track,
-        currentIndex: currentIndex,
-        recordsCount: queue.length,
-        isPlaying: state == State.Playing
-    }
-}
 
 class TrackPlayer {
     private static instance: TrackPlayer
@@ -65,15 +50,32 @@ class TrackPlayer {
         RNTrackPlayer.registerPlaybackService(() => require('./services/audio'))
     }
 
-    public async addTrackToQueue(track: Track) {
+    private async isInQueue(track: Track): Promise<boolean> {
         const queue = await RNTrackPlayer.getQueue()
         const existingTracks = queue.filter((t) => t.id == track.id)
         if (existingTracks.length > 0) {
-            console.warn('Track with id ' + track.id + ' is already in queue.')
+            console.info('Track with id ' + track.id + ' is already in queue.')
+            return true
+        }
+        return false
+    }
+
+    public async addTrackToQueue(track: Track) {
+        const queue = await RNTrackPlayer.getQueue()
+        const existingTracks = queue.filter((t) => t.id == track.id)
+        const alreadyInqueue = await this.isInQueue(track)
+        if (alreadyInqueue) {
             return queue
         }
         track['isPlaying'] = false
         RNTrackPlayer.add([track])
+        return RNTrackPlayer.getQueue()
+    }
+
+    public async addTracksToQueue(tracks: Track[]) {
+        tracks.forEach(async track => {
+            this.addTrackToQueue(track)
+        })
         return RNTrackPlayer.getQueue()
     }
 

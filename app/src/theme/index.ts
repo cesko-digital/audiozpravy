@@ -1,25 +1,28 @@
-import { DefaultTheme, DarkTheme, useTheme as useThemeOriginal } from "@react-navigation/native";
-import Color from "./colors";
+import { DefaultTheme, DarkTheme, useTheme as useThemeOriginal } from "@react-navigation/native"
+import Color from "./colors"
 
 
 export type AppTheme = {
-    dark: boolean;
+    dark: boolean
     colors: {
-        primary: string;
-        primaryLight: string;
-        background: string;
-        backgroundNegative: string;
-        card: string;
-        text: string;
-        border: string;
-        notification: string;
-        textLight: string;
-        textSemiLight: string;
-        textInverse: string;
-        skeletonLight: string;
-        separator: string;
-    };
-};
+        primary: string
+        primaryLight: string
+        background: string
+        backgroundNegative: string
+        card: string
+        text: string
+        border: string
+        notification: string
+        textLight: string
+        textSemiLight: string
+        textInverse: string
+        skeletonLight: string
+        separator: string
+        primaryButton: string
+        primaryButtonDisabled: string
+        primaryButtonLabel: string
+    }
+}
 
 export const AppLightTheme: AppTheme = {
     ...DefaultTheme,
@@ -33,9 +36,12 @@ export const AppLightTheme: AppTheme = {
         textSemiLight: '#565459',
         textInverse: '#FFFFFF',
         skeletonLight: '#c2c2c3',
-        separator: '#DBDADB'
+        separator: '#DBDADB',
+        primaryButton: Color["black-100"],
+        primaryButtonDisabled: Color["black-64"],
+        primaryButtonLabel: Color.white
     },
-};
+}
 
 export const AppDarkTheme: AppTheme = {
     ...DarkTheme,
@@ -48,9 +54,12 @@ export const AppDarkTheme: AppTheme = {
         textSemiLight: '#565459',
         textInverse: '#FFFFFF',
         skeletonLight: '#c2c2c3',
-        separator: '#DBDADB'
+        separator: '#DBDADB',
+        primaryButton: Color["black-88"],
+        primaryButtonDisabled: Color["black-64"],
+        primaryButtonLabel: Color.white
     },
-};
+}
 
 export function useTheme(): AppTheme {
     return useThemeOriginal() as AppTheme

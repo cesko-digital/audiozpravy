@@ -9,7 +9,6 @@ import { View } from "react-native";
 import Svg, { Path } from "react-native-svg";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Color from "../../theme/colors";
-import TrackPlayer, { useProgress, useTrackPlayerEvents, Event, State } from 'react-native-track-player';
 import { usePlayer } from "../../trackPlayerContext";
 
 interface Props extends ViewProps {

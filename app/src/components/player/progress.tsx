@@ -25,7 +25,7 @@ const Progress: FC<Props> = ({
     >
       <PlaybackTime
         seconds={currentSecond}
-        style={{ color: Color["black-16"] }}
+        style={{ color: Color["black-16"], width: 46 }}
       />
       <Slider
         value={currentSecond}
@@ -40,7 +40,7 @@ const Progress: FC<Props> = ({
       />
       <PlaybackTime
         seconds={totalSeconds}
-        style={{ color: Color["black-16"] }}
+        style={{ color: Color["black-16"], width: 46, textAlign: 'right' }}
       />
     </View>
   );

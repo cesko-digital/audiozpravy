@@ -1,11 +1,11 @@
-import * as React from "react";
-import { useState } from "react";
-import { View, Dimensions, Text, StyleSheet } from "react-native";
-import { TabView, SceneMap, TabBar } from "react-native-tab-view";
-import NewsNavList from "./news-list";
-import Fonts from "../../theme/fonts";
-import { useTheme } from "../../theme";
-import useFonts from "../../theme/fonts";
+import React, { FC } from "react"
+import { useState } from "react"
+import { View, Dimensions, Text, StyleSheet, ViewProps } from "react-native"
+import { TabView, SceneMap, TabBar } from "react-native-tab-view"
+import NewsNavList, { ScreenVariant } from "./news-list"
+import { useTheme } from "../../theme"
+import useFonts from "../../theme/fonts"
+import { useMemo } from "react"
 
 const renderTabBar = (props) => {
   const theme = useTheme();
@@ -46,16 +46,26 @@ const renderTabBar = (props) => {
 const initialLayout = { width: Dimensions.get("window").width };
 
 const renderScene = SceneMap({
-  today: () => <NewsNavList topicID="today" />,
-  thisWeek: () => <NewsNavList topicID="week" />,
+  today: () => <NewsNavList variant={ScreenVariant.today} />,
+  thisWeek: () => <NewsNavList variant={ScreenVariant.week} />,
 });
 
-export default function TabViewNews() {
-  const [index, setIndex] = useState(0);
-  const [routes] = useState([
+const todayDayNumber = (): number => {
+  return new Date().getDay()
+}
+
+const getRoutes = (dayNumber: number) => {
+  return [
     { key: "today", title: "Dnes" },
-    { key: "thisWeek", title: "Tento týden" }
-  ]);
+    { key: "thisWeek", title: dayNumber == 0 ? 'Minulý týden' : 'Tento týden' }
+  ]
+}
+
+const TabViewNews: FC<ViewProps> = ({ style }) => {
+  const [index, setIndex] = useState(0)
+  const routes = useMemo(() => {
+    return getRoutes(todayDayNumber())
+  }, [todayDayNumber])
 
   return (
     <TabView
@@ -64,7 +74,9 @@ export default function TabViewNews() {
       onIndexChange={setIndex}
       initialLayout={initialLayout}
       renderTabBar={renderTabBar}
-      style={{ flex: 1 }}
+      style={StyleSheet.compose({ flex: 1 }, style)}
     />
-  );
+  )
 }
+
+export default TabViewNews

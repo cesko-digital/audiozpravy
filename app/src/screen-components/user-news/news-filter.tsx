@@ -1,88 +1,74 @@
-import React, { useState, useEffect, useRef, FC } from "react";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import useFonts from "../../theme/fonts";
+import React, { useState, useEffect, useRef, FC } from "react"
+import { MaterialCommunityIcons } from "@expo/vector-icons"
+import useFonts from "../../theme/fonts"
 import { useTheme } from '../../theme'
-import CategoryButton from "../../components/buttons/category-button";
-import { Text, View, StyleSheet, ScrollView, Animated, TouchableWithoutFeedback, Easing } from "react-native";
+import CategoryButton from "../../components/buttons/category-button"
+import { Text, View, StyleSheet, ScrollView, Animated, TouchableWithoutFeedback, Easing } from "react-native"
+import categories from "../../shared/categories"
 
-type FilterChageCallback = (selectedCategories: number[], selectedTimeRanges: number[], selectedTypes: number[]) => void
+export enum TimeRangeItem {
+    now,
+    today,
+    week,
+    month
+}
+
+export interface TimeRange {
+    gteDate?: Date
+    lteDate?: Date
+}
+
+const timeRanges = [
+    { id: TimeRangeItem.now, name: "Nyní" },
+    { id: TimeRangeItem.today, name: "Dnes" },
+    { id: TimeRangeItem.week, name: "Tento týden" },
+    { id: TimeRangeItem.month, name: "Tento měsíc" }
+]
+
+type FilterChageCallback = (selectedCategories: string[], selectedTimeRange: TimeRangeItem) => void
 
 interface INewsFilter {
-    initialTimeRanges: number[]
-    initialCategories: number[]
-    initialTypes: number[]
+    initialTimeRange: TimeRangeItem
+    initialCategories: string[]
     isExpanded: boolean
     onFilterChange: FilterChageCallback
     onExpadedChange: (isExpanded: boolean) => void
 }
 
-const NewsFilter: FC<INewsFilter> = ({ initialTimeRanges, initialCategories, initialTypes, isExpanded, onFilterChange, onExpadedChange }) => {
-    const theme = useTheme();
-    const fonts = useFonts();
+const NewsFilter: FC<INewsFilter> = ({ initialTimeRange, initialCategories, isExpanded, onFilterChange, onExpadedChange }) => {
+    const theme = useTheme()
+    const fonts = useFonts()
 
-    const [selectedTimeRanges, setTimeRanges] = useState(initialTimeRanges);
-    const [selectedCategories, setCategories] = useState(initialCategories);
-    const [selectedTypes, setTypes] = useState(initialTypes);
+    const [selectedTimeRange, setTimeRange] = useState(initialTimeRange)
+    const [selectedCategories, setCategories] = useState(initialCategories)
 
-    const [expanded, setExpanded] = useState(isExpanded);
-    const animationHeight = useRef(new Animated.Value(0)).current;
-    const animationOpacity = useRef(new Animated.Value(0)).current;
+    const [expanded, setExpanded] = useState(isExpanded)
+    const animationHeight = useRef(new Animated.Value(0)).current
+    const animationOpacity = useRef(new Animated.Value(0)).current
 
     const toggleExpansion = () => {
         setExpanded(!expanded)
         onExpadedChange(expanded)
-    };
+    }
 
     const onChange: FilterChageCallback = onFilterChange
 
-    const categories = [
-        { id: 1, name: "Ekonomika", active: false },
-        { id: 2, name: "Zprávy z domova", active: false },
-        { id: 3, name: "Zprávy ze světa", active: false },
-        { id: 4, name: "Sport", active: false },
-        { id: 5, name: "Kultura", active: false },
-        { id: 6, name: "Technologie", active: false },
-        { id: 7, name: "Regiony", active: false },
-        { id: 8, name: "Zdraví", active: false },
-        { id: 9, name: "Koronavirus", active: false },
-        { id: 10, name: "Volby do parlamentu", active: false },
-        { id: 11, name: "Bitcoin", active: false },
-        { id: 12, name: "Myanmar", active: false },
-        { id: 13, name: "Vakcíny", active: false },
-        { id: 14, name: "Bělorusko", active: false },
-        { id: 15, name: "Regiony", active: false },
-    ];
 
-    const timeRanges = [
-        { id: 1, name: "Nyní", active: false },
-        { id: 2, name: "Před hodinou", active: true },
-        { id: 3, name: "Dnes", active: true },
-        { id: 4, name: "Tento týden", active: true },
-        { id: 5, name: "Minulý týden", active: true }
-    ];
-
-
-    const articleTypes = [
-        { id: 1, name: "Rozhovor", active: false },
-        { id: 2, name: "Publicistika", active: false },
-        { id: 3, name: "Komentář", active: false },
-        { id: 4, name: "Nekrolog", active: false }
-    ];
 
     useEffect(() => {
         if (expanded) {
             Animated.timing(animationHeight, {
                 duration: 300,
-                toValue: 190,
+                toValue: 125,
                 easing: Easing.cubic,
                 useNativeDriver: false
-            }).start();
+            }).start()
             Animated.timing(animationOpacity, {
                 duration: 300,
                 toValue: 1,
                 easing: Easing.cubic,
                 useNativeDriver: false
-            }).start();
+            }).start()
         }
         else {
             Animated.timing(animationHeight, {
@@ -90,28 +76,28 @@ const NewsFilter: FC<INewsFilter> = ({ initialTimeRanges, initialCategories, ini
                 toValue: 0,
                 easing: Easing.cubic,
                 useNativeDriver: false
-            }).start();
+            }).start()
             Animated.timing(animationOpacity, {
                 duration: 300,
                 toValue: 0,
                 easing: Easing.cubic,
                 useNativeDriver: false
-            }).start();
+            }).start()
         }
-    }, [expanded]);
+    }, [expanded])
 
-    const handleChange = (itemID: number, collection: number[], setter: React.Dispatch<React.SetStateAction<number[]>>) => {
+    const handleCategoryChange = (itemID: string, collection: string[], setter: React.Dispatch<React.SetStateAction<string[]>>) => {
         if (collection.includes(itemID)) {
-            const filtered = collection.filter((id) => id !== itemID);
-            setter(filtered);
+            const filtered = collection.filter((id) => id !== itemID)
+            setter(filtered)
         } else {
-            setter((array) => [...array, itemID]);
+            setter((array) => [...array, itemID])
         }
     }
 
     useEffect(() => {
-        onChange(selectedCategories, selectedTimeRanges, selectedTypes)
-    }, [selectedCategories, selectedTimeRanges, selectedTypes]);
+        onChange(selectedCategories, selectedTimeRange)
+    }, [selectedCategories, selectedTimeRange])
 
     const styles = StyleSheet.create({
         filterSection: {
@@ -140,11 +126,11 @@ const NewsFilter: FC<INewsFilter> = ({ initialTimeRanges, initialCategories, ini
             backgroundColor: theme.colors.primaryLight,
             marginTop: 16
         }
-    });
+    })
 
     return (
         <View style={styles.filterSection}>
-            <TouchableWithoutFeedback onPress={() => { toggleExpansion(); }} >
+            <TouchableWithoutFeedback onPress={() => { toggleExpansion() }} >
                 <View style={styles.filterHeader}>
                     <MaterialCommunityIcons name={expanded ? 'close' : 'filter'} size={24} color={theme.colors.textSemiLight} />
                     <Text style={StyleSheet.compose(fonts.titleRegular, { color: theme.colors.textSemiLight, marginStart: 8 })}>{expanded ? 'Zavřít filtry' : 'Filtrovat'}</Text>
@@ -155,7 +141,7 @@ const NewsFilter: FC<INewsFilter> = ({ initialTimeRanges, initialCategories, ini
                 <View style={styles.filterContainer}>
                     <ScrollView horizontal={true}>
                         <View style={styles.filterRow}>
-                            <CategoryButton key={0} onPress={() => { setTimeRanges([]) }} active={selectedTimeRanges.length == 0}>
+                            <CategoryButton key={0} onPress={() => { setTimeRange(null) }} active={selectedTimeRange == null}>
                                 <Text>Vydáno kdykoliv</Text>
                             </CategoryButton>
 
@@ -163,9 +149,9 @@ const NewsFilter: FC<INewsFilter> = ({ initialTimeRanges, initialCategories, ini
                                 <CategoryButton
                                     key={item.id}
                                     onPress={() => {
-                                        handleChange(item.id, selectedTimeRanges, setTimeRanges)
+                                        setTimeRange(item.id)
                                     }}
-                                    active={selectedTimeRanges.includes(item.id)}
+                                    active={selectedTimeRange == item.id}
                                 >
                                     {item.name}
                                 </CategoryButton>
@@ -184,43 +170,21 @@ const NewsFilter: FC<INewsFilter> = ({ initialTimeRanges, initialCategories, ini
                                 <CategoryButton
                                     key={item.id}
                                     onPress={() => {
-                                        handleChange(item.id, selectedCategories, setCategories)
+                                        handleCategoryChange(item.key, selectedCategories, setCategories)
                                     }}
-                                    active={selectedCategories.includes(item.id)}
+                                    active={selectedCategories.includes(item.key)}
                                 >
-                                    {item.name}
+                                    {item.title}
                                 </CategoryButton>
                             ))}
                             <View style={{ width: 16, height: 16 }}></View>
                         </View>
                     </ScrollView>
-
-                    <ScrollView horizontal={true}>
-                        <View style={styles.filterRow}>
-                            <CategoryButton key={0} onPress={() => { setTypes([]) }} active={selectedTypes.length == 0}>
-                                <Text>Všechny typy</Text>
-                            </CategoryButton>
-
-                            {articleTypes.map((item) => (
-                                <CategoryButton
-                                    key={item.id}
-                                    onPress={() => {
-                                        handleChange(item.id, selectedTypes, setTypes)
-                                    }}
-                                    active={selectedTypes.includes(item.id)}
-                                >
-                                    {item.name}
-                                </CategoryButton>
-                            ))}
-                            <View style={{ width: 16, height: 16 }}></View>
-                        </View>
-                    </ScrollView>
-
                     <View style={styles.filterSeparator}></View>
                 </View>
             </Animated.View>
         </View>
-    );
-};
+    )
+}
 
-export default NewsFilter;
+export default NewsFilter
