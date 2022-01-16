@@ -1,21 +1,26 @@
 from enum import Enum, auto
 
+class Category:
+    def __init__(self, name, key):
+        self.name = name
+        self.key = key
+
+
 class CategoryEnum(Enum):
-    DOMOV = 'Zprávy z domova'
-    ZAHRANICI = 'Zprávy ze světa'
-    SPORT = "Sport"
-    BYZNYS = 'Byznys zprávy'
-    KULTURA = "Kultura"
-    ZDRAVI = "Zdraví"
-    EKONOMIKA = "Ekonomika"
-    CESTOVANI = "Cestování"
-    RELAX ="relax"
-    VEDA = "Věda a technologie"
-    AUTO = "Auto"
-    ZIVOTNI_STYL = 'Životní styl a společnost'
-    HISTORIE = "historie"
-    ZAJIMAVOSTI = "Zajímavosti"
-    OSTATNI = "Ostatní"
+    PETI_MIN = Category('5minutovka na míru', '5min')
+    DOMOV = Category("Z domova", "domov")
+    ZAHRANICI = Category("Zahraničí", "zahranici")
+    SPORT = Category("Sport", "sport")
+    BYZNYS = Category("Byznys", "byznys")
+    KULTURA = Category("Kultura", "kultura")
+    ZDRAVI = Category("Zdraví", "zdravi")
+    CESTOVANI = Category("Cestovaní", "cestovani")
+    RELAX = Category("Relax", "relax")
+    VEDA = Category("Věda", "veda")
+    AUTO = Category("Auto", "auto")
+    ZIVOTNI_STYL = Category("Životní styl", "zivotni-styl")
+    HISTORIE = Category("Historie", "historie")
+    UNKNOWN = Category("", "unknown")
 
 
 class MetricEnum(Enum):

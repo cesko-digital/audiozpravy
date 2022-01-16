@@ -43,24 +43,24 @@ def format_articles(selected_articles: pd.DataFrame) -> pd.DataFrame:
 
 def category_mapper(keyword):
     keyword_to_category = {
-        'Zprávy z domova': CategoryEnum.DOMOV.value,
-        'Česko': CategoryEnum.DOMOV.value,
+        'Zprávy z domova': CategoryEnum.DOMOV,
+        'Česko': CategoryEnum.DOMOV,
         'Svět': CategoryEnum.ZAHRANICI,
-        'Zprávy ze světa': CategoryEnum.ZAHRANICI.value,
-        'Sport': CategoryEnum.SPORT.value,
-        'Kultura': CategoryEnum.KULTURA.value,
-        'Zdraví': CategoryEnum.ZDRAVI.value,
-        'Zajímavosti': CategoryEnum.ZAJIMAVOSTI.value,
-        'Ekonomika': CategoryEnum.EKONOMIKA.value,
-        'Životní styl a společnost': CategoryEnum.ZIVOTNI_STYL.value,
-        'Věda a technologie': CategoryEnum.VEDA.value,
-        'Byznys zprávy': CategoryEnum.BYZNYS.value,
-        'Věda': CategoryEnum.VEDA.value,
-        'Cestování': CategoryEnum.CESTOVANI.value,
-        'Auto': CategoryEnum.AUTO.value
+        'Zprávy ze světa': CategoryEnum.ZAHRANICI,
+        'Sport': CategoryEnum.SPORT,
+        'Kultura': CategoryEnum.KULTURA,
+        'Zdraví': CategoryEnum.ZDRAVI,
+        'Zajímavosti': CategoryEnum.ZAJIMAVOSTI,
+        'Ekonomika': CategoryEnum.EKONOMIKA,
+        'Životní styl a společnost': CategoryEnum.ZIVOTNI_STYL,
+        'Věda a technologie': CategoryEnum.VEDA,
+        'Byznys zprávy': CategoryEnum.BYZNYS,
+        'Věda': CategoryEnum.VEDA,
+        'Cestování': CategoryEnum.CESTOVANI,
+        'Auto': CategoryEnum.AUTO
     }
     if keyword in keyword_to_category:
-        return keyword_to_category[keyword]
+        return keyword_to_category[keyword].value
     else:
         logging.Logger.info(f'Keyword {keyword} is not in a list of known keywords. Returning category: "ostatni"')
         return CategoryEnum.OSTATNI.value
