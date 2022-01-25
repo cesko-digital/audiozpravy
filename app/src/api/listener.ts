@@ -36,7 +36,7 @@ export function logArticlePlayed(articleID: number) {
   console.info("logArticlePlayed(" + articleID + ")");
   // TODO
   client
-    .mutate({ mutation: LOG_ARTICLE_PLAY, variables: { articleID: 1 } })
+    .mutate({ mutation: LOG_ARTICLE_PLAY, variables: { articleID: articleID } })
     .catch((error) => {
       console.error(error);
     })
