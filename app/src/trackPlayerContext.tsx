@@ -6,6 +6,7 @@ import RNTrackPlayer, {
   State,
 } from "react-native-track-player";
 import { initialPlayerState, PlayerState } from "./trackPlayer";
+import { logArticlePlayed } from "./api/listener";
 
 export type PlayerContextState = {
   state: PlayerState;
@@ -57,14 +58,13 @@ const PlayerContextProvider: FC = ({ children }) => {
         const prevTrackIndex = event.track;
         if (prevTrackIndex != null) {
           const prevTrack = await RNTrackPlayer.getTrack(prevTrackIndex);
-          if (prevTrack != null) {
-            const prevTrackPosition = event.position;
-            console.info(
-              "Message to BE: last played track (id: " +
-                prevTrack.id +
-                ") position = " +
-                prevTrackPosition
-            );
+          const prevTrackPosition = event.position;
+          if (
+            prevTrack != null &&
+            prevTrackPosition != null &&
+            prevTrackPosition > 5
+          ) {
+            logArticlePlayed(prevTrack.id);
           }
         }
         const nextTrack = event.nextTrack;

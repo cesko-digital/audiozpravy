@@ -27,7 +27,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "cz.ceskodigital.audiozpravy"
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
