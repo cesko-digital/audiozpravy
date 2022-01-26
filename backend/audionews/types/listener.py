@@ -1,8 +1,8 @@
 import datetime
+from typing import Optional, List
 
 import graphene
 from django.db.models.query import QuerySet
-from graphene import Field, Int, List, NonNull
 from graphene.relay import Connection, Node
 from graphene_django import DjangoConnectionField, DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
@@ -14,8 +14,13 @@ from .article import ArticleNode
 from classes.queue_filler import QueueFiller
 
 class ListenerNode(DjangoObjectType):
-    plays = List(NonNull(PlayNode), required=True)
-    queue = List(NonNull(ArticleNode), n_of_messages=graphene.Int(), last_articles_date=graphene.String())
+    plays = graphene.List(graphene.NonNull(PlayNode), required=True)
+    queue = graphene.List(
+        graphene.NonNull(ArticleNode),
+        favourite_articles=graphene.List(graphene.Int),
+        n_of_messages=graphene.Int(),
+        last_articles_date=graphene.String()
+    )
 
     class Meta:
         model = Listener
@@ -32,7 +37,12 @@ class ListenerNode(DjangoObjectType):
         return Play.objects.filter(listener_id=root.id).all()
 
 
-    def resolve_queue(root, info, n_of_messages: str = 10, last_articles_date: str = "2018-10-10"):
+    def resolve_queue(
+            root, info,
+            favourite_articles: Optional[List[int]] = None,
+            n_of_messages: str = 10,
+            last_articles_date: str = "2018-10-10"
+    ):
         """
         Get recommended articles for a given user
 
@@ -40,8 +50,10 @@ class ListenerNode(DjangoObjectType):
         :param last_articles_dat: date of the last article to recommend as string in format YYYY-MM-DD
         """
         user_plays = Listener.objects.get(user_ptr_id=root.id).plays.all()
-
         user_articles_ids = [play.article.id for play in user_plays]
+        if favourite_articles is not None:
+            user_articles_ids.extend(favourite_articles)
+
         user_articles = Article.objects.filter(id__in=user_articles_ids)
 
         # get user history articles

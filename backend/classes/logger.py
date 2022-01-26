@@ -1,8 +1,9 @@
+import datetime
 import os
 import logging
 from logging.handlers import RotatingFileHandler
-from common.helper import now_as_string
 parent_directory = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+
 
 class Logger:
     def __init__(self, name=""):
@@ -10,7 +11,7 @@ class Logger:
         logging.basicConfig(level=logging.ERROR)
         self.logger = logging.getLogger(__name__)
         self.logger.setLevel(logging.INFO)
-        file_path = os.path.join(parent_directory, "logs", f"{name}-{now_as_string()}.log")
+        file_path = os.path.join(parent_directory, "logs", f"{name}-{str(datetime.datetime.now())}.log")
         """
         self.handler = RotatingFileHandler(file_path, maxBytes=10000000, backupCount=5)
         self.handler.setLevel(logging.INFO)
