@@ -35,7 +35,7 @@ if __name__ == '__main__':
             title=row.title,
             perex=row.summary,
             recording_created_at=datetime.now(),
-            pub_date=datetime.fromtimestamp(row.published),
+            pub_date=datetime.now(),
             url=str(row.link),
             provider=provider,
             text=row.lemmatized_text

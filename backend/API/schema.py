@@ -16,7 +16,7 @@ class ObtainJSONWebToken(JSONWebTokenMutation):
 
     @classmethod
     def resolve(cls, root, info: ResolveInfo, **kwargs):
-        reporter = Listener.objects.get(username=info.context.listener.username)
+        reporter = Listener.objects.get(username=info.context.listener.username).first()
         logger.info(f'User logged in as {repr(reporter)}.')
         return cls(reporter=reporter)
 
