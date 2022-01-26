@@ -16,6 +16,10 @@ from recommender.utils import get_embeddings
 from gensim.models.doc2vec import Doc2Vec
 
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger('Embeddings creation')
+
+
 def calculate_doc2vec_vectors(model_path: str, vectors_path: str) -> None:
     ''' Calculates embeddings for all available articles that are missing from "vectors_path" file and save it into
     this file'''
@@ -42,17 +46,18 @@ def calculate_doc2vec_vectors(model_path: str, vectors_path: str) -> None:
     json.dump(article_embeddings, open(vectors_path, 'w'))
 
 
-def calculate_bert_vectors(model_path_folder: str, vectors_path: str):
-    from deeppavlov.core.common.file import read_json
-    from deeppavlov import build_model, configs
+def calculate_bert_vectors(model_path_folder: str, vectors_path: str, create_new_vectors: bool = True):
+    ''' Calculate embeddings from bert model save them into "vectors_path'''
 
     bert_config = read_json(configs.embedder.bert_embedder)
-    bert_config['metadata']['variables']['BERT_PATH'] = '/home/michal/projects/audiozpravy/bert/bg_cs_pl_ru_cased_L-12_H-768_A-12_pt'
+    bert_config['metadata']['variables']['BERT_PATH'] = model_path_folder
+
+    logger.info('Building belrt model ...')
 
     slavic_bert = build_model(bert_config)
 
     all_articles = Article.objects.all()
-    if os.path.exists(vectors_path):
+    if os.path.exists(vectors_path) and not create_new_vectors:
         article_embeddings = json.load(open(vectors_path, 'r'))
     else:
         article_embeddings = {}
@@ -60,12 +65,13 @@ def calculate_bert_vectors(model_path_folder: str, vectors_path: str):
     article_ids = [article.id for article in all_articles]
     new_articles = set(article_ids) - set(list(map(int, article_embeddings.keys())))
 
+    logger.info('Creating embedding vectors ...')
     tokens, token_embs, subtokens, subtoken_embs, sent_max_embs, sent_mean_embs, bert_pooler_outputs = slavic_bert(
         [article.perex for article in all_articles if article.id in new_articles]
     )
 
-    for new_article_id, emb_vecotr in zip(new_articles, sent_mean_embs):
-        article_embeddings[str(new_article_id)] = {'tokens': tokens, 'sent_embedding': list(emb_vecotr)}
+    for new_article_id, emb_vecotr, token in zip(new_articles, sent_mean_embs, tokens):
+        article_embeddings[str(new_article_id)] = {'tokens': token, 'sent_embedding': list(map(str, emb_vecotr))}
 
     json.dump(article_embeddings, open(vectors_path, 'w'))
 
