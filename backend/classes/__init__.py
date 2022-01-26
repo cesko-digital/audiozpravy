@@ -5,7 +5,6 @@ class Category:
         self.name = name
         self.key = key
 
-
 class CategoryEnum(Enum):
     PETI_MIN = Category('5minutovka na míru', '5min')
     DOMOV = Category("Z domova", "domov")

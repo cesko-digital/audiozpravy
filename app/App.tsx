@@ -1,61 +1,103 @@
-import React from "react";
-import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import AppLoading from "expo-app-loading";
-import { useFonts } from "expo-font";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import React, { useState, useEffect } from "react"
+import { NavigationContainer } from "@react-navigation/native"
+import { createStackNavigator } from "@react-navigation/stack"
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
+import AppLoading from "expo-app-loading"
+import { MaterialCommunityIcons } from "@expo/vector-icons"
 
-import TopicsScreen from "./screen-components/topics";
-import { Screens } from "./screens";
-import OnboardingScreen from "./screen-components/onboarding";
-import NewsScreen from "./screen-components/news";
-import FriendsScreen from "./screen-components/friends";
-import QueueScreen from "./screen-components/queue";
-import CategoriesScreen from "./screen-components/categories";
-import SettingsScreen from "./screen-components/settings";
-import Bar from "./components/buttons/navigation/bar";
+import { Screens } from "./src/screens"
+import TopicsScreen from "./src/screen-components/onboarding-topics"
+import OnboardingScreen from "./src/screen-components/onboarding"
+import NewsScreen from "./src/screen-components/news-categories"
+import UserNewsScreen from "./src/screen-components/user-news"
+import QueueScreen from "./src/screen-components/queue"
+import Bar from "./src/components/navigation/bar"
+import { useColorScheme, Appearance } from 'react-native'
+import { AppDarkTheme, AppLightTheme } from './src/theme'
+import { StatusBar } from "expo-status-bar"
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context'
+import TrackPlayer from './src/trackPlayer'
+import PlayerContextProvider from "./src/trackPlayerContext"
+import { ApolloProvider } from '@apollo/client'
+import { getPreferredTopics, getUserUUID } from "./src/securePreferences"
+import SettingsScreen from "./src/screen-components/settings"
+import { client } from "./src/api/apiClient"
+import { loadFonts } from "./src/theme/fonts"
+import { registerListener } from "./src/api/listener"
 
-const Tab = createBottomTabNavigator();
-const Stack = createStackNavigator();
+const Tab = createBottomTabNavigator()
+const Stack = createStackNavigator()
 
 export default function App() {
-  let [fontsLoaded] = useFonts({
-    MondaBold: require("./assets/fonts/Monda-Bold.ttf"),
-    RobotoLight: require("./assets/fonts/Roboto-Light.ttf"),
-    RobotoBold: require("./assets/fonts/Roboto-Bold.ttf"),
-  });
+  const [userUUID, setUserUUID] = useState(null)
+  const [preferredTopics, setPreferredTopics] = useState([])
+  const [fontsLoaded] = loadFonts()
+  const colorScheme = useColorScheme()
+  const [theme, setTheme] = useState(colorScheme === 'dark' ? AppDarkTheme : AppLightTheme)
 
-  if (!fontsLoaded) {
-    return <AppLoading />;
+  useEffect(() => {
+    TrackPlayer.registerService()
+
+    getUserUUID().then((userUUID) => {
+      setUserUUID(userUUID)
+      registerListener(userUUID)
+    })
+
+    getPreferredTopics().then((topics) => {
+      setPreferredTopics(topics)
+    })
+
+    Appearance.addChangeListener(({ colorScheme }) => {
+      setTheme(colorScheme === 'dark' ? AppDarkTheme : AppLightTheme)
+    })
+  }, [])
+
+
+  if (!fontsLoaded || userUUID == null) {
+    return <AppLoading />
   } else {
     return (
-      <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen
-            name={Screens.onboarding}
-            component={OnboardingScreen}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name={Screens.topics}
-            component={TopicsScreen}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name={Screens.home}
-            component={HomeTabs}
-            options={{ headerShown: false }}
-          />
-        </Stack.Navigator>
-      </NavigationContainer>
-    );
+      <SafeAreaProvider>
+        <ApolloProvider client={client}>
+          <PlayerContextProvider>
+            <NavigationContainer theme={theme}>
+              <Stack.Navigator>
+                {preferredTopics.length < 3 && <Stack.Screen
+                  name={Screens.onboarding}
+                  component={OnboardingScreen}
+                  options={{ headerShown: false }}
+                />}
+                {preferredTopics.length < 3 && <Stack.Screen
+                  name={Screens.topics}
+                  component={TopicsScreen}
+                  options={{ headerShown: false }}
+                />
+                }
+                <Stack.Screen
+                  name={Screens.home}
+                  component={HomeTabs}
+                  options={{ headerShown: false }}
+                />
+              </Stack.Navigator>
+            </NavigationContainer>
+            <StatusBar style={colorScheme === 'dark' ? 'auto' : 'dark'} />
+          </PlayerContextProvider>
+        </ApolloProvider>
+      </SafeAreaProvider>
+    )
   }
 }
 
 const HomeTabs = () => {
+  const scheme = useColorScheme()
+  const insets = useSafeAreaInsets()
+
   return (
-    <Tab.Navigator tabBar={Bar}>
+    <Tab.Navigator initialRouteName={Screens.news} tabBar={props => <Bar {...props} />} tabBarOptions={{
+      style: {
+        backgroundColor: scheme === 'dark' ? AppDarkTheme.colors.background : AppLightTheme.colors.background
+      }
+    }}>
       <Tab.Screen
         name={Screens.news}
         component={NewsScreen}
@@ -67,16 +109,12 @@ const HomeTabs = () => {
         }}
       />
       <Tab.Screen
-        name={Screens.friends}
-        component={FriendsScreen}
+        name={Screens.userNews}
+        component={UserNewsScreen}
         options={{
-          title: "Přátelé",
+          title: "Vlastní výběr",
           tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons
-              name="account-multiple"
-              color={color}
-              size={20}
-            />
+            <MaterialCommunityIcons name="heart" color={color} size={20} />
           ),
         }}
       />
@@ -86,24 +124,7 @@ const HomeTabs = () => {
         options={{
           title: "Fronta",
           tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons
-              name="playlist-music"
-              color={color}
-              size={20}
-            />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name={Screens.categories}
-        component={CategoriesScreen}
-        options={{
-          title: "Kategorie",
-          tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons
-              name="format-list-bulleted"
-              color={color}
-              size={20}
+            <MaterialCommunityIcons name="playlist-music" color={color} size={20}
             />
           ),
         }}
@@ -114,10 +135,11 @@ const HomeTabs = () => {
         options={{
           title: "Nastavení",
           tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons name="cog" color={color} size={20} />
+            <MaterialCommunityIcons name="cog" color={color} size={20}
+            />
           ),
         }}
       />
     </Tab.Navigator>
-  );
-};
+  )
+}
