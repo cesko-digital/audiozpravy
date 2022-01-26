@@ -23,15 +23,7 @@ from classes.trend_watcher import TrendWatcher
 from pipeline.rss_scraper.rss_scraper import SOURCES
 from pipeline.rss_scraper.rss_scraper.scraper import _scrape_feed
 
-CTIDOMA_SOURCE = {
-        "name": "ctidoma.cz",
-        "feeds": [
-            {
-                "url": "https://www.ctidoma.cz/export/cesko-digital",
-                "category": parse_ctidoma_category,
-            }
-        ],
-    }
+
 
 class JobRunner:
     def __init__(self):
@@ -41,7 +33,11 @@ class JobRunner:
     def get_new_articles(self):
         """ Get new articles from feed"""
         self.logger.info('Getting new articles from ctidoma feed')
-        entries = _scrape_feed(source=CTIDOMA_SOURCE, local_dev=0)
+
+        entries = []
+
+        for source in SOURCES:
+            entries.extend(_scrape_feed(source, local_dev=0))
         for entry in entries:
 
             provider, create = Provider.objects.get_or_create(name=CTIDOMA_SOURCE["name"])
