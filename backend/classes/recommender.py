@@ -8,7 +8,7 @@ import numpy as np
 from classes.metrics import calculate_frecency, calculate_age_in_secs
 from classes.trend_watcher import TrendWatcher
 from classes import MetricEnum
-from pipeline.text_processing import fit_tf_idf
+from job_runner.text_processing import fit_tf_idf
 
 ARTICLE_PROPS = ["title", "url", "perex", "pub_date", "category"]
 
