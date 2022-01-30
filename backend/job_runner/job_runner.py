@@ -3,6 +3,7 @@ import datetime
 import json
 import logging
 import time
+from typing import List
 
 import django
 import os
@@ -40,14 +41,20 @@ class JobRunner:
         self.new_entries = []
         self.logger = logging.getLogger('Job Runner')
 
-    def get_new_articles(self):
+    def get_new_articles(self, sources_names: List[str] = None):
         """ Get new articles from feed"""
         self.logger.info('Getting new articles from ctidoma feed')
 
         entries = []
 
         for source in SOURCES:
-            entries.extend(_scrape_feed(source, local_dev=0))
+            if not sources_names:
+                self.logger.info(f'Scrapin data for {source["name"]}')
+                entries.extend(_scrape_feed(source, local_dev=0))
+            elif source['name'] in sources_names:
+                self.logger.info(f'Scrapin data for {source["name"]}')
+                entries.extend(_scrape_feed(source, local_dev=0))
+
         for entry in entries:
 
             provider, create = Provider.objects.get_or_create(name=CTIDOMA_SOURCE["name"])
@@ -106,6 +113,10 @@ if __name__ == '__main__':
     args.add_argument('--n-past-days', default=100000,
                       help = 'Number of days to consider for articles to recommend for categories. for value 4 we '
                              'consider only articles in last 4 days.')
+    args.add_argument('--sources_names', default='ctidoma.cz',
+                      help='all sources names that will be scraped by the script. If empty string is given, we '
+                           'scrape all available sources. Sources are separated by commas. To view all available sources'
+                           'see pipeline.rss_scraper.rss_scraper.SOURCES ')
 
     cfg = args.parse_args()
     date_today = datetime.date(2021,12,24)
