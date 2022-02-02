@@ -1,6 +1,6 @@
 from datetime import datetime
-from collections import namedtuple
 from random import random
+from classes.helper import category_mapper
 import os
 import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "API.settings")
@@ -12,8 +12,8 @@ import pandas as pd
 from classes.categorizer import parse_category
 from audionews.models import Provider, Category, Article, Listener, Playlist, Play
 
-
 DEVICE_ID = "abcd"
+
 if __name__ == '__main__':
     """ Add data from pandas df into sqlite database"""
     # articles = pd.read_csv('s3_input/articles.csv')
@@ -29,14 +29,15 @@ if __name__ == '__main__':
 
     articles_for_category_count = defaultdict(lambda: 0)
     for index, row in articles_new.iterrows():
-        provider, create = Provider.objects.get_or_create(name=row.source)
         cat = parse_category(str(row.link))
+        provider, create = Provider.objects.get_or_create(name=row.source)
         category, create = Category.objects.get_or_create(name=cat.value.name, key=cat.value.key)
         article = Article.objects.create(
             category=category,
             title=row.title,
             perex=row.summary,
-            pub_date=datetime.fromtimestamp(row.published),
+            pub_date=datetime.now(),
+            recording_created_at=datetime.now(),
             url=str(row.link),
             provider=provider,
             text=row.lemmatized_text
@@ -57,7 +58,7 @@ if __name__ == '__main__':
         if articles_for_category_count[row.category] <= 8:
             playlist.articles.add(article)
 
-        if random() > 0.5:
+        if random() > 0.9:
             play, created = Play.objects.get_or_create(
                 article=article,
                 listener=listener

@@ -17,9 +17,10 @@ class ObtainJSONWebToken(JSONWebTokenMutation):
 
     @classmethod
     def resolve(cls, root, info, **kwargs):
-        listener = Listener.objects.get(username=info.context.user.username)
+        listener = Listener.objects.get(username=info.context.user.username).first()
         logger.info(f'User logged in as {repr(listener)}.')
         return cls(listener=listener)
+
 
 
 class Query(
