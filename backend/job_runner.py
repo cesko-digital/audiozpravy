@@ -7,7 +7,7 @@ import time
 import django
 import os
 
-from pipeline.rss_scraper.rss_scraper.sources import parse_ctidoma_category
+from classes.categorizer import parse_ctidoma_category
 from pipeline.text_processing import fit_tf_idf
 from recommender.save_embeddings import calculate_doc2vec_vectors, calculate_bert_vectors
 from recommender.train_doc2vec import train_w2v_model
@@ -101,8 +101,7 @@ class JobRunner:
 if __name__ == '__main__':
     "Regular jobs that run on a daily basis. Script runs all the jobs 30 minutes after midnight each day "
     args = argparse.ArgumentParser()
-    args.add_argument('--doc2vec-path', default='s3_input/doc2vec_articles.model')
-    args.add_argument('--bert-folder-path', default='audiozpravy/bert/bg_cs_pl_ru_cased_L-12_H-768_A-12_pt')
+    args.add_argument('--bert-folder-path', default='/home/michal/projects/audiozpravy/bert/bg_cs_pl_ru_cased_L-12_H-768_A-12_pt')
     args.add_argument('--vectors-path', default='s3_input/articles_embeddings.json')
     args.add_argument('--n-past-days', default=100000,
                       help = 'Number of days to consider for articles to recommend for categories. for value 4 we '
@@ -121,8 +120,7 @@ if __name__ == '__main__':
             runner.get_new_articles()
             date_in_past = (datetime.datetime.now() - datetime.timedelta(days=cfg.n_past_days)).date()
             runner.create_playlists(date_today, date_in_past)
-            # runner.train_w2v_model(cfg.doc2vec_path)
-            runner.save_embeddings(cfg.doc2vec_path, cfg.vectors_path)
+            runner.save_embeddings(cfg.bert_folder_path, cfg.vectors_path)
 
         # sleep for 30 minutes
         logging.getLogger('Main').info('Sleep for 30 minutes ..')
