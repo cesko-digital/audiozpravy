@@ -45,24 +45,13 @@ class PlayArticle(ClientIDMutation):
     play = Field(PlayNode)
 
     class Input:
-<<<<<<< HEAD
         article_id = String(required=True)
-        device_id = String(required=True)
-=======
-        article_id = Int(required=True)
->>>>>>> 62a53934ac9ae58816cab82a532e7d1456ee4899
 
     @classmethod
     def mutate_and_get_payload(cls, root, info: ResolveInfo, **input) -> 'PlayArticle':
         article_id = input['article_id']
-
-<<<<<<< HEAD
         listener = Listener.objects.get(username=info.context.listener.username).first()
         play = Play.objects.create(listener=listener, article_id=article_id)
-=======
-        listener = Listener.objects.filter(user__username=info.context.user.username).first()
-        play = Play.objects.create(listener=listener, article__id=article_id)
->>>>>>> 62a53934ac9ae58816cab82a532e7d1456ee4899
 
         return PlayArticle(play=play)
 
