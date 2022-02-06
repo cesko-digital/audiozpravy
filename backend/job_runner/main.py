@@ -1,10 +1,7 @@
 import glob
 import numpy as np
-from rss_scraper.rss_scraper.scraper import scrape_feeds
-from text_processing import load_article_snapshots, add_lemmatized_texts, fit_tf_idf
-import boto3
-from botocore.exceptions import ClientError
-import os
+from job_runner.scraper import scrape_feeds
+from recommender.text_processing import load_article_snapshots, add_lemmatized_texts, fit_tf_idf
 from tts import process_audio, upload_to_s3
 from os import environ
 

@@ -1,4 +1,4 @@
-from pipeline.rss_scraper.rss_scraper.sources import (
+from job_runner.sources import (
     parse_ctidoma_category,
     Category,
 )

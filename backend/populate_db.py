@@ -18,7 +18,7 @@ DEVICE_ID = "abcd"
 if __name__ == '__main__':
     """ Add data from pandas df into sqlite database"""
     # articles = pd.read_csv('s3_input/articles.csv')
-    articles_new = pd.read_csv("s3_input/articles.csv", parse_dates=["published"])
+    articles_new = pd.read_csv("job_runner/data/articles.csv", parse_dates=["published"])
     articles_new['published'] = articles_new.published.apply(recommender.recommend.to_timestamp)
     django.setup()
 

@@ -20,7 +20,7 @@ class FeedMaker:
             .filter(pub_date__gte=date_from) \
             .all().values()
 
-        category_mapping = {d['id']: d['name'] for d in Category.objects.all().values()}
+        category_mapping = {d['key']: d['name'] for d in Category.objects.all().values()}
 
         articles_df = pd.DataFrame(article_dicts)
         articles_df['category'] = articles_df['category_id'].apply(lambda x: category_mapping[x])
