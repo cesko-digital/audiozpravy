@@ -8,6 +8,7 @@ import django
 import os
 
 from classes.categorizer import parse_ctidoma_category
+from job_runner.tts import process_audio, upload_to_s3
 
 from recommender.save_embeddings import calculate_doc2vec_vectors, calculate_bert_vectors
 from recommender.train_doc2vec import train_w2v_model
@@ -106,17 +107,35 @@ class JobRunner:
         self.logger.info(f'Creating embeddings and saving into {vectors_path}')
         calculate_bert_vectors(bert_folder_path, vectors_path)
 
+    def add_audio_for_new_entries(self, path_audio_output: str ):
+        ''' Adds audio fo each new entry and saves it into s3 file'''
+        if os.getenv('AZURE_KEY') and os.getenv('AZURE_REGION'):
 
+            self.logger.info(f'Creating audio for {len(self.new_entries)} articles')
+            for new_article in self.new_entries:
+                process_audio(new_article['title'], new_article['perex'], path_audio_output)
+
+            if os.getenv('AWS_ACCESS_KEY') and os.getenv('AWS_SECRET_KEY') and os.getenv('S3_BUCKET') and os.getenv('S3_BUCKET_AUDIO'):
+                self.logger.info(f'Uplading {len(self.new_entries)} files into s3')
+                upload_to_s3(path_audio_output)
+            else:
+                self.logger.warning('Environment variables AWS_ACCESS_KEY, AWS_SECRET_KEY, S3_BUCKET and S3_BUCKET_AUDIO'
+                                'needs to be defined in order to save files into s3')
+        else:
+            self.logger.warning('Environment variables AZURE_KEY and AZURE_REGION needs toi be defined in order to '
+                                'process audio')
 
 
 def strtolist(string, sep=',') -> Optional[List[str]]:
     return string.split(sep) if string != '' else None
+
 
 if __name__ == '__main__':
     "Regular jobs that run on a daily basis. Script runs all the jobs 30 minutes after midnight each day "
     args = argparse.ArgumentParser()
     args.add_argument('--bert-path', default='job_runner/data/bg_cs_pl_ru_cased_L-12_H-768_A-12_pt')
     args.add_argument('--vectors-path', default='job_runner/data/articles_embeddings.json')
+    args.add_argument('--audio-path', default='job_runner/data/audio/')
     args.add_argument('--n-past-days', default=100000,
                       help = 'Number of days to consider for articles to recommend for categories. for value 4 we '
                              'consider only articles in last 4 days.')
@@ -132,3 +151,4 @@ if __name__ == '__main__':
     date_in_past = (datetime.datetime.now() - datetime.timedelta(days=cfg.n_past_days)).date()
     runner.create_playlists(date_today, date_in_past)
     runner.save_embeddings(cfg.bert_path, cfg.vectors_path)
+    runner.add_audio_for_new_entries(cfg.audio_path)

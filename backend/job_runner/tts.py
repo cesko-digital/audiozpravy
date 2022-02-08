@@ -1,8 +1,9 @@
+import logging
+
 from azure.cognitiveservices.speech import (
     AudioDataStream,
     SpeechConfig,
     SpeechSynthesizer,
-    SpeechSynthesisOutputFormat,
 )
 from azure.cognitiveservices.speech.audio import AudioOutputConfig
 
@@ -13,6 +14,15 @@ import unicodedata
 import re
 from os import environ
 
+class CONFIG:
+    azureKey: str = os.getenv('AZURE_KEY')
+    azureRegion: str = os.getenv('AZURE_REGION')
+    awsAccessKey: str = os.getenv('AWS_ACCESS_KEY')
+    awsSecretKey: str = os.getenv('AWS_SECRET_KEY')
+    s3Bucket: str = os.getenv('S3_BUCKET')
+    s3BucketAudio: str = os.getenv('S3_BUCKET_AUDIO')
+
+
 
 def title_to_filename(title: str):
     filename = unicodedata.normalize("NFKD", title)
@@ -22,13 +32,11 @@ def title_to_filename(title: str):
     return filename + ".wav"
 
 
-def process_audio(title: str, content: str) -> str:
-    local_dev = environ.get("LOCAL_DEV", 0)
-    if local_dev:
-        return "sample.wav"
-
-    from config import CONFIG
-    speech_config = SpeechConfig(CONFIG["azureKey"], CONFIG["azureRegion"])
+def process_audio(title: str, content: str, temporal_storage_audio: str) -> str:
+    ''' Creats audio for title and content by azure SpeechSynthesizer. AZURE_KEY and AZURE_REGION local variables need
+    to be determined '''
+    # from config import CONFIG
+    speech_config = SpeechConfig(CONFIG.azureKey, CONFIG.azureRegion)
     synthesizer = SpeechSynthesizer(speech_config=speech_config, audio_config=None)
 
     result = synthesizer.speak_ssml_async(
@@ -41,43 +49,43 @@ def process_audio(title: str, content: str) -> str:
     stream = AudioDataStream(result)
 
     filename = title_to_filename(title)
-    stream.save_to_wav_file("audio/" + filename)
-
+    stream.save_to_wav_file(os.path.join(temporal_storage_audio, filename))
     return filename
 
 
-def upload_to_s3():
-    from config import CONFIG
+def upload_to_s3(input_path: str):
+    ''' Upload all files from input_path into S3'''
+    # from config import CONFIG
 
     s3_client = boto3.client(
         "s3",
-        aws_access_key_id=CONFIG["awsAccessKey"],
-        aws_secret_access_key=CONFIG["awsSecretKey"],
+        aws_access_key_id=CONFIG.awsAccessKey,
+        aws_secret_access_key=CONFIG.awsSecretKey,
     )
 
     session = boto3.Session(
-        aws_access_key_id=CONFIG["awsAccessKey"],
-        aws_secret_access_key=CONFIG["awsSecretKey"],
+        aws_access_key_id=CONFIG.awsAccessKey,
+        aws_secret_access_key=CONFIG.awsSecretKey,
     )
 
     try:
-        session.resource("s3").Bucket(CONFIG["s3Bucket"]).objects.all().delete()
-        session.resource("s3").Bucket(CONFIG["s3BucketAudio"]).objects.all().delete()
+        session.resource("s3").Bucket(CONFIG.s3Bucket).objects.all().delete()
+        session.resource("s3").Bucket(CONFIG.s3BucketAudio).objects.all().delete()
 
-        arr = os.listdir("s3")
+        arr = os.listdir(input_path)
 
         for file in arr:
             if file == "articles":
                 continue
 
-            s3_client.upload_file("s3/" + file, CONFIG["s3Bucket"], file)
+            s3_client.upload_file("s3/" + file, CONFIG.s3Bucket, file)
 
         arr = os.listdir("audio")
 
         for file in arr:
             s3_client.upload_file(
                 "audio/" + file,
-                CONFIG["s3BucketAudio"],
+                CONFIG.s3BucketAudio,
                 file,
                 ExtraArgs={"ACL": "public-read"},
             )
