@@ -8,7 +8,6 @@ import django
 import os
 
 from classes.categorizer import parse_ctidoma_category
-from pipeline.text_processing import fit_tf_idf
 
 from recommender.save_embeddings import calculate_doc2vec_vectors, calculate_bert_vectors
 from recommender.train_doc2vec import train_w2v_model
@@ -128,21 +127,8 @@ if __name__ == '__main__':
 
     cfg = args.parse_args()
     date_today = datetime.date(2021,12,24)
-
-
-
-    current_day = 88
-    while True:
-        if datetime.datetime.now().day != current_day:
-            current_day = datetime.datetime.now().day
-            runner = JobRunner()
-            runner.get_new_articles(sources_names=cfg.sources_names)
-            date_in_past = (datetime.datetime.now() - datetime.timedelta(days=cfg.n_past_days)).date()
-            runner.create_playlists(date_today, date_in_past)
-            runner.save_embeddings(cfg.bert_folder_path, cfg.vectors_path)
-
-        # sleep for 30 minutes
-        logging.getLogger('Main').info('Sleep for 30 minutes ..')
-        time.sleep(30 * 60)
-
-
+    runner = JobRunner()
+    runner.get_new_articles(sources_names=cfg.sources_names)
+    date_in_past = (datetime.datetime.now() - datetime.timedelta(days=cfg.n_past_days)).date()
+    runner.create_playlists(date_today, date_in_past)
+    runner.save_embeddings(cfg.bert_path, cfg.vectors_path)
