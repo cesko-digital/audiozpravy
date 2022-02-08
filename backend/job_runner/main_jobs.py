@@ -112,6 +112,7 @@ class JobRunner:
         if os.getenv('AZURE_KEY') and os.getenv('AZURE_REGION'):
 
             self.logger.info(f'Creating audio for {len(self.new_entries)} articles')
+            os.makedirs(path_audio_output, exist_ok=True)
             for new_article in self.new_entries:
                 process_audio(new_article['title'], new_article['perex'], path_audio_output)
 
@@ -145,7 +146,7 @@ if __name__ == '__main__':
                            'see job_runner.rss_scraper.rss_scraper.SOURCES ')
 
     cfg = args.parse_args()
-    date_today = datetime.date(2021,12,24)
+    date_today = datetime.date.today()
     runner = JobRunner()
     runner.get_new_articles(sources_names=cfg.sources_names)
     date_in_past = (datetime.datetime.now() - datetime.timedelta(days=cfg.n_past_days)).date()
