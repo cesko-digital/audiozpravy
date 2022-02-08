@@ -35,7 +35,7 @@ class Query(ObjectType):
         return user
 
     def resolve_my_articles(root, info, **kwargs):
-        return Article.objects.filter(plays__listener__username=info.context.user.username).all()
+        return Article.objects.exclude(plays__listener__username=info.context.user.username).all()
 
     def resolve_articles(root, info, **kwargs):
         return Article.objects.all()

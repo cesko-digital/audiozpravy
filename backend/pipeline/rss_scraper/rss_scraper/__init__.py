@@ -1,4 +1,6 @@
 from classes import CategoryEnum
+from classes.categorizer import parse_ctidoma_category
+
 SOURCES = [
     {
         "name": "lidovky.cz",
