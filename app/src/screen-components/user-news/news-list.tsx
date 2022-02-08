@@ -22,7 +22,9 @@ import { gql, useQuery, NetworkStatus } from "@apollo/client";
 import { useEffect } from "react";
 import { useState } from "react";
 import { TimeRange, TimeRangeItem } from "./news-filter";
-import { subDays, subHours } from "date-fns";
+import { subDays, subHours, format, parseJSON } from "date-fns";
+import { cs } from "date-fns/locale";
+import { debug } from "react-native-reanimated";
 
 interface Props extends ViewProps {
   selected: boolean;
@@ -114,7 +116,7 @@ const Item: FC<ItemProps> = ({ item, onPress, onPlusPress }) => {
                 color: theme.colors.textLight,
               })}
             >
-              {item.published}
+              {format(item.published, "do MMMM, HH:mm", { locale: cs })}
             </Text>
           </View>
         </TouchableOpacity>
@@ -134,8 +136,8 @@ const QUERY = gql`
     $first: Int
     $after: String
     $categories: [ID]
-    $gteDate: Date
-    $lteDate: Date
+    $gteDate: DateTime
+    $lteDate: DateTime
   ) {
     articles(
       first: $first
@@ -203,10 +205,10 @@ const getQueryVariables = (
   if (timeRange != null) {
     const selectedTimeRange = getTimeRange(timeRange);
     if (selectedTimeRange.gteDate) {
-      params.gteDate = selectedTimeRange.gteDate?.toISOString().split("T")[0];
+      params.gteDate = selectedTimeRange.gteDate?.toISOString();
     }
     if (selectedTimeRange.lteDate) {
-      params.lteDate = selectedTimeRange.lteDate?.toISOString().split("T")[0];
+      params.lteDate = selectedTimeRange.lteDate?.toISOString();
     }
   }
   console.info(params);
@@ -252,18 +254,27 @@ const NewsNavList: FC<NewsList> = ({ style, categories, timeRange }) => {
     if (data == undefined) {
       return;
     }
-    const enriched = data.articles.edges.map((item, index) => {
-      const randomTrackNumber = Math.floor(Math.random() * 15 + 1);
-      return {
-        ...item.node,
-        img: "https://picsum.photos/200/140/?id" + item.node.id,
-        url:
-          "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-" +
-          randomTrackNumber +
-          ".mp3",
-        artist: item.node.provider.name,
-      };
-    });
+
+    const enriched = data.articles.edges
+      .filter((item) => {
+        if (item.node != null) {
+          return item;
+        }
+        return null;
+      })
+      .map((item, index) => {
+        const randomTrackNumber = Math.floor(Math.random() * 15 + 1);
+        return {
+          ...item.node,
+          published: parseJSON(item.node.published),
+          img: "https://picsum.photos/200/140/?id" + item.node.id,
+          url:
+            "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-" +
+            randomTrackNumber +
+            ".mp3",
+          artist: item.node.provider.name,
+        };
+      });
     setEnrichedData(enriched);
   }, [data]);
 
