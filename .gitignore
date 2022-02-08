@@ -9,3 +9,4 @@ config.py
 app/.vscode/**
 app/android
 app/ios
+*.code-workspace
