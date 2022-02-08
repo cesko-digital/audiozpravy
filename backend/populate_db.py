@@ -11,6 +11,7 @@ import recommender.recommend
 import pandas as pd
 from classes.categorizer import parse_category
 from audionews.models import Provider, Category, Article, Listener, Playlist, Play
+from classes import CategoryEnum
 
 DEVICE_ID = "abcd"
 
@@ -26,6 +27,9 @@ if __name__ == '__main__':
     listener.user_permissions.add(permission)
     listener.set_password(DEVICE_ID)
     listener.save()
+
+    for cat in CategoryEnum:
+        category, create = Category.objects.get_or_create(name=cat.value.name, key=cat.value.key)
 
     articles_for_category_count = defaultdict(lambda: 0)
     for index, row in articles_new.iterrows():

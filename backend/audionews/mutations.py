@@ -50,7 +50,7 @@ class PlayArticle(ClientIDMutation):
     @classmethod
     def mutate_and_get_payload(cls, root, info: ResolveInfo, **input) -> 'PlayArticle':
         article_id = input['article_id']
-        listener = Listener.objects.get(username=info.context.listener.username).first()
+        listener = Listener.objects.get(username=info.context.user.username).first()
         play = Play.objects.create(listener=listener, article_id=article_id)
 
         return PlayArticle(play=play)
