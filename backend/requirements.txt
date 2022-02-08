@@ -25,3 +25,5 @@ mixer
 pytest-cov
 flake8
 werkzeug
+deeppavlov==0.17.2
+transformers==4.16.2

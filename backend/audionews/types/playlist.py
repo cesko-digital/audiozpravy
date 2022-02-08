@@ -4,12 +4,6 @@ from django.db.models.query import QuerySet
 from graphene import Field, Int, List, NonNull, Date, String
 from graphene.relay import Connection, Node
 from graphene_django import DjangoConnectionField, DjangoObjectType
-from graphene_django.filter import DjangoFilterConnectionField
-from graphql.execution.base import ResolveInfo
-from promise.promise import Promise
-from classes.queue_filler import QueueFiller
-#from recommender.personal_recommend import PersonalRecommender
-from recommender.recommend import recommend_by_google_trends
 from ..models import Article, Listener, Play, Provider, Playlist, Category
 from .play import PlayNode
 from .category import CategoryNode

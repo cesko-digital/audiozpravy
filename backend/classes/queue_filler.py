@@ -22,9 +22,9 @@ def get_bert_model(bert_model_path: str):
 class QueueFiller:
     embed_vectors_path = 'job_runner/data/articles_embeddings.json'
     bert_model_path = 'job_runner/data/bg_cs_pl_ru_cased_L-12_H-768_A-12_pt'
-    stop_words = json.load(open('job_runner/data/stop_words_czech.json', 'r'))
+    stop_words = [] #json.load(open('job_runner/data/stop_words_czech.json', 'r'))
     logger = logging.getLogger('QueueFiller')
-    all_article_vectors = json.load(open(embed_vectors_path, 'r'))
+    all_article_vectors = [] #json.load(open(embed_vectors_path, 'r'))
     bert_model = get_bert_model(bert_model_path)
 
     @staticmethod
