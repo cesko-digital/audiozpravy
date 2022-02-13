@@ -53,7 +53,7 @@ def process_audio(title: str, content: str, temporal_storage_audio: str) -> str:
     return filename
 
 
-def upload_to_s3(input_path: str):
+def upload_file_to_s3(file_path: str):
     ''' Upload all files from input_path into S3'''
     # from config import CONFIG
 
@@ -71,23 +71,7 @@ def upload_to_s3(input_path: str):
     try:
         session.resource("s3").Bucket(CONFIG.s3Bucket).objects.all().delete()
         session.resource("s3").Bucket(CONFIG.s3BucketAudio).objects.all().delete()
+        s3_client.upload_file("s3/" + file_path, CONFIG.s3Bucket, file_path, ExtraArgs={"ACL": "public-read"})
 
-        arr = os.listdir(input_path)
-
-        for file in arr:
-            if file == "articles":
-                continue
-
-            s3_client.upload_file("s3/" + file, CONFIG.s3Bucket, file)
-
-        arr = os.listdir("audio")
-
-        for file in arr:
-            s3_client.upload_file(
-                "audio/" + file,
-                CONFIG.s3BucketAudio,
-                file,
-                ExtraArgs={"ACL": "public-read"},
-            )
     except ClientError as e:
         logging.error(e)
