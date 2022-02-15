@@ -36,7 +36,7 @@ class ListenerNode(DjangoObjectType):
 
     def resolve_queue(
             root, info,
-            articles_ids_in_queue: Optional[List[int]] = None,
+            articles_ids_in_queue: Optional[List[int]] = [],
             n_of_messages: str = 10,
             last_articles_date: str = "2018-10-10"
     ):
