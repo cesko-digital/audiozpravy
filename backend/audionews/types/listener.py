@@ -39,7 +39,7 @@ class ListenerNode(DjangoObjectType):
 
     def resolve_queue(
             root, info,
-            favourite_articles: Optional[List[int]] = None,
+            articles_ids_in_queue: Optional[List[int]] = None,
             n_of_messages: str = 10,
             last_articles_date: str = "2018-10-10"
     ):
@@ -51,8 +51,8 @@ class ListenerNode(DjangoObjectType):
         """
         user_plays = Listener.objects.get(user_ptr_id=root.id).plays.all()
         user_articles_ids = [play.article.id for play in user_plays]
-        if favourite_articles is not None:
-            user_articles_ids.extend(favourite_articles)
+        if articles_ids_in_queue is not None:
+            user_articles_ids.extend(articles_ids_in_queue)
 
         user_articles = Article.objects.filter(id__in=user_articles_ids)
 
@@ -60,6 +60,6 @@ class ListenerNode(DjangoObjectType):
         our_date = datetime.datetime.strptime(last_articles_date, "%Y-%m-%d")
         all_articles = Article.objects.filter(pub_date__gte=our_date)
 
-        recommended_ids = [] #QueueFiller.recommend_articles(user_articles, all_articles)
+        recommended_ids = [a.id for a in all_articles] #QueueFiller.recommend_articles(user_articles, all_articles)
         recommended_articles_queue = Article.objects.filter(id__in=recommended_ids[:n_of_messages])
         return recommended_articles_queue
