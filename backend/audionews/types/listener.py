@@ -5,9 +5,6 @@ import graphene
 from django.db.models.query import QuerySet
 from graphene.relay import Connection, Node
 from graphene_django import DjangoConnectionField, DjangoObjectType
-from graphene_django.filter import DjangoFilterConnectionField
-from graphql.execution.base import ResolveInfo
-from promise.promise import Promise
 from ..models import Article, Listener, Play, Provider
 from .play import PlayNode
 from .article import ArticleNode
@@ -46,6 +43,7 @@ class ListenerNode(DjangoObjectType):
         """
         Get recommended articles for a given user
 
+        :param articles_ids_in_queue: ids or articles currently in user's queue
         :param n_of_messages: number of messages to display
         :param last_articles_dat: date of the last article to recommend as string in format YYYY-MM-DD
         """
