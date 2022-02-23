@@ -1,23 +1,60 @@
-import React, { FC, useState, createContext, useContext } from "react";
-import RNTrackPlayer, {
-  Track,
+import React, {
+  FC,
+  useState,
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+} from "react";
+import playerInstance, {
+  useProgress,
   useTrackPlayerEvents,
   Event,
-  State,
-} from "react-native-track-player";
-import { initialPlayerState, PlayerState } from "./trackPlayer";
+} from "./trackPlayer";
 import { logArticlePlayed } from "./api/listener";
+import { Article } from "./shared/article";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+export type TrackProgress = {
+  position: number;
+  duration: number;
+  buffered: number;
+};
+
+export type PlayerState = {
+  currentTrack: Article;
+  queue: Article[];
+  isPlaying: boolean;
+};
+
+export const initialPlayerState: PlayerState = {
+  currentTrack: null,
+  queue: [],
+  isPlaying: false,
+};
 
 export type PlayerContextState = {
   state: PlayerState;
-  setQueue: (queue: Track[]) => void;
-  setState: (state: PlayerState) => void;
+  progress: TrackProgress;
+  playPause: () => void;
+  playArticle: (id: String) => void;
+  addArticle: (article: Article) => void;
+  skipToNext: () => void;
+  seekTo: (position: number) => void;
+  setPlayed: (article: Article) => void;
+  clearQueue: () => void;
 };
 
 const contextDefaultValues: PlayerContextState = {
   state: initialPlayerState,
-  setQueue: () => {},
-  setState: () => {},
+  progress: { position: 0, duration: 0, buffered: 0 },
+  clearQueue: () => {},
+  playPause: () => {},
+  playArticle: (id: String) => {},
+  addArticle: (article: Article) => {},
+  skipToNext: () => {},
+  seekTo: (position: number) => {},
+  setPlayed: (article: Article) => {},
 };
 
 export const PlayerContext =
@@ -28,61 +65,289 @@ export function usePlayer() {
   return context;
 }
 
-export async function createPlayerState() {
-  const queue = await RNTrackPlayer.getQueue();
-  const currentIndex = await RNTrackPlayer.getCurrentTrack();
-  const state = await RNTrackPlayer.getState();
-  var track: Track = null;
-  if (currentIndex != null) {
-    track = await RNTrackPlayer.getTrack(currentIndex);
-  }
-
-  return {
-    currentTrack: track,
-    currentIndex: currentIndex,
-    recordsCount: queue.length,
-    isPlaying: state == State.Playing,
-  };
-}
+const QUEUE_STORAGE_KEY = "audio_queue";
 
 const PlayerContextProvider: FC = ({ children }) => {
   const [state, _setState] = useState<PlayerState>(contextDefaultValues.state);
-
-  useTrackPlayerEvents(
-    [Event.PlaybackState, Event.PlaybackTrackChanged, Event.PlaybackError],
-    async (event) => {
-      const newState = await createPlayerState();
-      setState(newState);
-
-      if (event.type == Event.PlaybackTrackChanged) {
-        const prevTrackIndex = event.track;
-        if (prevTrackIndex != null) {
-          const prevTrack = await RNTrackPlayer.getTrack(prevTrackIndex);
-          const prevTrackPosition = event.position;
-          if (
-            prevTrack != null &&
-            prevTrackPosition != null &&
-            prevTrackPosition > 5
-          ) {
-            logArticlePlayed(prevTrack.id);
-          }
-        }
-        const nextTrack = event.nextTrack;
-      }
-    }
+  const [progress, setProgress] = useState<TrackProgress>(
+    contextDefaultValues.progress
   );
+  const playerProgress = useProgress();
 
-  const setQueue = async (queue: Track[]) => {
-    var newState = await createPlayerState();
-    _setState(newState);
+  // init
+  useEffect(() => {
+    getSavedState().then((savedState) => {
+      if (savedState != null) {
+        console.info("Loading saved state.");
+        const notPlayingState = {
+          ...savedState,
+          isPlaying: false,
+        };
+        _setState(notPlayingState);
+        if (notPlayingState.currentTrack != null) {
+          playerInstance.setActiveTrack(notPlayingState.currentTrack);
+        }
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    setProgress(playerProgress);
+
+    if (playerProgress.position > 5 && state.isPlaying) {
+      reportCurrentTrackPlayback();
+    }
+  }, [playerProgress]);
+
+  useEffect(() => {
+    console.info("State changed");
+    saveState();
+  }, [state]);
+
+  /**
+   * State persisting
+   */
+  const getSavedState = async () => {
+    try {
+      const jsonData = await AsyncStorage.getItem(QUEUE_STORAGE_KEY);
+      if (jsonData != null) {
+        const stateObject: PlayerState = JSON.parse(jsonData);
+        return stateObject;
+      }
+      return null;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
   };
 
-  const setState = (state: PlayerState) => {
-    _setState(state);
+  const saveState = async () => {
+    try {
+      const jsonValue = JSON.stringify(state);
+      await AsyncStorage.setItem(QUEUE_STORAGE_KEY, jsonValue);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  /**
+   * Player events handling
+   */
+
+  useTrackPlayerEvents([Event.PlaybackQueueEnded], async (event) => {
+    console.info("PlaybackQueueEnded", event, progress);
+    const _state = {
+      ...state,
+      isPlaying: false,
+    };
+    _setState(_state);
+
+    skipToNext();
+  });
+
+  /**
+   * Send info about playback to the backend and store flag to the article
+   */
+  const reportCurrentTrackPlayback = () => {
+    if (
+      state.currentTrack != null &&
+      state.currentTrack["isReported"] != true
+    ) {
+      logArticlePlayed(state.currentTrack.id);
+      updateArticle(state.currentTrack, { isReported: true });
+    }
+  };
+
+  /**
+   * Add or change article properties in the queue
+   */
+  const updateArticle = (article: Article, data: any) => {
+    const articleIndex = state.queue.findIndex((a) => a.id == article.id);
+    if (articleIndex < 0) {
+      console.debug("updateArticle", "article not found");
+      return;
+    }
+    var updatedArticle = {
+      ...article,
+      ...data,
+    };
+    var queue = state.queue;
+    queue[articleIndex] = updatedArticle;
+    const _state = {
+      ...state,
+      queue: queue,
+    };
+    // when updated article is same as current track, apply changes also to them
+    if (_state.currentTrack.id == article.id) {
+      _state.currentTrack = updatedArticle;
+    }
+
+    _setState(_state);
+  };
+
+  const handleCurrentTrackChange = () => {
+    // store playback information to the current article
+    if (state.currentTrack != null) {
+      updateArticle(state.currentTrack, {
+        lastPosition: progress.position,
+        duration: progress.duration,
+      });
+    }
+
+    // hide article from queue if played more than 90%
+    if (state.currentTrack != null) {
+      const lastPosition = progress?.position ?? 0;
+      const duration = progress?.duration ?? 1;
+      const percentPosition = (lastPosition / duration) * 100;
+      if (percentPosition > 90) {
+        console.info("track played near the end..");
+        updateArticle(state.currentTrack, { played: true });
+      }
+    }
+  };
+
+  const playArticle = async (id: String) => {
+    console.info("playArticle", id);
+    handleCurrentTrackChange();
+    const article = state.queue.find((a) => a.id == id);
+    console.info(article);
+    if (article != null) {
+      var _state = {
+        ...state,
+        currentTrack: article,
+        isPlaying: true,
+      };
+      _setState(_state);
+
+      if (
+        article.lastPosition != undefined &&
+        article.lastPosition != null &&
+        article.lastPosition > 0
+      ) {
+        playerInstance.setActiveTrack(article).then(() => {
+          console.info("seekTo", article.lastPosition);
+          setTimeout(() => {
+            playerInstance.seekTo(article.lastPosition).then(() => {
+              playerInstance.play();
+            });
+          }, 200);
+        });
+      } else {
+        await playerInstance.playTrack(article);
+      }
+    }
+  };
+
+  const playPause = () => {
+    console.info("playPause");
+
+    if (state.currentTrack != null) {
+      const newIsPlayingState = !state.isPlaying;
+      var _state = {
+        ...state,
+        isPlaying: newIsPlayingState,
+      };
+      _setState(_state);
+      if (newIsPlayingState) {
+        playerInstance.play();
+      } else {
+        playerInstance.pause();
+      }
+    }
+  };
+
+  const addArticle = (article: Article) => {
+    console.info("addArticle", article.id);
+    const existingTracks = state.queue.filter((t) => t.id == article.id);
+    if (existingTracks.length > 0) {
+      console.info("Article with id " + article.id + " is already in queue.");
+      return true;
+    }
+
+    // automatic start playing when queue was empty
+    const notPlayedArticled = state.queue.filter((a) => a.played != true);
+    if (notPlayedArticled.length == 0) {
+      setTimeout(() => {
+        playArticle(article.id);
+      }, 100);
+    }
+
+    var _state = {
+      ...state,
+    };
+    _state.queue.push(article);
+    _setState(_state);
+  };
+
+  const skipToNext = () => {
+    console.info("skipToNext");
+    if (state.currentTrack != null) {
+      const actualArticleIndex = state.queue.indexOf(state.currentTrack);
+      console.info("actualArticleIndex", actualArticleIndex);
+      if (actualArticleIndex < state.queue.length - 1) {
+        const nextInQueue = state.queue[actualArticleIndex + 1];
+        if (state.isPlaying) {
+          // skip and play
+          playArticle(nextInQueue.id);
+        } else {
+          // only skip track
+          handleCurrentTrackChange();
+          var _state = {
+            ...state,
+            currentTrack: nextInQueue,
+          };
+          _setState(_state);
+        }
+      } else {
+        // last article in queue
+        // TODO: fetch/play next recomended articles from BE
+        console.info("last track in queue played");
+        handleCurrentTrackChange();
+        var _state = {
+          ...state,
+          isPlaying: false,
+          currentTrack: null as Article,
+        };
+        _setState(_state);
+        playerInstance.resetPlayer();
+      }
+    }
+  };
+
+  const seekTo = async (position: number) => {
+    return await playerInstance.seekTo(position);
+  };
+
+  const setPlayed = (article: Article) => {
+    updateArticle(article, { played: true });
+  };
+
+  const clearQueue = async () => {
+    var _state = {
+      ...state,
+      isPlaying: false,
+      currentTrack: null as Article,
+      queue: [],
+    };
+    _setState(_state);
+    playerInstance.resetPlayer();
+    await AsyncStorage.removeItem(QUEUE_STORAGE_KEY);
   };
 
   return (
-    <PlayerContext.Provider value={{ state, setQueue, setState }}>
+    <PlayerContext.Provider
+      value={{
+        state,
+        progress,
+        clearQueue,
+        playPause,
+        playArticle,
+        addArticle,
+        skipToNext,
+        seekTo,
+        setPlayed,
+      }}
+    >
       {children}
     </PlayerContext.Provider>
   );

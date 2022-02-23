@@ -1,89 +1,100 @@
-import RNTrackPlayer, { Track, Capability, Event, State } from 'react-native-track-player'
+import RNTrackPlayer, {
+  Track,
+  Capability,
+  Event,
+  State,
+  useTrackPlayerEvents as _useTrackPlayerEvents,
+} from "react-native-track-player";
+export {
+  Track,
+  Event,
+  State,
+  useProgress,
+  useTrackPlayerEvents,
+} from "react-native-track-player";
 
-export type PlayerState = {
-    currentTrack: Track,
-    currentIndex: number,
-    recordsCount: number,
-    isPlaying: boolean
-}
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Article } from "./shared/article";
 
-export const initialPlayerState: PlayerState = {
-    currentTrack: null,
-    currentIndex: null,
-    recordsCount: 0,
-    isPlaying: false
-}
-
-
+declare type Handler = (payload: { type: Event; [key: string]: any }) => void;
 
 class TrackPlayer {
-    private static instance: TrackPlayer
+  private static instance: TrackPlayer;
 
-    static getInstance() {
-        if (!TrackPlayer.instance) {
-            TrackPlayer.instance = new TrackPlayer()
-            TrackPlayer.instance.init()
-            return TrackPlayer.instance
-        }
-
-        return TrackPlayer.instance
+  static getInstance() {
+    if (!TrackPlayer.instance) {
+      TrackPlayer.instance = new TrackPlayer();
+      TrackPlayer.instance.init();
+      return TrackPlayer.instance;
     }
 
-    private init() {
-        RNTrackPlayer.setupPlayer({})
+    return TrackPlayer.instance;
+  }
 
-        const capabilities = [
-            Capability.Play,
-            Capability.Pause,
-            Capability.SeekTo
-        ]
-        const options = {
-            stopWithApp: false,
-            capabilities,
-            compactCapabilities: capabilities
-        }
-        RNTrackPlayer.updateOptions(options)
-    }
+  private init() {
+    RNTrackPlayer.setupPlayer({});
 
-    public registerService() {
-        console.info('TrackPlayer.registerService()')
-        RNTrackPlayer.registerPlaybackService(() => require('./services/audio'))
-    }
+    const capabilities = [Capability.Play, Capability.Pause, Capability.SeekTo];
+    const options = {
+      stopWithApp: false,
+      capabilities,
+      compactCapabilities: capabilities,
+    };
+    RNTrackPlayer.updateOptions(options);
+    // this.initPlayerQueue();
+  }
 
-    private async isInQueue(track: Track): Promise<boolean> {
-        const queue = await RNTrackPlayer.getQueue()
-        const existingTracks = queue.filter((t) => t.id == track.id)
-        if (existingTracks.length > 0) {
-            console.info('Track with id ' + track.id + ' is already in queue.')
-            return true
-        }
-        return false
-    }
+  public registerService() {
+    console.info("TrackPlayer.registerService()");
+    RNTrackPlayer.registerPlaybackService(() => require("./services/audio"));
+  }
 
-    public async addTrackToQueue(track: Track) {
-        const queue = await RNTrackPlayer.getQueue()
-        const existingTracks = queue.filter((t) => t.id == track.id)
-        const alreadyInqueue = await this.isInQueue(track)
-        if (alreadyInqueue) {
-            return queue
-        }
-        track['isPlaying'] = false
-        RNTrackPlayer.add([track])
-        return RNTrackPlayer.getQueue()
-    }
+  private async clearQueue() {
+    const queue = await RNTrackPlayer.getQueue();
 
-    public async addTracksToQueue(tracks: Track[]) {
-        tracks.forEach(async track => {
-            this.addTrackToQueue(track)
-        })
-        return RNTrackPlayer.getQueue()
-    }
+    var indexesToRemove = new Array(queue.length);
+    for (let i = 0; i < queue.length; i++)
+      indexesToRemove[i] = queue.length - 1 - i;
 
-    public async resetPlayer() {
-        console.info('TrackPlayer.resetPlayer()')
-        await RNTrackPlayer.reset()
+    for (const id of indexesToRemove) {
+      await RNTrackPlayer.remove([id]);
     }
+  }
+
+  public async setActiveTrack(track: Track) {
+    await RNTrackPlayer.stop();
+    await this.clearQueue();
+    return await RNTrackPlayer.add(track);
+  }
+
+  /**
+   * Same as setActiveTrack but starts playing
+   * @param track
+   */
+  public async playTrack(track: Track) {
+    RNTrackPlayer.stop();
+    this.clearQueue();
+    RNTrackPlayer.add(track);
+    RNTrackPlayer.play();
+  }
+
+  public async play() {
+    RNTrackPlayer.play();
+  }
+
+  public async pause() {
+    RNTrackPlayer.pause();
+  }
+
+  public async seekTo(position: number) {
+    return await RNTrackPlayer.seekTo(position);
+  }
+
+  public async resetPlayer() {
+    console.info("TrackPlayer.resetPlayer()");
+    await RNTrackPlayer.reset();
+  }
 }
 
-const playerInstance = TrackPlayer.getInstance()
-export default playerInstance
+const playerInstance = TrackPlayer.getInstance();
+export default playerInstance;

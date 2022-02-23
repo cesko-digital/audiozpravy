@@ -10,7 +10,7 @@ interface Props extends ViewProps {
   onChange(handlePos: number): void;
 }
 
-const Progress: FC<Props> = ({
+const SeekProgressBar: FC<Props> = ({
   currentSecond,
   totalSeconds,
   style,
@@ -40,10 +40,10 @@ const Progress: FC<Props> = ({
       />
       <PlaybackTime
         seconds={totalSeconds}
-        style={{ color: Color["black-16"], width: 46, textAlign: 'right' }}
+        style={{ color: Color["black-16"], width: 46, textAlign: "right" }}
       />
     </View>
   );
 };
 
-export default Progress;
+export default SeekProgressBar;

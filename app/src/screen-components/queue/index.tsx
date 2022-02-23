@@ -1,170 +1,184 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Text, View, StyleSheet, SectionList, FlatList, TouchableOpacity, Image } from "react-native";
+import {
+  Text,
+  View,
+  StyleSheet,
+  SectionList,
+  FlatList,
+  TouchableOpacity,
+  Image,
+} from "react-native";
 import Player from "../../components/player";
 import useFonts from "../../theme/fonts";
-import { useTheme } from '../../theme'
+import { useTheme } from "../../theme";
 import Color from "../../theme/colors";
-import AppStatusBar from "../../components/statusBar"
+import AppStatusBar from "../../components/statusBar";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import TrackPlayer, { Track } from 'react-native-track-player';
-import { useIsFocused } from '@react-navigation/native';
+import { useIsFocused } from "@react-navigation/native";
 import { usePlayer } from "../../trackPlayerContext";
 
-const Item = ({ item, isSelected, isPlaying, onPress, onIconPress }) => {
-  const theme = useTheme();
-  const fonts = useFonts();
-
-  return (<View style={{ alignItems: "center" }}>
-    <View
-      style={{
-        flexDirection: "row",
-        justifyContent: "space-between",
-        paddingStart: 16,
-        paddingEnd: 16,
-        paddingBottom: 8,
-        paddingTop: 16,
-        backgroundColor: isSelected ? theme.colors.primary : "transparent"
-      }}
-    >
-      <TouchableOpacity style={{ width: 56, height: 42 }} onPress={onIconPress}>
-        <Image
-          style={{
-            width: "100%",
-            height: "100%",
-            borderRadius: 10
-          }}
-          source={{
-            uri: item.img,
-          }}
-        />
-        <View
-          style={{
-            backgroundColor: "black",
-            borderRadius: 15,
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            height: 30,
-            width: 30,
-            marginTop: -36,
-            marginLeft: 12
-          }}
-        >
-          <MaterialCommunityIcons name={isPlaying ? "pause" : "play"} color="white" size={24} />
-        </View>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        onPress={onPress}
-        style={{
-          flex: 1,
-          marginStart: 16,
-          marginEnd: 8
-        }}
-      >
-        <View style={{}}>
-          <Text
-            style={StyleSheet.compose(fonts.titleSmall, { color: theme.colors.textInverse, lineHeight: 20 })}
-            numberOfLines={2}
-          >
-            {item.title}
-          </Text>
-          <Text
-            style={{
-              fontWeight: "400",
-              fontSize: 10,
-              lineHeight: 16,
-              color: Color["black-24"],
-            }}
-          >
-          </Text>
-        </View>
-      </TouchableOpacity>
-    </View>
-  </View>)
-};
+import { Item, IncompleteItem } from "./list-item";
+import { Article } from "../../shared/article";
 
 const QueueScreen = ({ navigation }) => {
   const theme = useTheme();
   const fonts = useFonts();
-  const isFocused = useIsFocused();
-  const [queue, setQueue] = useState([])
-  const { state, setState } = usePlayer()
+  const { state, progress, playArticle, playPause, setPlayed } = usePlayer();
+  const [groupedData, setGrouped] = useState([]);
 
   useEffect(() => {
-    TrackPlayer.getQueue().then(async (queue) => {
-      setQueue(queue)
-    })
-  }, [isFocused])
+    var played = { key: 0, title: "Pokračujte v poslechu", data: [] };
+    var queued = { key: 1, title: "Ve frontě", data: [] };
+
+    state.queue.forEach((article) => {
+      // ignore already played articles
+      if (article.played != true) {
+        if (article.lastPosition != undefined && article.lastPosition > 0) {
+          played.data.push(article);
+        } else {
+          queued.data.push(article);
+        }
+      }
+    });
+
+    var sections = [];
+    if (played.data.length > 0) {
+      sections.push(played);
+    }
+    if (queued.data.length > 0) {
+      sections.push(queued);
+    }
+    setGrouped(sections);
+  }, [state]);
 
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: theme.colors.backgroundNegative
+      backgroundColor: theme.colors.backgroundNegative,
     },
     header: {
-      ...fonts.textSmall as Object,
+      ...(fonts.textSmall as Object),
       color: Color["black-8"],
+      fontWeight: "800",
       paddingStart: 16,
       paddingTop: 8,
-      paddingBottom: 4
+      paddingBottom: 4,
     },
     separator: {
       height: 1,
-      backgroundColor: theme.colors.separator,
+      backgroundColor: theme.colors.separatorInverted,
       marginStart: 16,
-      marginEnd: 16
-    }
+      marginEnd: 16,
+    },
   });
 
-  const onIconPress = (item: Track, index: number) => {
-    if (index == state.currentIndex) {
-      if (state.isPlaying) {
-        TrackPlayer.pause()
-      } else {
-        TrackPlayer.play()
-      }
+  const onIconPress = (item: Article, index: number) => {
+    if (state.currentTrack?.id == item.id) {
+      playPause();
     } else {
-      TrackPlayer.skip(index)
+      playArticle(item.id);
     }
-  }
+  };
+
+  const onPress = (article: Article) => {
+    playArticle(article.id);
+  };
+
+  const onIconClearPress = (article: Article) => {
+    console.log("onIconClearPress");
+    setPlayed(article);
+  };
 
   const emptyView = () => (
-    <View style={{ alignSelf: 'center', justifyContent: 'center', alignItems: 'center' }}>
-      <Ionicons size={48} name='volume-mute-outline' style={{}} color={theme.colors.textLight} />
-      <Text style={StyleSheet.compose(fonts.textReguar, { color: theme.colors.textLight })}>Ve frontě nic nic není :(</Text>
+    <View
+      style={{
+        alignSelf: "center",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <Ionicons
+        size={48}
+        name="volume-mute-outline"
+        style={{}}
+        color={theme.colors.textLight}
+      />
+      <Text
+        style={StyleSheet.compose(fonts.textReguar, {
+          color: theme.colors.textLight,
+        })}
+      >
+        Ve frontě nic nic není :(
+      </Text>
     </View>
-  )
+  );
+
+  const renderItem = ({ item, index, section }) => {
+    if (section.key == 0) {
+      return (
+        <IncompleteItem
+          item={item}
+          progress={
+            item.id == state.currentTrack?.id && state.isPlaying
+              ? progress
+              : null
+          }
+          isPlaying={item.id == state.currentTrack?.id && state.isPlaying}
+          onPress={() => onPress(item)}
+          onIconPress={() => {
+            onIconPress(item, index);
+          }}
+          onClearIconPress={() => onIconClearPress(item)}
+        />
+      );
+    } else {
+      return (
+        <Item
+          item={item}
+          isSelected={item.id == state.currentTrack?.id}
+          isPlaying={item.id == state.currentTrack?.id && state.isPlaying}
+          onPress={() => onPress(item)}
+          onIconPress={() => {
+            onIconPress(item, index);
+          }}
+        />
+      );
+    }
+  };
+
+  const renderSeparator = ({ highlighted, section }) => {
+    if (section.key == 0) {
+      return <View />;
+    }
+    return <View style={styles.separator}></View>;
+  };
 
   return (
     <View style={styles.container}>
-      <AppStatusBar barStyle="light-content" backgroundColor={Color["black-88"]} />
-      <FlatList
-        data={queue}
-        extraData={state.currentIndex}
-        ItemSeparatorComponent={
-          ({ highlighted }) => (
-            <View style={styles.separator}></View>
-          )
-        }
-        keyExtractor={(item, index) => String(item.id)}
-
-        renderItem={({ item, index }) => <Item
-          item={item}
-          isSelected={index == state.currentIndex}
-          isPlaying={index == state.currentIndex && state.isPlaying}
-          onPress={() => TrackPlayer.skip(index)}
-          onIconPress={() => { onIconPress(item, index) }}
-        />}
-
-        contentContainerStyle={[{ flexGrow: 1 }, queue.length ? null : { justifyContent: 'center' }]}
-        ListEmptyComponent={emptyView}
+      <AppStatusBar
+        barStyle="light-content"
+        backgroundColor={Color["black-88"]}
       />
-
+      <SectionList
+        sections={groupedData}
+        ItemSeparatorComponent={renderSeparator}
+        keyExtractor={(item, index) => {
+          return String(item.id);
+        }}
+        renderSectionHeader={({ section }) => (
+          <Text style={styles.header}>{section.title}</Text>
+        )}
+        renderItem={renderItem}
+        contentContainerStyle={[
+          { flexGrow: 1 },
+          groupedData.length ? null : { justifyContent: "center" },
+        ]}
+        ListEmptyComponent={emptyView}
+        stickySectionHeadersEnabled={false}
+      ></SectionList>
       <Player></Player>
     </View>
   );
 };
 
-export default QueueScreen
-
+export default QueueScreen;

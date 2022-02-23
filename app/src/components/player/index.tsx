@@ -2,14 +2,12 @@ import React, { FC } from "react";
 import { StyleSheet, View, ViewProps } from "react-native";
 
 import Color from "../../theme/colors";
-import Progress from "./progress";
+import SeekProgressBar from "./seek-progress";
 import PlaybackControls from "./playback-controls";
-import TrackPlayer, { useProgress } from "react-native-track-player";
 import { usePlayer } from "../../trackPlayerContext";
 
 const Player: FC<ViewProps> = ({ style }) => {
-  const progress = useProgress();
-  const { state, setState, setQueue } = usePlayer();
+  const { state, progress, seekTo, playPause, skipToNext } = usePlayer();
 
   return (
     <View
@@ -22,27 +20,23 @@ const Player: FC<ViewProps> = ({ style }) => {
         style
       )}
     >
-      <Progress
+      <SeekProgressBar
         currentSecond={progress.position}
         totalSeconds={progress.duration}
         onChange={(handlePos) => {
-          TrackPlayer.seekTo(Math.floor(handlePos));
+          seekTo(Math.floor(handlePos));
         }}
         style={{ marginTop: 16 }}
       />
       <PlaybackControls
         onRewind={() => {
-          TrackPlayer.seekTo(Math.floor(Math.max(progress.position - 10, 0)));
+          seekTo(Math.floor(Math.max(progress.position - 10, 0)));
         }}
         onPlayPause={() => {
-          if (state.isPlaying) {
-            TrackPlayer.pause();
-          } else {
-            TrackPlayer.play();
-          }
+          playPause();
         }}
         onNext={() => {
-          TrackPlayer.skipToNext();
+          skipToNext();
         }}
         style={{ marginTop: 20 }}
       />

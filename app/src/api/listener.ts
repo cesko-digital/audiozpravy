@@ -34,12 +34,12 @@ const LOG_ARTICLE_PLAY = gql`
 
 export function logArticlePlayed(articleID: string) {
   console.info("logArticlePlayed(" + articleID + ")");
-  client
-    .mutate({ mutation: LOG_ARTICLE_PLAY, variables: { articleID: articleID } })
-    .catch((error) => {
-      console.error(error);
-    })
-    .then((result: FetchResult) => {
-      console.error("Article (" + articleID + ") play logged to BE.");
-    });
+  // client
+  //   .mutate({ mutation: LOG_ARTICLE_PLAY, variables: { articleID: articleID } })
+  //   .catch((error) => {
+  //     console.error(error);
+  //   })
+  //   .then((result: FetchResult) => {
+  //     console.error("Article (" + articleID + ") play logged to BE.");
+  //   });
 }
