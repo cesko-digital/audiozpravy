@@ -125,7 +125,7 @@ export const IncompleteItem = ({
 
   useEffect(() => {
     if (progress != null) {
-      const lastPosition = progress.position;
+      const lastPosition = Math.max(progress.position, item.lastPosition ?? 0);
       const duration = progress.duration;
       setProgressWidth((lastPosition / duration) * 100);
     }

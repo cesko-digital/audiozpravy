@@ -72,10 +72,10 @@ class TrackPlayer {
    * @param track
    */
   public async playTrack(track: Track) {
-    RNTrackPlayer.stop();
-    this.clearQueue();
-    RNTrackPlayer.add(track);
-    RNTrackPlayer.play();
+    await RNTrackPlayer.stop();
+    await this.clearQueue();
+    await RNTrackPlayer.add(track);
+    return await RNTrackPlayer.play();
   }
 
   public async play() {

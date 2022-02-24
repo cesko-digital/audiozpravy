@@ -219,21 +219,17 @@ const PlayerContextProvider: FC = ({ children }) => {
       };
       _setState(_state);
 
+      await playerInstance.playTrack(article);
+
       if (
         article.lastPosition != undefined &&
         article.lastPosition != null &&
         article.lastPosition > 0
       ) {
-        playerInstance.setActiveTrack(article).then(() => {
-          console.info("seekTo", article.lastPosition);
-          setTimeout(() => {
-            playerInstance.seekTo(article.lastPosition).then(() => {
-              playerInstance.play();
-            });
-          }, 200);
-        });
-      } else {
-        await playerInstance.playTrack(article);
+        console.info("seekTo", article.lastPosition);
+        setTimeout(() => {
+          playerInstance.seekTo(article.lastPosition);
+        }, 200);
       }
     }
   };
