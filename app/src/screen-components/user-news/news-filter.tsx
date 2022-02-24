@@ -38,7 +38,7 @@ type FilterChageCallback = (
   selectedTimeRange: TimeRangeItem
 ) => void;
 
-interface INewsFilter {
+export interface NewsFilterProps {
   initialTimeRange: TimeRangeItem;
   initialCategories: string[];
   isExpanded: boolean;
@@ -46,7 +46,7 @@ interface INewsFilter {
   onExpadedChange: (isExpanded: boolean) => void;
 }
 
-const NewsFilter: FC<INewsFilter> = ({
+const NewsFilter: FC<NewsFilterProps> = ({
   initialTimeRange,
   initialCategories,
   isExpanded,

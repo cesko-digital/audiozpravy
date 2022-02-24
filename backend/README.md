@@ -1,4 +1,3 @@
-
 # Getting Started
 
 ## Installing Dependencies
@@ -55,4 +54,3 @@ python3 backend/manage.py generate_fixtures -r 1000 -a 10 -p 10
 # To delete all data
 python backend/manage.py flush
 ```
-
