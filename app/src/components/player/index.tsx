@@ -23,6 +23,7 @@ const Player: FC<ViewProps> = ({ style }) => {
       <SeekProgressBar
         currentSecond={progress.position}
         totalSeconds={progress.duration}
+        buffered={progress.buffered}
         onChange={(handlePos) => {
           seekTo(Math.floor(handlePos));
         }}

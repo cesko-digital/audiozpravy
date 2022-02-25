@@ -133,8 +133,8 @@ export const IncompleteItem = ({
 
   const styles = StyleSheet.create({
     container: {
-      paddingStart: 16,
-      paddingEnd: 16,
+      paddingStart: 8,
+      paddingEnd: 8,
       paddingBottom: 8,
       paddingTop: 8,
     },
@@ -143,6 +143,7 @@ export const IncompleteItem = ({
       justifyContent: "space-between",
       backgroundColor: theme.colors.cardInverted,
       borderRadius: 12,
+      padding: 8,
     },
     progressBack: {
       backgroundColor: theme.colors.textSemiLight,
