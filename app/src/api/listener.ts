@@ -25,16 +25,15 @@ export function registerListener(deviceID: string) {
 }
 
 const LOG_ARTICLE_PLAY = gql`
-  mutation PlayArticle($articleID: Int!) {
+  mutation PlayArticle($articleID: String!) {
     playArticle(input: { articleId: $articleID }) {
       clientMutationId
     }
   }
 `;
 
-export function logArticlePlayed(articleID: number) {
+export function logArticlePlayed(articleID: string) {
   console.info("logArticlePlayed(" + articleID + ")");
-  // TODO
   client
     .mutate({ mutation: LOG_ARTICLE_PLAY, variables: { articleID: articleID } })
     .catch((error) => {

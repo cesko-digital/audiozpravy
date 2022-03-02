@@ -139,7 +139,7 @@ const QUERY = gql`
     $gteDate: DateTime
     $lteDate: DateTime
   ) {
-    articles(
+    myArticles(
       first: $first
       after: $after
       category_Key_In: $categories
@@ -211,7 +211,6 @@ const getQueryVariables = (
       params.lteDate = selectedTimeRange.lteDate?.toISOString();
     }
   }
-  console.info(params);
   return params;
 };
 
@@ -254,8 +253,11 @@ const NewsNavList: FC<NewsList> = ({ style, categories, timeRange }) => {
     if (data == undefined) {
       return;
     }
-
-    const enriched = data.articles.edges
+    // BE hotfix
+    if (data.myArticles == null) {
+      data.myArticles = { edges: [] };
+    }
+    const enriched = data.myArticles.edges
       .filter((item) => {
         if (item.node != null) {
           return item;

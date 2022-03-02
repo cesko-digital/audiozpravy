@@ -1,4 +1,3 @@
-
 # Getting Started
 
 ## Installing Dependencies
@@ -81,3 +80,4 @@ To edit the crontab file. To run the script each 8 hours, add following line int
 ```
 0 */8 * * * CUDA_VISIBLE_DEVICES="" python3 backend/job_runner/main_jobs.py
 ```
+
