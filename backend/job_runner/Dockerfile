@@ -7,5 +7,5 @@ RUN pip3 install -r requirements.txt && \
     rm czech-morfflex-pdt-161115.zip
 
 COPY . .
-CMD [ "python3", "main.py"]
+CMD [ "python3", "job_runner.py"]
 

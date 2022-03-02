@@ -54,3 +54,30 @@ python3 backend/manage.py generate_fixtures -r 1000 -a 10 -p 10
 # To delete all data
 python backend/manage.py flush
 ```
+
+
+### Running job runner
+Job runner requires slavic bert model. To download the model and extract model, run
+```
+wget -P backend/job_runner/data/ http://files.deeppavlov.ai/deeppavlov_data/bert/bg_cs_pl_ru_cased_L-12_H-768_A-12_pt.tar.gz
+tar -xf backend/job_runner/data/bg_cs_pl_ru_cased_L-12_H-768_A-12_pt.tar.gz -C backend/job_runner/data/
+```
+
+To run job runner script run
+```
+CUDA_VISIBLE_DEVICES="" python3 backend/job_runner/main_jobs.py
+```
+Job runner scrapes latest articles from provided feeds, creates audio for each feed (if Azure audio is provided), creats
+vectors for each article and saves them into job_runner/data/articles_embeddings.json file.
+
+Run this script as a cronjob via these commands:
+
+```
+crontab -e
+```
+To edit the crontab file. To run the script each 8 hours, add following line into crontab:
+
+```
+0 */8 * * * CUDA_VISIBLE_DEVICES="" python3 backend/job_runner/main_jobs.py
+```
+

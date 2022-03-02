@@ -5,10 +5,16 @@ import graphene
 from django.db.models.query import QuerySet
 from graphene.relay import Connection, Node
 from graphene_django import DjangoConnectionField, DjangoObjectType
+
+from graphene_django.filter import DjangoFilterConnectionField
+from graphql.execution.base import ResolveInfo
+from promise.promise import Promise
+
+from classes.queue_filler import QueueFiller
+
 from ..models import Article, Listener, Play, Provider
 from .play import PlayNode
 from .article import ArticleNode
-#from classes.queue_filler import QueueFiller
 
 class ListenerNode(DjangoObjectType):
     plays = graphene.List(graphene.NonNull(PlayNode), required=True)
@@ -58,6 +64,7 @@ class ListenerNode(DjangoObjectType):
         our_date = datetime.datetime.strptime(last_articles_date, "%Y-%m-%d")
         all_articles = Article.objects.filter(pub_date__gte=our_date)
 
-        recommended_ids = [a.id for a in all_articles] #QueueFiller.recommend_articles(user_articles, all_articles)
+
+        recommended_ids = QueueFiller.recommend_articles(user_articles, all_articles)
         recommended_articles_queue = Article.objects.filter(id__in=recommended_ids[:n_of_messages])
         return recommended_articles_queue
