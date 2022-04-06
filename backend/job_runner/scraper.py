@@ -6,8 +6,6 @@ from tqdm import tqdm
 from os import environ
 import json
 
-from . import SOURCES
-
 
 def _scrape_feed(source, local_dev):
     entries = []
@@ -25,7 +23,7 @@ def _scrape_feed(source, local_dev):
             if callable(category_obj):
                 # category might be simple code or function that parses the code
                 # from url
-                category = category_obj(e["link"])
+                category = category_obj(feed['url'])
             else:
                 category = category_obj
 
@@ -38,25 +36,7 @@ def _scrape_feed(source, local_dev):
                     "tags": [t["term"] for t in e.get("tags")] if e.get("tags") else None,
                     "category": category.name,
                     "credit": e.get("credit"),
-                    "source": e.get("source_name"),
+                    "source": source.get("name"),
                 }
             )
     return entries
-
-
-def scrape_feeds():
-    entries = []
-
-    local_dev = environ.get("LOCAL_DEV", 0)
-
-    for source in SOURCES:
-        entries.extend(_scrape_feed(source, local_dev))
-        if local_dev:
-            # we have snapshot of just one feed
-            break
-
-    articles = pd.DataFrame(entries)
-
-    # TODO: fix formatting for single digit integers e.g. 5 --> "05"
-    df_name = "-".join([str(i) for i in tuple(time.localtime())[:5]])
-    articles.to_csv(f"s3/articles/articles-{df_name}.csv", index=None)

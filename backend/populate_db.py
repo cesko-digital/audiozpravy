@@ -14,11 +14,12 @@ from audionews.models import Provider, Category, Article, Listener, Playlist, Pl
 from classes import CategoryEnum
 
 DEVICE_ID = "abcd"
+MOCKED_AUDIO_PATH = 'job_runner/audio/gandalf_shallnotpass.mp3'
 
 if __name__ == '__main__':
     """ Add data from pandas df into sqlite database"""
     # articles = pd.read_csv('s3_input/articles.csv')
-    articles_new = pd.read_csv("s3_input/articles.csv", parse_dates=["published"])
+    articles_new = pd.read_csv("job_runner/data/articles.csv", parse_dates=["published"])
     articles_new['published'] = articles_new.published.apply(recommender.recommend.to_timestamp)
     django.setup()
 
@@ -42,6 +43,7 @@ if __name__ == '__main__':
             perex=row.summary,
             pub_date=datetime.now(),
             recording_created_at=datetime.now(),
+            recording_url=MOCKED_AUDIO_PATH,
             url=str(row.link),
             provider=provider,
             text=row.lemmatized_text
