@@ -21,8 +21,6 @@ USER app_user:app_user
 COPY --chown=app_user:app_user . .
 RUN chmod +x docker/*.sh
 RUN chmod 777 static
-RUN chmod 777 db.sqlite3
-
 
 # Section 6- Docker Run Checks and Configurations
 ENTRYPOINT [ "docker/entrypoint.sh" ]
