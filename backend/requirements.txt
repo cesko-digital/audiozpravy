@@ -27,4 +27,4 @@ flake8
 werkzeug
 deeppavlov==0.17.2
 transformers==4.16.2
-eventlet==0.33.0
+eventlet==0.30.2
