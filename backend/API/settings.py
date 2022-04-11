@@ -87,7 +87,7 @@ else:
             'NAME': 'audiozpravy',
             'USER': 'audiozpravy',
             'PASSWORD': 'AZURE999audio',
-            'HOST': 'http://20.113.148.155',
+            'HOST': '20.113.148.155',
             'PORT': 5432,
         }
     }
