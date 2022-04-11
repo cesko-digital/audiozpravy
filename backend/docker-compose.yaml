@@ -21,4 +21,4 @@ services:
       - postgres
     restart: unless-stopped
 volumes:
-  postgres
+  postgres:
