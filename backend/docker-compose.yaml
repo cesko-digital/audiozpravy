@@ -13,8 +13,14 @@ services:
       POSTGRES_USER: audiozpravy
       POSTGRES_PASSWORD: AZURE999audio
       PGDATA: /data/postgres
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-q", "-d", "postgres", "-U", "audiozpravy" ]
+      timeout: 45s
+      interval: 10s
+      retries: 10
     volumes:
       - postgres:/data/postgres
+      - ./docker/postgres.sh:/docker-entrypoint-initdb.d/postgres.sh
     ports:
       - "5432:5432"
     networks:
