@@ -12,6 +12,7 @@ services:
     environment:
       POSTGRES_USER: audiozpravy
       POSTGRES_PASSWORD: AZURE999audio
+      POSTGRES_DB: audiozpravy
       PGDATA: /data/postgres
     healthcheck:
       test: [ "CMD", "pg_isready", "-q", "-d", "postgres", "-U", "audiozpravy" ]
