@@ -6,3 +6,17 @@ services:
     build: .
     ports:
       - "8000:8000"
+  audiozpravy-db:
+    container_name: postgres_container
+    image: postgres
+    environment:
+      POSTGRES_USER: audiozpravy
+      POSTGRES_PASSWORD: AZURE999audio
+      PGDATA: /data/postgres
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres
+    restart: unless-stopped

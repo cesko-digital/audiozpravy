@@ -83,9 +83,13 @@ if 'DATABASE_URL' in os.environ:
 else:
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        },
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'audiozpravy',
+            'USER': 'audiozpravy',
+            'PASSWORD': 'AZURE999audio',
+            'HOST': 'http://20.113.148.155',
+            'PORT': 5432,
+        }
     }
 
 

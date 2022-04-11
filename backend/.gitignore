@@ -1,5 +1,7 @@
 backend.iml
 audionews/migrations/[0-9]*.py
+data
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
