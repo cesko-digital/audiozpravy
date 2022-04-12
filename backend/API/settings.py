@@ -23,7 +23,16 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET', 'developmentsecret')
 DEBUG = os.environ.get('DEBUG', '1') == '1'
 
 #ALLOWED_HOSTS = ['*']
-ALLOWED_HOSTS = ['20.113.148.155', '127.0.0.1', 'localhost', 'django-graphene-starter.herokuapp.com', 'django-graphene-starter.jerrynsh.com']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost',
+                 'django-graphene-starter.herokuapp.com',
+                 'django-graphene-starter.jerrynsh.com',
+]
+ALLOWED_HOSTS.extend(
+    filter(
+        None,
+        os.environ.get('ALLOWED_HOSTS', '').split(','),
+    )
+)
 
 ENVIRONMENT = os.environ.get('ENVIRONMENT', 'development')
 
@@ -85,11 +94,11 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': 'audiozpravy',
-            'USER': 'audiozpravy',
-            'PASSWORD': 'AZURE999audio',
-            'HOST': '20.113.148.155',
-            'PORT': 5432,
+            'NAME': os.environ.get('DB_NAME'),
+            'USER': os.environ.get('DB_USER'),
+            'PASSWORD': os.environ.get('DB_PASSWORD'),
+            'HOST': os.environ.get('DB_HOST'),
+            'PORT': os.environ.get('DB_PORT'),
         }
     }
 

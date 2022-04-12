@@ -2,7 +2,7 @@ version: "3.3"
 services:
   audiozpravy-api:
     container_name: audiozpravy-api
-    restart: unless-stopped
+    restart: always
     build: .
     ports:
       - "8000:8000"
@@ -10,9 +10,10 @@ services:
     container_name: postgres_container
     image: postgres
     environment:
-      POSTGRES_USER: audiozpravy
-      POSTGRES_PASSWORD: AZURE999audio
-      POSTGRES_DB: audiozpravy
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS}
       PGDATA: /data/postgres
     healthcheck:
       test: [ "CMD", "pg_isready", "-q", "-d", "postgres", "-U", "audiozpravy" ]
@@ -23,10 +24,10 @@ services:
       - postgres:/data/postgres
       - ./docker/postgres.sh:/docker-entrypoint-initdb.d/postgres.sh
     ports:
-      - "5432:5432"
+      - "5432:${DB_PORT}"
     networks:
       - postgres
-    restart: unless-stopped
+    restart: always
 volumes:
   postgres:
 networks:
