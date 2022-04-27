@@ -2,3 +2,8 @@ pipenv install feedparser --skip-lock
 
 
 pipenv --python path/to/anaconda/bin/python
+
+
+ssh -i ~/.ssh/audiozpravy-team.pem  audiozpravy-team@20.113.148.155
+
+

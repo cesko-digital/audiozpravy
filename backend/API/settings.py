@@ -22,7 +22,6 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET', 'developmentsecret')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', '1') == '1'
 
-#ALLOWED_HOSTS = ['*']
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost',
                  'django-graphene-starter.herokuapp.com',
                  'django-graphene-starter.jerrynsh.com',
@@ -61,6 +60,18 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'ratelimit.middleware.RatelimitMiddleware',
 ]
+
+CORS_ORIGIN_WHITELIST = [
+    'http://20.113.148.155:8000',
+    'http://20.113.148.155:5000',
+    'http://20.113.148.155',
+    'http://localhost:4200',
+    'https://localhost:4200',
+    'http://127.0.0.1:4200',
+    'https://127.0.0.1:4200',
+]
+
+CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'API.urls'
 
