@@ -22,7 +22,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET', 'developmentsecret')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', '1') == '1'
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost',
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '20.113.148.155',
                  'django-graphene-starter.herokuapp.com',
                  'django-graphene-starter.jerrynsh.com',
 ]
