@@ -1,10 +1,10 @@
-django==3.2
+django>=3.0,<4.0
+psycopg2>=2.8
 graphene-django
 django-filter
 django-graphql-auth==0.3.16
 django-graphql-jwt==0.3.0
 pyjwt
-psycopg2-binary
 dj-database-url
 django-ratelimit
 colorlog
