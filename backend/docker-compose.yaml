@@ -24,7 +24,7 @@ services:
       - postgres:/data/postgres
       - ./docker/postgres.sh:/docker-entrypoint-initdb.d/postgres.sh
     ports:
-      - "5432:${DB_PORT}"
+      - "${DB_PORT}:5432"
     networks:
       - postgres
     restart: always
