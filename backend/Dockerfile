@@ -1,12 +1,11 @@
 # Dockerfile for Django Applications
 # Section 1- Base Image
-FROM python:3.8
+FROM python:3.7-alpine as builder
 # Section 2- Python Interpreter Flags
 ENV PYTHONUNBUFFERED 1
 ENV PYTHONDONTWRITEBYTECODE 1
-RUN apt-get update \
-    && apt-get install postgresql-dev gcc python3-dev musl-dev
-
+RUN apk update \
+    && apk add postgresql-dev gcc python3-dev musl-dev
 # install dependencies
 RUN pip install --upgrade pip
 COPY ./requirements.txt .
