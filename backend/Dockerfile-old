@@ -24,6 +24,5 @@ RUN chmod +x docker/*.sh
 RUN chmod 777 static
 
 # Section 6- Docker Run Checks and Configurations
-ENTRYPOINT [ "docker/entrypoint.sh" ]
-CMD [ "docker/start.sh", "server" ]
+ENTRYPOINT [ "shell/entrypoint.sh" ]
 
