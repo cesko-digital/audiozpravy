@@ -16,6 +16,7 @@ __pycache__/
 .env*
 env/
 build/
+nltk_data/
 develop-eggs/
 dist/x
 downloads/
