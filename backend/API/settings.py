@@ -26,10 +26,11 @@ ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '20.113.148.155',
                  'django-graphene-starter.herokuapp.com',
                  'django-graphene-starter.jerrynsh.com',
 ]
+
 ALLOWED_HOSTS.extend(
     filter(
         None,
-        os.environ.get('ALLOWED_HOSTS', '').split(','),
+        os.environ.get('DJANGO_ALLOWED_HOSTS', '').split(','),
     )
 )
 

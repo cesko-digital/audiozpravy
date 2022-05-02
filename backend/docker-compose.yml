@@ -6,7 +6,7 @@ services:
     container_name: techanalyzer-django-dev
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
-      - ./app/:/usr/src/app/
+      - ./app/:/app/
     ports:
       - 8000:8000
     env_file:
