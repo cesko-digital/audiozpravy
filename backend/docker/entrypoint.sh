@@ -1,11 +1,17 @@
-#!/bin/bash
-# entrypoint.sh file of Dockerfile
-# Section 1- Bash options
-set -o errexit
-set -o pipefail
-set -o nounset
+#!/bin/sh
 
-python manage.py collectstatic --noinput
-python manage.py makemigrations
+if [ "$DATABASE" = "postgres" ]
+then
+    echo "Waiting for postgres..."
+
+    while ! nc -z $SQL_HOST $SQL_PORT; do
+      sleep 0.1
+    done
+
+    echo "PostgreSQL started"
+fi
+
+python manage.py flush --no-input
 python manage.py migrate
+
 exec "$@"
