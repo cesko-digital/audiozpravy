@@ -60,6 +60,9 @@ RUN pip install --no-cache /wheels/*
 # copy project
 COPY . $APP_HOME
 
+# copy NLTK data
+COPY ./nltk_data/tokenizers /root/nltk_data/tokenizers
+
 # set rights to entrypoint.prod.sh
 RUN sed -i 's/\r$//g'  $APP_HOME/shell/entrypoint.prod.sh
 RUN chmod +x  $APP_HOME/shell/entrypoint.prod.sh
