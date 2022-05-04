@@ -8,9 +8,10 @@ from transformers import AutoModel, AutoTokenizer
 
 
 model_name = "DeepPavlov/bert-base-bg-cs-pl-ru-cased"
+MODEL_PATH = 'data/bert-base-bg-cs-pl-ru-cased/'
 class QueueFiller:
-    model = AutoModel.from_pretrained(model_name, output_hidden_states=True)
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    model = AutoModel.from_pretrained(MODEL_PATH, local_files_only=True, output_hidden_states=True)
+    tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH, local_files_only=True)
     stop_words = [] #json.load(open('job_runner/data/stop_words_czech.json', 'r'))
     logger = logging.getLogger('QueueFiller')
     all_article_vectors = [] #json.load(open(embed_vectors_path, 'r')

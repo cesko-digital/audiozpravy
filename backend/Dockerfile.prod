@@ -17,12 +17,6 @@ ENV PYTHONUNBUFFERED 1
 RUN apt-get update \
     && apt-get install -y postgresql postgresql-contrib gcc python3
 
-# lint
-RUN pip install --upgrade pip
-RUN pip install flake8==3.9.2
-COPY . .
-#RUN flake8 --ignore=E501,F401 .
-
 # install dependencies
 COPY ./requirements.txt .
 RUN pip wheel --no-cache-dir --no-deps --wheel-dir /app/wheels -r requirements.txt
@@ -61,7 +55,7 @@ RUN pip install --no-cache /wheels/*
 COPY . $APP_HOME
 
 # copy NLTK data
-COPY ./nltk_data/tokenizers /home/app/nltk_data/tokenizers
+COPY ./data/nltk/tokenizers /home/app/data/nltk/tokenizers
 
 # set rights to entrypoint.prod.sh
 RUN sed -i 's/\r$//g'  $APP_HOME/shell/entrypoint.prod.sh

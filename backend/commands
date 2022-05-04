@@ -7,6 +7,9 @@ pipenv --python path/to/anaconda/bin/python
 ssh -i ~/.ssh/audiozpravy-team.pem  audiozpravy-team@20.113.159.239
 
 
+ docker compose -f docker-compose.prod.yml up  --build
+
+
 docker system prune -f ; docker volume prune -f ;docker rm -f -v $(docker ps -q -a)
 
 
