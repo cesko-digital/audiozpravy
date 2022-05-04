@@ -6,8 +6,14 @@ from colorlog import ColoredFormatter
 from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk.integrations.logging import ignore_logger
 
+
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+from dotenv import load_dotenv
+load_dotenv(os.path.join(BASE_DIR, ".env.prod"))
 
 SILENCED_SYSTEM_CHECKS = ["models.E017"]
 
@@ -22,6 +28,8 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET', 'developmentsecret')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', '1') == '1'
 
+ALLOWED_HOSTS = ["*"]
+"""
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '20.113.148.155',
                  'django-graphene-starter.herokuapp.com',
                  'django-graphene-starter.jerrynsh.com',
@@ -33,6 +41,7 @@ ALLOWED_HOSTS.extend(
         os.environ.get('DJANGO_ALLOWED_HOSTS', '').split(','),
     )
 )
+"""
 
 ENVIRONMENT = os.environ.get('ENVIRONMENT', 'development')
 
@@ -96,19 +105,20 @@ TEMPLATES = [
 WSGI_APPLICATION = 'API.wsgi.application'
 
 
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 DATABASES = {
     'default': {
-        'ENGINE': os.environ.get("SQL_ENGINE"),
-        'NAME': os.environ.get('SQL_NAME'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': os.environ.get('SQL_DATABASE'),
         'USER': os.environ.get('SQL_USER'),
         'PASSWORD': os.environ.get('SQL_PASSWORD'),
         'HOST': os.environ.get('SQL_HOST'),
         'PORT': os.environ.get('SQL_PORT'),
+
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators

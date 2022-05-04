@@ -75,3 +75,4 @@ USER app
 
 # run entrypoint.prod.sh
 #ENTRYPOINT ["/home/app/web/shell/entrypoint.prod.sh"]
+CMD ["gunicorn", "--bind", ":8000", "--workers", "1", "API.wsgi:application"]

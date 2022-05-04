@@ -26,4 +26,5 @@ COPY . .
 RUN sed -i 's/\r$//g' /app/shell/entrypoint.sh
 RUN chmod +x /app/shell/entrypoint.sh
 
-ENTRYPOINT ["/app/shell/entrypoint.sh"]
+#ENTRYPOINT ["/app/shell/entrypoint.sh"]
+CMD ["python", "./manage.py runserver 0.0.0.0:8000"]
