@@ -65,6 +65,5 @@ RUN chown -R app:app $APP_HOME
 # change to the app user
 USER app
 
-# run entrypoint.prod.sh
-#ENTRYPOINT ["/home/app/web/shell/entrypoint.prod.sh"]
+# run gunicorn
 CMD ["gunicorn", "--bind", ":8000", "--workers", "1", "API.wsgi:application"]
