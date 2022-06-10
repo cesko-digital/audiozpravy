@@ -32,7 +32,7 @@ const QueueScreen = ({ navigation }) => {
 
     state.queue.forEach((article) => {
       // ignore already played articles
-      if (article.played != true) {
+      if (!article.played) {
         if (article.lastPosition != undefined && article.lastPosition > 0) {
           played.data.push(article);
         } else {
