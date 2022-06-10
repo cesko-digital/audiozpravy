@@ -18,7 +18,7 @@ const SeekProgressBar: FC<Props> = ({
   style,
   onChange,
 }) => {
-  const bufferedWidth = String((buffered / totalSeconds) * 100) + "%";
+  const bufferedWidth = `${buffered / totalSeconds * 100}%`;
   return (
     <View
       style={StyleSheet.compose(
