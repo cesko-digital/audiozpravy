@@ -17,7 +17,8 @@ import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useIsFocused } from "@react-navigation/native";
 import { usePlayer } from "../../trackPlayerContext";
 
-import { Item, IncompleteItem } from "./list-item";
+import Item from "./list-item";
+import IncompleteItem from "./incomplete-item";
 import { Article } from "../../shared/article";
 
 const QueueScreen = ({ navigation }) => {
@@ -108,12 +109,16 @@ const QueueScreen = ({ navigation }) => {
           color: theme.colors.textLight,
         })}
       >
-        Ve frontě nic nic není :(
+        Ve frontě nic není :(
       </Text>
     </View>
   );
 
   const renderItem = ({ item, index, section }) => {
+    const isCurrent = () => {
+      return item.id == state.currentTrack?.id;
+    };
+
     if (section.key == 0) {
       return (
         <IncompleteItem
@@ -123,7 +128,7 @@ const QueueScreen = ({ navigation }) => {
               ? progress
               : null
           }
-          isPlaying={item.id == state.currentTrack?.id && state.isPlaying}
+          isPlaying={isCurrent() && state.isPlaying}
           onPress={() => onPress(item)}
           onIconPress={() => {
             onIconPress(item, index);

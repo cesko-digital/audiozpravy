@@ -136,11 +136,7 @@ const PlayerContextProvider: FC = ({ children }) => {
 
   useTrackPlayerEvents([Event.PlaybackQueueEnded], async (event) => {
     console.info("PlaybackQueueEnded", event, progress);
-    const _state = {
-      ...state,
-      isPlaying: false,
-    };
-    _setState(_state);
+    _setState((state) => ({ ...state, isPlaying: false }));
 
     skipToNext();
   });

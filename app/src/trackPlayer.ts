@@ -64,7 +64,7 @@ class TrackPlayer {
   public async setActiveTrack(track: Track) {
     await RNTrackPlayer.stop();
     await this.clearQueue();
-    return await RNTrackPlayer.add(track);
+    await RNTrackPlayer.add(track);
   }
 
   /**
@@ -75,7 +75,7 @@ class TrackPlayer {
     await RNTrackPlayer.stop();
     await this.clearQueue();
     await RNTrackPlayer.add(track);
-    return await RNTrackPlayer.play();
+    await RNTrackPlayer.play();
   }
 
   public async play() {
