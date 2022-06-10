@@ -1,5 +1,5 @@
-from pipeline.rss_scraper.rss_scraper.scraper import _scrape_feed
-from pipeline.rss_scraper.rss_scraper.sources import SOURCES
+from job_runner.scraper import _scrape_feed
+from job_runner.sources import SOURCES
 
 
 def test_scrape_feeds():

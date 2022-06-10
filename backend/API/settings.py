@@ -6,8 +6,14 @@ from colorlog import ColoredFormatter
 from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk.integrations.logging import ignore_logger
 
+
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+from dotenv import load_dotenv
+load_dotenv(os.path.join(BASE_DIR, ".env.prod"))
 
 SILENCED_SYSTEM_CHECKS = ["models.E017"]
 
@@ -20,9 +26,22 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET', 'developmentsecret')
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', '1') == '1'
+DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'django-graphene-starter.herokuapp.com', 'django-graphene-starter.jerrynsh.com']
+ALLOWED_HOSTS = ["*"]
+"""
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '20.113.148.155',
+                 'django-graphene-starter.herokuapp.com',
+                 'django-graphene-starter.jerrynsh.com',
+]
+
+ALLOWED_HOSTS.extend(
+    filter(
+        None,
+        os.environ.get('DJANGO_ALLOWED_HOSTS', '').split(','),
+    )
+)
+"""
 
 ENVIRONMENT = os.environ.get('ENVIRONMENT', 'development')
 
@@ -52,6 +71,18 @@ MIDDLEWARE = [
     'ratelimit.middleware.RatelimitMiddleware',
 ]
 
+CORS_ORIGIN_WHITELIST = [
+    'http://20.113.148.155:8000',
+    'http://20.113.148.155:5000',
+    'http://20.113.148.155',
+    'http://localhost:4200',
+    'https://localhost:4200',
+    'http://127.0.0.1:4200',
+    'https://127.0.0.1:4200',
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
 ROOT_URLCONF = 'API.urls'
 
 TEMPLATES = [
@@ -74,20 +105,20 @@ TEMPLATES = [
 WSGI_APPLICATION = 'API.wsgi.application'
 
 
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
-if 'DATABASE_URL' in os.environ:
-    import dj_database_url
-    DATABASES = {'default': dj_database_url.config(conn_max_age=600)}
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': os.environ.get('SQL_DATABASE'),
+        'USER': os.environ.get('SQL_USER'),
+        'PASSWORD': os.environ.get('SQL_PASSWORD'),
+        'HOST': os.environ.get('SQL_HOST'),
+        'PORT': os.environ.get('SQL_PORT'),
 
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        },
     }
-
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
@@ -217,8 +248,7 @@ RATELIMIT_RATE = os.environ.get('RATELIMIT_RATE', '5/s')
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATIC_URL = '/static/'
 
 
