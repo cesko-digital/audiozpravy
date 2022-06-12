@@ -1,20 +1,17 @@
-import json
-import logging
 from typing import List
-import torch
+
 import numpy as np
 import sklearn.metrics
-from transformers import AutoModel, AutoTokenizer
+import json
+
+from audionews.models import Article
+from classes.BERT import BERT
 
 
-model_name = "DeepPavlov/bert-base-bg-cs-pl-ru-cased"
-MODEL_PATH = 'data/bert-base-bg-cs-pl-ru-cased/'
 class QueueFiller:
-    model = AutoModel.from_pretrained(MODEL_PATH, local_files_only=True, output_hidden_states=True)
-    tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH, local_files_only=True)
-    stop_words = [] #json.load(open('job_runner/data/stop_words_czech.json', 'r'))
-    logger = logging.getLogger('QueueFiller')
-    all_article_vectors = [] #json.load(open(embed_vectors_path, 'r')
+    EMBED_VECTORS_PATH = 'job_runner/data/articles_embeddings.json'
+    model = BERT
+    all_article_vectors = json.load(open(EMBED_VECTORS_PATH, 'r'))
 
     @staticmethod
     def recommend_articles(played_articles, articles_history) -> np.array:
@@ -38,41 +35,21 @@ class QueueFiller:
         return sorted_articles_ids
 
     @staticmethod
-    def _get_bert_embeddings(articles) -> List[np.ndarray]:
+    def _get_bert_embeddings(articles: List[Article]) -> List[np.ndarray]:
         articles_embeddings = []
         for article in articles:
 
             if str(article.id) not in QueueFiller.all_article_vectors:
-                QueueFiller.logger.warning(f'Embedding vector for article {article.title} and id {article.id} '
-                                           f'not yet calculated. Predicting vector ...')
+                BERT.logger.warning(f'Embedding vector for article {article.title} and id {article.id} '
+                                    f'not yet calculated. Predicting vector ...')
 
-                words = [word for word in article.perex.split() if word not in QueueFiller.stop_words]
-                words_vector = QueueFiller._get_words_mean_vector(words)
+                words = [word for word in article.perex.split() if word not in BERT.stop_words]
+                words_vector = BERT.vectorize_words(words)
                 articles_embeddings.append(words_vector)
             else:
                 articles_embeddings.append(QueueFiller.all_article_vectors[str(article.id)]['sent_embedding'])
 
         return articles_embeddings
 
-    @staticmethod
-    def _get_hidden_states(encoded):
-        layers = [-4, -3, -2, -1]
-        """Push input IDs through model. Stack and sum `layers` (last four by default).
-           Select only those subword token outputs that belong to our word of interest
-           and average them."""
-        with torch.no_grad():
-            output = QueueFiller.model(**encoded)
-        # Get all hidden states
-        states = output.hidden_states
-        # Stack and sum all requested layers
-        output = torch.stack([states[i] for i in layers]).sum(0).squeeze()
-        return output.mean(dim=0)
-
-    @staticmethod
-    def _get_words_mean_vector(words: List[str]):
-        """Get a word vector by first tokenizing the input sentence, getting all token idxs
-           that make up the word of interest, and then `get_hidden_states`."""
-        encoded = QueueFiller.tokenizer.encode_plus(" ".join(words), return_tensors="pt")
-        return QueueFiller._get_hidden_states(encoded)
 
 
