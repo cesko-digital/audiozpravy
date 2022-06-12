@@ -1,30 +1,30 @@
-# Dockerfile for Django Applications
-# Section 1- Base Image
-FROM python:3.8-buster
-# Section 2- Python Interpreter Flags
-ENV PYTHONUNBUFFERED 1
+# pull official base image
+FROM python:3.7.13-buster
+
+# set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
-# Section 3- Compiler and OS libraries
+ENV PYTHONUNBUFFERED 1
+
+# install psycopg2 dependencies
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends build-essential libpq-dev \
-  && rm -rf /var/lib/apt/lists/*
-# Section 4- Project libraries and User Creation
-COPY requirements.txt /tmp/requirements.txt
-RUN pip install --no-cache-dir -r /tmp/requirements.txt \
-    && rm -rf /tmp/requirements.txt \
-    && useradd -U app_user \
-    && install -d -m 0755 -o app_user -g app_user /app/static
-# Section 5- Code and User Setup
+    && apt-get install -y postgresql postgresql-contrib gcc python3
+
+# set work directory
+RUN mkdir -p /app
 WORKDIR /app
 
-USER app_user:app_user
-COPY --chown=app_user:app_user . .
-RUN chmod +x docker/*.sh
-RUN chmod 777 static
-RUN chmod 777 db.sqlite3
+# install dependencies
+RUN pip install --upgrade pip
+COPY ./requirements.txt .
+RUN pip install -r requirements.txt
 
 
-# Section 6- Docker Run Checks and Configurations
-ENTRYPOINT [ "docker/entrypoint.sh" ]
-CMD [ "docker/start.sh", "server" ]
+# copy project
+COPY . .
 
+# set rights entrypoint.sh
+RUN sed -i 's/\r$//g' /app/shell/entrypoint.sh
+RUN chmod +x /app/shell/entrypoint.sh
+
+#ENTRYPOINT ["/app/shell/entrypoint.sh"]
+CMD ["python", "./manage.py runserver 0.0.0.0:8000"]

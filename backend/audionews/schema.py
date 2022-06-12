@@ -53,8 +53,7 @@ class Query(ObjectType):
         return Playlist.objects.all()
 
     def resolve_playlists_for_today(root, info):
-        return Playlist.objects.filter(type="Day").all()
-        #.filter(prepared_for_date=datetime.today())
+        return Playlist.objects.filter(type="Day").all().filter(prepared_for_date=datetime.today())
 
     def resolve_playlists_for_this_week(root, info):
         return Playlist.objects.filter(type="Week").all()
