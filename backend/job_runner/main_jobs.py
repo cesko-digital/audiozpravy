@@ -49,14 +49,13 @@ class JobRunner:
 
         for source in SOURCES:
             if not sources_names:
-                self.logger.info(f'Scrapin data for {source["name"]}')
+                self.logger.info(f'Scraping data for {source["name"]}')
                 entries.extend(_scrape_feed(source, local_dev=0))
             elif source['name'] in sources_names:
-                self.logger.info(f'Scrapin data for {source["name"]}')
+                self.logger.info(f'Scraping data for {source["name"]}')
                 entries.extend(_scrape_feed(source, local_dev=0))
 
         for entry in entries:
-
             provider, create = Provider.objects.get_or_create(name=entry['source'])
             cat = parse_category(str(entry['link']))
             if not cat:

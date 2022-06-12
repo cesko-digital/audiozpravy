@@ -9,16 +9,17 @@ import json
 
 def _scrape_feed(source, local_dev):
     entries = []
-
     source_name = source["name"]
-    print(f"scraping {source_name} RSS feed")
+    print(f"Scraping {source_name} RSS feed")
     for feed in tqdm(source["feeds"]):
         if local_dev:
             with open("pipeline/local_dev/feed_snapshot.json", "r") as f:
                 parsed_feed = feedparser.util.FeedParserDict(json.load(f))
         else:
             parsed_feed = feedparser.parse(feed['url'])
+            print(parsed_feed)
         for e in parsed_feed.entries:
+            print(e)
             category_obj = feed["category"]
             if callable(category_obj):
                 # category might be simple code or function that parses the code
@@ -39,4 +40,5 @@ def _scrape_feed(source, local_dev):
                     "source": source.get("name"),
                 }
             )
+            print(e.get("title"))
     return entries

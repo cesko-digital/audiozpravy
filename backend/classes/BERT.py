@@ -36,5 +36,5 @@ class BERT:
     @staticmethod
     def batch_vectorize_texts(texts: List[str]):
         inputs = BERT.tokenizer.batch_encode_plus(texts, padding=True, truncation=True, return_tensors="pt")
-        input_ids, token_type_ids, attention_mask, overflowing_tokens, num_truncated_tokens, special_tokens_mask = inputs
+        input_ids, token_type_ids, attention_mask = inputs
         return input_ids, BERT._get_hidden_states(inputs)

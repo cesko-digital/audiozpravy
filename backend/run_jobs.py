@@ -9,7 +9,7 @@ if __name__ == '__main__':
     args.add_argument('--bert-path', default='job_runner/data/bg_cs_pl_ru_cased_L-12_H-768_A-12_pt')
     args.add_argument('--vectors-path', default='job_runner/data/articles_embeddings.json')
     args.add_argument('--audio-path', default='job_runner/data/audio/')
-    args.add_argument('--n-past-days', default=100000,
+    args.add_argument('--n-past-days', default=300,
                       help = 'Number of days to consider for articles to recommend for categories. for value 4 we '
                              'consider only articles in last 4 days.')
     args.add_argument('--sources_names', default='ctidoma.cz', type=strtolist,
