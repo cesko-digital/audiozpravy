@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React, { FC, useEffect, useState } from "react";
 import {
   StyleSheet,
   View,
@@ -9,7 +9,6 @@ import {
 } from "react-native";
 
 import Color from "../../theme/colors";
-import TrackPlayer, { useProgress } from "react-native-track-player";
 import { usePlayer } from "../../trackPlayerContext";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTheme } from "../../theme";
@@ -50,21 +49,25 @@ const styles = StyleSheet.create({
 });
 
 const MiniPlayer: FC<ViewProps> = ({ style }) => {
-  const progress = useProgress();
-  const { state, setState, setQueue } = usePlayer();
+  const { state, progress, skipToNext, playPause } = usePlayer();
   const theme = useTheme();
   const fonts = useFonts();
+  const [hasNext, setHasNext] = useState(true);
+
+  useEffect(() => {
+    if (state.currentTrack != null) {
+      const actualArticleIndex = state.queue.indexOf(state.currentTrack);
+      const _hasNext = actualArticleIndex < state.queue.length - 1;
+      setHasNext(_hasNext);
+    }
+  }, [state]);
 
   const onPlayPause = () => {
-    if (state.isPlaying) {
-      TrackPlayer.pause();
-    } else {
-      TrackPlayer.play();
-    }
+    playPause();
   };
 
   const onNext = () => {
-    TrackPlayer.skipToNext();
+    skipToNext();
   };
 
   const descriptionStyle = StyleSheet.compose(fonts.textLightSmall, {
@@ -76,7 +79,7 @@ const MiniPlayer: FC<ViewProps> = ({ style }) => {
       style={[
         styles.player,
         style,
-        { transform: [{ translateY: state.recordsCount > 0 ? 0 : 90 }] },
+        { transform: [{ translateY: state.queue.length > 0 ? 0 : 90 }] },
       ]}
     >
       <View style={{ flexDirection: "row", padding: 16 }}>
@@ -98,7 +101,7 @@ const MiniPlayer: FC<ViewProps> = ({ style }) => {
         <TouchableOpacity
           onPress={onNext}
           style={styles.smallButtonStyle}
-          disabled={state.currentIndex + 1 >= state.recordsCount}
+          disabled={!hasNext}
         >
           <MaterialCommunityIcons
             name="skip-next"

@@ -10,7 +10,6 @@ import {
 } from "../../securePreferences";
 import { useState } from "react";
 import { usePlayer } from "../../trackPlayerContext";
-import TrackPlayer from "react-native-track-player";
 
 interface RowProps {
   title: string;
@@ -33,27 +32,13 @@ const SettingsScreen = ({ navigation }) => {
   const theme = useTheme();
   const fonts = useFonts();
   const [preferredTopics, setTopics] = useState([]);
-  const { setQueue } = usePlayer();
+  const { clearQueue } = usePlayer();
 
   useEffect(() => {
     getPreferredTopics().then((topics) => {
       setTopics(topics);
     });
   }, []);
-
-  const clearQueue = async () => {
-    TrackPlayer.stop();
-    const queue = await TrackPlayer.getQueue();
-
-    var indexesToRemove = new Array(queue.length);
-    for (let i = 0; i < queue.length; i++)
-      indexesToRemove[i] = queue.length - 1 - i;
-
-    for (const id of indexesToRemove) {
-      await TrackPlayer.remove([id]);
-    }
-    setQueue([]);
-  };
 
   return (
     <View style={{ flex: 1 }}>
