@@ -1,4 +1,4 @@
-import React, { FC, useState, useContext } from "react";
+import React, { FC, useState, useEffect } from "react";
 import {
   StyleSheet,
   TouchableOpacity,
@@ -23,8 +23,17 @@ const PlaybackControls: FC<Props> = ({
   onNext,
   style,
 }) => {
+  const { state } = usePlayer();
 
-  const { state, setQueue, setState } = usePlayer()
+  const [hasNext, setHasNext] = useState(true);
+
+  useEffect(() => {
+    if (state.currentTrack != null) {
+      const actualArticleIndex = state.queue.indexOf(state.currentTrack);
+      const _hasNext = actualArticleIndex < state.queue.length - 1;
+      setHasNext(_hasNext);
+    }
+  }, [state]);
 
   return (
     <View
@@ -41,6 +50,7 @@ const PlaybackControls: FC<Props> = ({
       <TouchableOpacity
         onPress={onRewind}
         style={StyleSheet.compose(buttonStyle, { height: 40, width: 40 })}
+        disabled={state.currentTrack == null}
       >
         <RewindBackIcon color={Color["black-100"]} size={24} />
       </TouchableOpacity>
@@ -52,6 +62,7 @@ const PlaybackControls: FC<Props> = ({
           width: 47,
           marginHorizontal: 28,
         }}
+        disabled={state.currentTrack == null}
       >
         <MaterialCommunityIcons
           name={state.isPlaying ? "pause" : "play"}
@@ -62,7 +73,7 @@ const PlaybackControls: FC<Props> = ({
       <TouchableOpacity
         onPress={onNext}
         style={{ ...buttonStyle, height: 40, width: 40 }}
-        disabled={state.currentIndex + 1 >= state.recordsCount}
+        disabled={!hasNext}
       >
         <MaterialCommunityIcons
           name="skip-next"
@@ -71,10 +82,10 @@ const PlaybackControls: FC<Props> = ({
         />
       </TouchableOpacity>
     </View>
-  )
-}
+  );
+};
 
-export default PlaybackControls
+export default PlaybackControls;
 
 const buttonStyle: ViewStyle = {
   backgroundColor: "white",
@@ -82,7 +93,7 @@ const buttonStyle: ViewStyle = {
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
-}
+};
 
 const RewindBackIcon = ({ color, size }) => (
   <Svg width={size} height={size} viewBox="0 0 20 25" fill="none">

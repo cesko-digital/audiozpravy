@@ -18,8 +18,8 @@ import { useTheme } from "../../theme";
 import useFonts from "../../theme/fonts";
 import { gql, useQuery, NetworkStatus } from "@apollo/client";
 import { Article } from "../../shared/article";
-import TrackPlayer from "../../trackPlayer";
-import RNTrackPlayer from "react-native-track-player";
+import { usePlayer } from "../../trackPlayerContext";
+import { parseJSON } from "date-fns";
 
 const CATEGORIES_TODAY = gql`
   {
@@ -31,7 +31,9 @@ const CATEGORIES_TODAY = gql`
         id
         url: recordingUrl
         title
+        publishedAt: pubDate
         artist: provider {
+          id
           name
         }
       }
@@ -52,7 +54,9 @@ const CATEGORIES_WEEK = gql`
         id
         url: recordingUrl
         title
+        publishedAt: pubDate
         artist: provider {
+          id
           name
         }
       }
@@ -281,6 +285,7 @@ interface NavListProps {
 }
 
 const NewsNavList: FC<NavListProps> = ({ variant }) => {
+  const { state, addArticle } = usePlayer();
   const query =
     variant == ScreenVariant.today ? CATEGORIES_TODAY : CATEGORIES_WEEK;
   const { data, loading, error, refetch, networkStatus } = useQuery(query, {
@@ -308,7 +313,9 @@ const NewsNavList: FC<NavListProps> = ({ variant }) => {
             const randomTrackNumber = Math.floor(Math.random() * 15 + 1);
             return {
               ...i,
+              publishedAt: parseJSON(i.publishedAt),
               artist: i.artist.name,
+              img: "https://picsum.photos/200/140/?id" + i.id,
               url:
                 "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-" +
                 randomTrackNumber +
@@ -324,9 +331,9 @@ const NewsNavList: FC<NavListProps> = ({ variant }) => {
     return enrichedData;
   };
 
-  const addToQueue = (items: Article[]) => {
-    TrackPlayer.addTracksToQueue(items).then((queue) => {
-      RNTrackPlayer.play();
+  const addToQueue = (articles: Article[]) => {
+    articles.forEach((a) => {
+      addArticle(a);
     });
   };
 

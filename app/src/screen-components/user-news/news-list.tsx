@@ -12,8 +12,6 @@ import {
 } from "react-native";
 import Color from "../../theme/colors";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import TrackPlayer from "../../trackPlayer";
-import RNTrackPlayer from "react-native-track-player";
 import { usePlayer } from "../../trackPlayerContext";
 import useFonts from "../../theme/fonts";
 import { useTheme } from "../../theme";
@@ -24,7 +22,6 @@ import { useState } from "react";
 import { TimeRange, TimeRangeItem } from "./news-filter";
 import { subDays, subHours, format, parseJSON } from "date-fns";
 import { cs } from "date-fns/locale";
-import { debug } from "react-native-reanimated";
 
 interface Props extends ViewProps {
   selected: boolean;
@@ -64,12 +61,10 @@ const Item: FC<ItemProps> = ({ item, onPress, onPlusPress }) => {
   const [inQueue, setInQueue] = useState(false);
 
   useEffect(() => {
-    const queue = RNTrackPlayer.getQueue().then((queue) => {
-      const filtered = queue.filter((value, index, array) => {
-        return value.id == item.id;
-      });
-      setInQueue(filtered.length > 0);
+    const filtered = state.queue.filter((value, index, array) => {
+      return value.id == item.id;
     });
+    setInQueue(filtered.length > 0);
   }, [state]);
 
   return (
@@ -116,7 +111,8 @@ const Item: FC<ItemProps> = ({ item, onPress, onPlusPress }) => {
                 color: theme.colors.textLight,
               })}
             >
-              {format(item.published, "do MMMM, HH:mm", { locale: cs })}
+              {format(item.publishedAt, "do MMMM, HH:mm", { locale: cs })} ‧{" "}
+              {item.artist}
             </Text>
           </View>
         </TouchableOpacity>
@@ -139,7 +135,7 @@ const QUERY = gql`
     $gteDate: DateTime
     $lteDate: DateTime
   ) {
-    articles(
+    myArticles(
       first: $first
       after: $after
       category_Key_In: $categories
@@ -155,7 +151,7 @@ const QUERY = gql`
           id
           title
           url: recordingUrl
-          published: pubDate
+          publishedAt: pubDate
           provider {
             name
             id
@@ -211,14 +207,13 @@ const getQueryVariables = (
       params.lteDate = selectedTimeRange.lteDate?.toISOString();
     }
   }
-  console.info(params);
   return params;
 };
 
 const NewsNavList: FC<NewsList> = ({ style, categories, timeRange }) => {
   const theme = useTheme();
   const fonts = useFonts();
-  const { setQueue } = usePlayer();
+  const { addArticle } = usePlayer();
 
   const variables = useMemo(() => {
     return getQueryVariables(categories, timeRange);
@@ -235,12 +230,7 @@ const NewsNavList: FC<NewsList> = ({ style, categories, timeRange }) => {
   }, [variables]);
 
   const addToQueue = (item: Article) => {
-    TrackPlayer.addTrackToQueue(item).then((queue) => {
-      setQueue(queue);
-      if (queue.length == 1) {
-        RNTrackPlayer.play();
-      }
-    });
+    addArticle(item);
   };
 
   const onItemPress = (item: Article) => addToQueue(item);
@@ -254,8 +244,11 @@ const NewsNavList: FC<NewsList> = ({ style, categories, timeRange }) => {
     if (data == undefined) {
       return;
     }
-
-    const enriched = data.articles.edges
+    // BE hotfix
+    if (data.myArticles == null) {
+      data.myArticles = { edges: [] };
+    }
+    const enriched = data.myArticles.edges
       .filter((item) => {
         if (item.node != null) {
           return item;
@@ -266,7 +259,7 @@ const NewsNavList: FC<NewsList> = ({ style, categories, timeRange }) => {
         const randomTrackNumber = Math.floor(Math.random() * 15 + 1);
         return {
           ...item.node,
-          published: parseJSON(item.node.published),
+          publishedAt: parseJSON(item.node.publishedAt),
           img: "https://picsum.photos/200/140/?id" + item.node.id,
           url:
             "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-" +
@@ -341,7 +334,7 @@ const NewsNavList: FC<NewsList> = ({ style, categories, timeRange }) => {
         fetchMore({
           variables: {
             ...variables,
-            after: data.articles.pageInfo.endCursor,
+            after: data.myArticles.pageInfo.endCursor,
           },
         });
       }}

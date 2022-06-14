@@ -24,8 +24,8 @@ class Query(ObjectType):
     listeners = DjangoFilterConnectionField(ListenerNode, description='Return list of listeners.')
     providers = List(ProviderNode, description='Return list of providers.')
     playlists = DjangoFilterConnectionField(PlaylistNode, description='Return list of playlists.')
-    playlists_for_today = List(PlaylistNode, required=True)
-    playlists_for_this_week = List(PlaylistNode, required=True)
+    playlists_for_today = List(PlaylistNode, description="Return list of playlists for today.")
+    playlists_for_this_week = List(PlaylistNode, description="Return list of playlists for this week.")
 
 
     def resolve_me(root, info, **kwargs):
@@ -53,7 +53,7 @@ class Query(ObjectType):
         return Playlist.objects.all()
 
     def resolve_playlists_for_today(root, info):
-        return Playlist.objects.filter(type="Day").all().filter(prepared_for_date=datetime.today())
+        return Playlist.objects.filter(type="Day").filter(prepared_for_date=datetime.today()).all()
 
     def resolve_playlists_for_this_week(root, info):
         return Playlist.objects.filter(type="Week").all()

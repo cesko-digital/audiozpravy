@@ -50,7 +50,7 @@ Oficiální repozitář týmu Audiozpráv v projeku #run-inovace-zpravodajskeho-
 
 ## 🚀 Setup backendu
 
-`cd pipeline`
+`cd backend`
 
 `pip install -r requirements.txt`
 
@@ -60,44 +60,14 @@ Oficiální repozitář týmu Audiozpráv v projeku #run-inovace-zpravodajskeho-
 
 `rm czech-morfflex-pdt-161115.zip` - odstranění původního souboru
 
-`python main.py` - spuštění celého procesu
-
-`cd ../backend` - přesun do adresáře s backendem
-
-`pip install -r requirements.txt` - nainstalování dependencies
-
-`python app.py` - spuštění Flask serveru
-
-`black pipeline` - formátování
-
-`isort pipeline --profile black` - formátování
+`python manage.py runserver` - spuštění django backendu
 
 ### Spuštění v Dockeru lokálně
-
-Pipeline:
-
-```
-cd pipeline
-docker build -t az-pipeline .
-docker run -ti --env LOCAL_DEV=1 -v /path/to/your/local/s3:/app/s3 az-pipeline
-```
 
 Backend:
 
 ```
-cd backend
-docker build -t az-backend .
-docker run -ti --env LOCAL_DEV=1 -p 5000:5000 az-backend
-```
-
-### Lokální vývoj
-
-Doporučujeme vyvíjet pomocí virtual enviroments a běžet alespoň python 3.7.9.
-
-Stačí zadát env variable a spustit dva hlavní skripty takto:
-```
-LOCAL_DEV=1 python pipeline/main.py
-LOCAL_DEV=1 python backend/app.py
+docker compose -f docker-compose.prod.yml up  --build
 ```
 
 ### Testování
@@ -106,4 +76,4 @@ V hlavním adresáři stačí spustit příkaz `pytest`
 
 ## ☎️ Komu se mám ozvat?
 
-**Techlead:** Jiří Zikeš (jiri@xomlo.io, 725 523 929)
+**Techlead:** Jakub Bareš (bares.jakub@gmail.com, 603 557 076)
