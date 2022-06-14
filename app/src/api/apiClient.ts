@@ -8,6 +8,8 @@ import { onError } from "@apollo/client/link/error";
 import { setContext } from "@apollo/client/link/context";
 import { getAccessToken } from "../securePreferences";
 
+import config from "../config";
+
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors)
     graphQLErrors.forEach(({ message, locations, path }) =>
@@ -19,7 +21,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 });
 
 const httpLink = createHttpLink({
-  uri: "http://localhost:8000/graphql/",
+  uri: config.api.host,
 });
 
 const authLink = setContext(async (_, { headers }) => {
