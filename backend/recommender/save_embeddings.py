@@ -11,6 +11,11 @@ from deeppavlov.core.common.file import read_json
 from deeppavlov import build_model, configs
 import django
 import os
+
+from transformers import AutoModel, AutoTokenizer
+
+from classes.BERT import BERT
+
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "API.settings")
 django.setup()
 
@@ -22,6 +27,9 @@ from gensim.models.doc2vec import Doc2Vec
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger('Embeddings creation')
 
+
+model_name = "DeepPavlov/bert-base-bg-cs-pl-ru-cased"
+MODEL_PATH = 'data/bert-base-bg-cs-pl-ru-cased/'
 
 def calculate_doc2vec_vectors(model_path: str, vectors_path: str) -> None:
     ''' Calculates embeddings for all available articles that are missing from "vectors_path" file and save it into
@@ -49,15 +57,8 @@ def calculate_doc2vec_vectors(model_path: str, vectors_path: str) -> None:
     json.dump(article_embeddings, open(vectors_path, 'w'))
 
 
-def calculate_bert_vectors(model_path_folder: str, vectors_path: str, create_new_vectors: bool = True):
+def calculate_bert_vectors(vectors_path: str, create_new_vectors: bool = True):
     ''' Calculate embeddings from bert model save them into "vectors_path'''
-
-    bert_config = read_json(configs.embedder.bert_embedder)
-    bert_config['metadata']['variables']['BERT_PATH'] = model_path_folder
-
-    logger.info('Building bert model ...')
-
-    slavic_bert = build_model(bert_config)
 
     all_articles = Article.objects.all()
     if os.path.exists(vectors_path) and not create_new_vectors:
@@ -70,22 +71,20 @@ def calculate_bert_vectors(model_path_folder: str, vectors_path: str, create_new
 
     logger.info('Creating embedding vectors ...')
     batch_size = 50
-    tokens_l, bert_pooler_outputs_l, sent_mean_embs_l  =[],[], []
+    tokens_list, article_mean_embs_list = [], []
     all_articles_list = [article.title for article in all_articles if article.id in new_articles]
 
-    for batch in tqdm(range(int(np.ceil(len(all_articles)/batch_size)))):
-        tokens, token_embs, subtokens, subtoken_embs, sent_max_embs, sent_mean_embs, bert_pooler_outputs = slavic_bert(
-            all_articles_list[batch * batch_size: (batch + 1) * batch_size]
+    for batch_index in tqdm(range(int(np.ceil(len(all_articles)/batch_size)))):
+        token_ids, article_mean_embs = BERT.batch_vectorize_texts(
+            all_articles_list[batch_index * batch_size: (batch_index + 1) * batch_size]
         )
-        tokens_l.extend(tokens)
-        sent_mean_embs_l.append(sent_mean_embs)
-        bert_pooler_outputs_l.extend(bert_pooler_outputs)
+        tokens_list.append(token_ids)
+        article_mean_embs_list.append(article_mean_embs)
 
-    sent_mean_embs_l = np.concatenate(sent_mean_embs_l, axis = 0)
+    article_mean_embs_list = np.concatenate(article_mean_embs_list, axis=0)
 
-
-    for new_article_id, emb_vecotr, token in zip(new_articles, sent_mean_embs_l, tokens_l):
-        article_embeddings[str(new_article_id)] = {'tokens': token, 'sent_embedding': list(map(str, emb_vecotr))}
+    for new_article_id, emb_vector, token_ids in zip(new_articles, article_mean_embs_list, tokens_list):
+        article_embeddings[str(new_article_id)] = {'tokens': token_ids, 'sent_embedding': list(map(str, emb_vector))}
 
     json.dump(article_embeddings, open(vectors_path, 'w'))
 
@@ -106,7 +105,7 @@ if __name__ == '__main__':
     if cfg.doc2vec:
         calculate_doc2vec_vectors(cfg.doc2vec_path, cfg.vectors_path)
     else:
-        calculate_bert_vectors(cfg.model_path, cfg.vectors_path)
+        calculate_bert_vectors(cfg.vectors_path)
 
 
 
