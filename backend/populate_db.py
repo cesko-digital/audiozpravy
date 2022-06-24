@@ -42,7 +42,6 @@ if __name__ == '__main__':
             title=row.title,
             perex=row.summary,
             pub_date=datetime.now(),
-            recording_created_at=datetime.now(),
             recording_url=MOCKED_AUDIO_PATH,
             url=str(row.link),
             provider=provider,

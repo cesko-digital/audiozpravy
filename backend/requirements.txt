@@ -34,3 +34,4 @@ psycopg2-binary
 Cython==0.29.14
 python-dotenv==0.20.0
 babel==2.10.1
+apscheduler==3.9.1

@@ -17,9 +17,7 @@ def _scrape_feed(source, local_dev):
                 parsed_feed = feedparser.util.FeedParserDict(json.load(f))
         else:
             parsed_feed = feedparser.parse(feed['url'])
-            print(parsed_feed)
         for e in parsed_feed.entries:
-            print(e)
             category_obj = feed["category"]
             if callable(category_obj):
                 # category might be simple code or function that parses the code
