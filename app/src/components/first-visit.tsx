@@ -1,14 +1,14 @@
 import React, { useState } from "react";
-import { Text, View, StyleSheet } from "react-native";
+import { Text, View, StyleSheet, ViewProps } from "react-native";
 import RNGestureHandlerButton from "react-native-gesture-handler/lib/typescript/components/GestureHandlerButton";
 import { Colors } from "react-native/Libraries/NewAppScreen";
 import Color from "../theme/colors";
 import CreateListButton from "./buttons/create-list-button";
 import PlaySelectedButton from "./buttons/play-selected-button";
 import Description from "./typography/description";
-import { Screens } from "../screens";
+import { Screens } from "../navigation/screens";
 
-const FirstVisit = ({ navigation }) => {
+const FirstVisit = () => {
   return (
     <>
       <View style={styles.overlay}>

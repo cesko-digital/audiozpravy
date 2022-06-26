@@ -1,0 +1,32 @@
+query Articles(
+  $first: Int
+  $after: String
+  $categories: [ID]
+  $gteDate: DateTime
+  $lteDate: DateTime
+) {
+  myArticles(
+    first: $first
+    after: $after
+    category_Key_In: $categories
+    pubDate_Gte: $gteDate
+    pubDate_Lte: $lteDate
+  ) {
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+    edges {
+      node {
+        id
+        title
+        url: recordingUrl
+        publishedAt: pubDate
+        provider {
+          name
+          id
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,5 @@
+mutation RegisterListerner($deviceID: String!) {
+  registerListener(input: { deviceId: $deviceID }) {
+    token
+  }
+}

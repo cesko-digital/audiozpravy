@@ -1,0 +1,12 @@
+overwrite: true
+schema: ${API_HOST}
+documents: "src/**/*.{gql,graphql}"
+generates:
+  src/graphql/generated/schema.ts:
+    plugins:
+      - "typescript"
+      - "typescript-operations"
+      - "typescript-react-apollo"
+  ./graphql.schema.json:
+    plugins:
+      - "introspection"

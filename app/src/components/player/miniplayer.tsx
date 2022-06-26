@@ -9,7 +9,7 @@ import {
 } from "react-native";
 
 import Color from "../../theme/colors";
-import { usePlayer } from "../../trackPlayerContext";
+import { usePlayer } from "../../providers/PlayerContextProvider";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTheme } from "../../theme";
 import useFonts from "../../theme/fonts";

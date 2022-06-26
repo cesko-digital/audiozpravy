@@ -1,0 +1,42 @@
+query playlistsForToday {
+  playlists: playlistsForToday {
+    category {
+      key
+    }
+    articles {
+      id
+      url: recordingUrl
+      title
+      publishedAt: pubDate
+      artist: provider {
+        id
+        name
+      }
+    }
+    preparedForDate
+    createdAt
+    type
+  }
+}
+
+query playlistsForThisWeek {
+  playlists: playlistsForThisWeek {
+    category {
+      key
+    }
+    articles {
+      id
+      url: recordingUrl
+      image: pictureUrl
+      title
+      publishedAt: pubDate
+      artist: provider {
+        id
+        name
+      }
+    }
+    preparedForDate
+    createdAt
+    type
+  }
+}
