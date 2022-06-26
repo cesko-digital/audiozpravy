@@ -31,7 +31,6 @@ class FeedMaker:
         for category in CategoryEnum:
             self.fill_category_feed(category)
 
-
     def fill_category_feed(
             self, category: CategoryEnum
     ):
