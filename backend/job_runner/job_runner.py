@@ -24,11 +24,6 @@ from classes import CategoryEnum, MetricEnum
 from classes.feed_maker import FeedMaker
 from job_runner.sources import SOURCES
 from job_runner.scraper import _scrape_feed
-import adal
-from msrestazure.azure_active_directory import AdalAuthentication
-from msrestazure.azure_cloud import AZURE_PUBLIC_CLOUD
-from azure.mgmt.media import AzureMediaServices
-from azure.mgmt.media.models import MediaService
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 CTIDOMA_SOURCE = {

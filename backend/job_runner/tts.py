@@ -5,7 +5,6 @@ from azure.cognitiveservices.speech import (
     SpeechConfig,
     SpeechSynthesizer,
 )
-from azure.cognitiveservices.speech.audio import AudioOutputConfig
 
 import boto3
 import os
