@@ -25,4 +25,5 @@ class Scheduler:
         #self.job_runner.save_embeddings,
         #self.job_runner.add_audio_for_new_entries,
         self.scheduler.start()
+        print("Scheduler has started")
         job = self.scheduler.add_job(process_articles, 'interval', hours=3)
