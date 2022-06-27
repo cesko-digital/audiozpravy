@@ -66,6 +66,6 @@ RUN chown -R app:app $APP_HOME
 # change to the app user
 USER app
 
-# run gunicorn
+# run gunicorně
 CMD ["gunicorn", "--bind", ":8000", "--workers", "1", "API.wsgi:application"]
-#CMD ["python", "./run_scheduler.py"]
+CMD ["python", "./run_scheduler.py"]
