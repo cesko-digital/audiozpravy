@@ -19,9 +19,10 @@ class Scheduler:
 
     def plan_jobs(self):
         process_articles = lambda: self.create_func(func=self.job_runner.get_new_articles,
-                                                    dep_funcs=[self.job_runner.save_embeddings,
-                                                     self.job_runner.add_audio_for_new_entries,
-                                                     self.job_runner.create_playlists],
+                                                    dep_funcs=[self.job_runner.create_playlists],
                                                     date_from=self.date_in_past, created_for_date=datetime.date.today())
+
+        #self.job_runner.save_embeddings,
+        #self.job_runner.add_audio_for_new_entries,
         self.scheduler.start()
         job = self.scheduler.add_job(process_articles, 'interval', hours=3)
