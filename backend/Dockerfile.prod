@@ -68,3 +68,4 @@ USER app
 
 # run gunicorn
 CMD ["gunicorn", "--bind", ":8000", "--workers", "1", "API.wsgi:application"]
+CMD ["python", "./run_scheduler.py"]
