@@ -17,7 +17,7 @@ class Scheduler:
         for dep_func in dep_funcs:
             dep_func(**kwargs)
 
-    def plan_jobs(self):
+    def plan_jobs(self, interval: float=180):
         process_articles = lambda: self.create_func(func=self.job_runner.get_new_articles,
                                                     dep_funcs=[self.job_runner.create_playlists],
                                                     date_from=self.date_in_past, created_for_date=datetime.date.today())
@@ -26,4 +26,4 @@ class Scheduler:
         #self.job_runner.add_audio_for_new_entries,
         self.scheduler.start()
         print("Scheduler has started")
-        job = self.scheduler.add_job(process_articles, 'interval', hours=3)
+        job = self.scheduler.add_job(process_articles, 'interval', minutes=interval)
