@@ -11,6 +11,7 @@ class Scheduler:
     def __init__(self):
         self.scheduler = BackgroundScheduler(timezone=settings.TIME_ZONE)
         self.job_runner = JobRunner()
+        self.job = None
 
     def create_func(self, func, dep_funcs: List, **kwargs):
         func(**kwargs)
@@ -30,5 +31,7 @@ class Scheduler:
 
         #self.job_runner.save_embeddings,
         #self.job_runner.add_audio_for_new_entries,
-        self.scheduler.remove_job(job_id)
-        job = self.scheduler.add_job(process_articles, 'cron', id=job_id,  **cron_job)
+        if self.job:
+            self.scheduler.remove_job(job_id)
+        self.job = self.scheduler.add_job(process_articles, 'cron', id=job_id,  **cron_job)
+
