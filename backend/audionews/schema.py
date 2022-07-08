@@ -60,9 +60,10 @@ class Query(ObjectType):
     def resolve_playlists_for_this_week(root, info):
         return Playlist.objects.filter(type="Week").all()
 
-    def resolve_run_scheduler(root, info, hours="*", minutes="*"):
+    def resolve_run_scheduler(root, info, hours, minutes):
         sc = Scheduler()
         sc.run()
-        sc.add_job(hours=hours, minutes=minutes)
-        time_segment = f"{hours} hours" if hours else f"{minutes} minutes"
+        params = {"hours": hours if hours else "*", "minutes": minutes if minutes else "*"}
+        sc.add_job(**params)
+        time_segment = f"{hours} hours" if hours != "*" else f"{minutes} minutes"
         return f"Scheduler is running every {time_segment}"
