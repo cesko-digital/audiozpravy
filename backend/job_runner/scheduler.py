@@ -1,9 +1,6 @@
 #https://apscheduler.readthedocs.io/en/3.x/userguide.html
-import datetime
 from typing import List
-
 from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from API import settings
 from job_runner.job_runner import JobRunner
 
@@ -12,9 +9,7 @@ from job_runner.job_runner import JobRunner
 
 class Scheduler:
     def __init__(self):
-        self.scheduler = BackgroundScheduler(timezone=settings.TIME_ZONE,
-                                             jobstores={'default': SQLAlchemyJobStore(url='sqlite:///./jobs.db')}
-        )
+        self.scheduler = BackgroundScheduler(timezone=settings.TIME_ZONE)
         self.job_runner = JobRunner()
 
     def create_func(self, func, dep_funcs: List, **kwargs):
