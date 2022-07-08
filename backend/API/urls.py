@@ -23,4 +23,4 @@ handler404 = 'API.views.custom_page_not_found_view'
 
 print("Running scheduler")
 scheduler = Scheduler()
-scheduler.plan_jobs(3)
+scheduler.plan_jobs()

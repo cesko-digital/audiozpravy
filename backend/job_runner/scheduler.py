@@ -13,7 +13,6 @@ from job_runner.job_runner import JobRunner
 class Scheduler:
     def __init__(self):
         self.scheduler = BackgroundScheduler(timezone=settings.TIME_ZONE)
-        self.scheduler.add_jobstore(DjangoJobStore(), "django")
         self.job_runner = JobRunner()
 
     def create_func(self, func, dep_funcs: List, **kwargs):
@@ -21,7 +20,7 @@ class Scheduler:
         for dep_func in dep_funcs:
             dep_func(**kwargs)
 
-    def plan_jobs(self, interval: float=3):
+    def plan_jobs(self):
         process_articles = lambda: self.create_func(func=self.job_runner.get_new_articles,
                                                     dep_funcs=[self.job_runner.create_playlists])
 
@@ -31,4 +30,4 @@ class Scheduler:
         if not self.scheduler.running:
             self.scheduler.start()
             print("Scheduler has started")
-        job = self.scheduler.add_job(process_articles, 'cron', jobstore="django", **cron_job)
+        job = self.scheduler.add_job(process_articles, 'cron', **cron_job)

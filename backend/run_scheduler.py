@@ -7,5 +7,5 @@ from job_runner.scheduler import Scheduler
 if __name__ == '__main__':
     print("Running scheduler")
     scheduler = Scheduler()
-    scheduler.plan_jobs(3)
+    scheduler.plan_jobs()
 
