@@ -65,5 +65,5 @@ class Query(ObjectType):
         sc.run()
         params = {"hours": hours if hours else "*", "minutes": minutes if minutes else "*"}
         sc.add_job(**params)
-        time_segment = f"{hours} hours" if hours != "*" else f"{minutes} minutes"
+        time_segment = f"{hours} hours" if hours else f"{minutes} minutes"
         return f"Scheduler is running every {time_segment}"
