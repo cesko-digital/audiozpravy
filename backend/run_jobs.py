@@ -14,6 +14,6 @@ if __name__ == '__main__':
     cfg = args.parse_args()
     runner = JobRunner()
     runner.get_new_articles(sources_names=cfg.sources_names, dep_funcs=[runner.save_embeddings, runner.add_audio_for_new_entries])
-    runner.create_playlists(create_for_date=datetime.date.today(), date_from=date_in_past)
+    runner.create_playlists(created_for_date=datetime.date.today(), date_from=date_in_past)
     runner.save_embeddings()
     runner.add_audio_for_new_entries()

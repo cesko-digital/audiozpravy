@@ -90,16 +90,17 @@ class JobRunner:
         remaining_count = Article.objects.values("url").annotate(duplicate_count=Count('url')).values("url").filter(duplicate_count__gt=1).count()
         print("Remaining count of duplicate articles:", remaining_count)
 
-    def create_playlists(self, **kwargs):
+    def create_playlists(self, created_for_date=datetime.date.today()):
         """
         Create playlist by google trend
 
-        :param create_for_date: date form which are playlist created
+        :param created_for_date: date form which are playlist created
         :param date_from: date from which are articles recommended
         """
         self.logger.info('Calculating playlists')
-        feed = FeedMaker(MetricEnum.FRECENCY, date=kwargs["create_for_date"])
-        feed.create_playlists(kwargs["date_from"])
+        date_in_past = (datetime.datetime.now() - datetime.timedelta(days=1)).date()
+        feed = FeedMaker(MetricEnum.FRECENCY, date=created_for_date)
+        feed.create_playlists(date_in_past)
 
 
     def train_w2v_model(self, model_path, **kwargs):

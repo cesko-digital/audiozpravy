@@ -7,7 +7,6 @@ from job_runner.job_runner import JobRunner
 
 
 class Scheduler:
-    date_in_past = (datetime.datetime.now() - datetime.timedelta(days=1)).date()
     def __init__(self):
         self.scheduler = BackgroundScheduler()
         self.job_runner = JobRunner()
@@ -17,10 +16,9 @@ class Scheduler:
         for dep_func in dep_funcs:
             dep_func(**kwargs)
 
-    def plan_jobs(self, interval: float=180):
+    def plan_jobs(self, interval: float=3):
         process_articles = lambda: self.create_func(func=self.job_runner.get_new_articles,
-                                                    dep_funcs=[self.job_runner.create_playlists],
-                                                    date_from=self.date_in_past, created_for_date=datetime.date.today())
+                                                    dep_funcs=[self.job_runner.create_playlists])
 
         #self.job_runner.save_embeddings,
         #self.job_runner.add_audio_for_new_entries,
