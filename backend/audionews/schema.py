@@ -60,7 +60,7 @@ class Query(ObjectType):
     def resolve_playlists_for_this_week(root, info):
         return Playlist.objects.filter(type="Week").all()
 
-    def resolve_run_scheduler(root, info, hours, minutes):
+    def resolve_run_scheduler(root, info, hours=None, minutes=None):
         sc = Scheduler()
         sc.run()
         params = {"hours": hours if hours else "*", "minutes": minutes if minutes else "*"}
