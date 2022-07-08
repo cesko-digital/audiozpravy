@@ -5,6 +5,7 @@ from graphene_django.filter import DjangoFilterConnectionField
 from datetime import datetime
 import graphql_jwt
 
+from job_runner.scheduler import Scheduler
 from .mutations import RegisterListener, PlayArticle
 from .types import ArticleNode, ListenerNode, PlayNode, ProviderNode, PlaylistNode, CategoryNode
 from .models import Article, Listener, Play, Provider, Playlist, Category
@@ -26,6 +27,7 @@ class Query(ObjectType):
     playlists = DjangoFilterConnectionField(PlaylistNode, description='Return list of playlists.')
     playlists_for_today = List(PlaylistNode, description="Return list of playlists for today.")
     playlists_for_this_week = List(PlaylistNode, description="Return list of playlists for this week.")
+    run_scheduler = Field(String, description="Start running a scheduler.")
 
 
     def resolve_me(root, info, **kwargs):
@@ -57,3 +59,9 @@ class Query(ObjectType):
 
     def resolve_playlists_for_this_week(root, info):
         return Playlist.objects.filter(type="Week").all()
+
+    def resolve_run_scheduler(root, info):
+        sc = Scheduler()
+        sc.run()
+        sc.add_job()
+        return "Scheduler is running"
