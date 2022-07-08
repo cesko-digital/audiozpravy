@@ -64,4 +64,5 @@ class Query(ObjectType):
         sc = Scheduler()
         sc.run()
         sc.add_job(hours=hours, minutes=minutes)
-        return f"Scheduler is running every {hours} hours"
+        time_segment = f"{hours} hours" if hours else f"{minutes} minutes"
+        return f"Scheduler is running every {time_segment}"
