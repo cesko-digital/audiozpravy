@@ -27,7 +27,7 @@ class Query(ObjectType):
     playlists = DjangoFilterConnectionField(PlaylistNode, description='Return list of playlists.')
     playlists_for_today = List(PlaylistNode, description="Return list of playlists for today.")
     playlists_for_this_week = List(PlaylistNode, description="Return list of playlists for this week.")
-    run_scheduler = Field(String, description="Start running a scheduler.")
+    run_scheduler = Field(String, hours=Int(), minutes=Int(), description="Start running a scheduler.")
 
 
     def resolve_me(root, info, **kwargs):
@@ -60,8 +60,8 @@ class Query(ObjectType):
     def resolve_playlists_for_this_week(root, info):
         return Playlist.objects.filter(type="Week").all()
 
-    def resolve_run_scheduler(root, info):
+    def resolve_run_scheduler(root, info, hours="*", minutes="*"):
         sc = Scheduler()
         sc.run()
-        sc.add_job()
-        return "Scheduler is running"
+        sc.add_job(hours=hours, minutes=minutes)
+        return f"Scheduler is running every {hours} hours"

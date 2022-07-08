@@ -22,11 +22,13 @@ class Scheduler:
             self.scheduler.start()
             print("Scheduler has started")
 
-    def add_job(self):
-        cron_job = {'month': '*', 'day': '*', 'hour': '*', 'minute':'*/2'}
+    def add_job(self, hours='*', minutes="*"):
+        job_id = "abc"
+        cron_job = {'month': '*', 'day': '*', 'hour': hours, 'minute': minutes}
         process_articles = lambda: self.create_func(func=self.job_runner.get_new_articles,
                                                     dep_funcs=[self.job_runner.create_playlists])
 
         #self.job_runner.save_embeddings,
         #self.job_runner.add_audio_for_new_entries,
-        job = self.scheduler.add_job(process_articles, 'cron', **cron_job)
+        self.scheduler.remove_job(job_id)
+        job = self.scheduler.add_job(process_articles, 'cron', id=job_id,  **cron_job)
