@@ -34,4 +34,5 @@ class Scheduler:
         if self.job:
             self.scheduler.remove_job(job_id)
         self.job = self.scheduler.add_job(process_articles, 'cron', id=job_id,  **cron_job)
+        print(f"Job with id {job_id} has been added")
 
