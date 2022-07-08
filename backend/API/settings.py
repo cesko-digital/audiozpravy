@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'django_filters',
     'graphql_auth',
     'graphene_django',
+    'django_apscheduler',
     'audionews',
 ]
 

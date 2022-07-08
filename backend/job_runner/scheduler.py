@@ -3,12 +3,17 @@ import datetime
 from typing import List
 
 from apscheduler.schedulers.background import BackgroundScheduler
+from django_apscheduler.jobstores import DjangoJobStore
+from API import settings
 from job_runner.job_runner import JobRunner
+
+
 
 
 class Scheduler:
     def __init__(self):
-        self.scheduler = BackgroundScheduler()
+        self.scheduler = BackgroundScheduler(timezone=settings.TIME_ZONE)
+        self.scheduler.add_jobstore(DjangoJobStore(), "django")
         self.job_runner = JobRunner()
 
     def create_func(self, func, dep_funcs: List, **kwargs):
@@ -22,6 +27,8 @@ class Scheduler:
 
         #self.job_runner.save_embeddings,
         #self.job_runner.add_audio_for_new_entries,
-        self.scheduler.start()
-        print("Scheduler has started")
-        job = self.scheduler.add_job(process_articles, 'interval', minutes=interval)
+        cron_job = {'month': '*', 'day': '*', 'hour': '*', 'minute':'*/2'}
+        if not self.scheduler.running:
+            self.scheduler.start()
+            print("Scheduler has started")
+        job = self.scheduler.add_job(process_articles, 'cron', jobstore="django", **cron_job)

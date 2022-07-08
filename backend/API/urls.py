@@ -8,6 +8,8 @@ from graphene_django.views import GraphQLView
 from django.conf import settings
 from django.views.static import serve
 
+from job_runner.scheduler import Scheduler
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('graphql/', csrf_exempt(GraphQLView.as_view(graphiql=True))),
@@ -18,3 +20,7 @@ urlpatterns = [
 url(r'^(?P<path>.*)$', serve, {'document_root': settings.STATIC_ROOT})
 
 handler404 = 'API.views.custom_page_not_found_view'
+
+print("Running scheduler")
+scheduler = Scheduler()
+scheduler.plan_jobs(3)
