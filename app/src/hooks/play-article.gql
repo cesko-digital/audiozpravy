@@ -1,0 +1,5 @@
+mutation PlayArticle($articleID: String!) {
+  playArticle(input: { articleId: $articleID }) {
+    clientMutationId
+  }
+}

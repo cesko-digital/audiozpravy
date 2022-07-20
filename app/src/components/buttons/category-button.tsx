@@ -1,21 +1,25 @@
-import React from "react"; 
+import React, { FC } from "react";
 import { Text, StyleSheet } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import Color from "../../theme/colors";
 
-const CategoryButton = ({ children, onPress, active }) => {
+type Props = {
+  onPress: () => void;
+  active: boolean;
+};
+
+const CategoryButton: FC<Props> = ({ children, onPress, active }) => {
   const activeStyle = active ? styles.activeButton : styles.button;
   const activeStyleText = active ? styles.activeText : styles.text;
 
   return (
-    <TouchableOpacity
-      style={activeStyle} onPress={onPress}>
+    <TouchableOpacity style={activeStyle} onPress={onPress}>
       <Text style={activeStyleText}>{children}</Text>
     </TouchableOpacity>
-  )
-}
+  );
+};
 
-const styles = StyleSheet.create ({
+const styles = StyleSheet.create({
   button: {
     color: "#fff",
     borderRadius: 40,
@@ -24,7 +28,7 @@ const styles = StyleSheet.create ({
     borderColor: Color["black-100"],
     display: "flex",
     flexDirection: "row",
-    margin: 3
+    margin: 3,
   },
   activeButton: {
     display: "flex",
@@ -33,7 +37,7 @@ const styles = StyleSheet.create ({
     borderRadius: 40,
     borderColor: Color["blue"],
     backgroundColor: Color["blue"],
-    color: "#fff"
+    color: "#fff",
   },
   text: {
     fontSize: 14,
@@ -41,7 +45,7 @@ const styles = StyleSheet.create ({
     lineHeight: 20,
     color: Color["black-100"],
     paddingVertical: 8,
-    paddingHorizontal: 16
+    paddingHorizontal: 16,
   },
   activeText: {
     fontSize: 14,
@@ -49,8 +53,8 @@ const styles = StyleSheet.create ({
     lineHeight: 20,
     color: "#fff",
     paddingVertical: 8,
-    paddingHorizontal: 16
-  }
-})
+    paddingHorizontal: 16,
+  },
+});
 
 export default CategoryButton;

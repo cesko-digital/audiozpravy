@@ -1,20 +1,32 @@
-import React from "react";
-import { TouchableOpacity, Text } from "react-native";
-import { useColorScheme } from 'react-native';
-import { AppLightTheme, AppDarkTheme } from '../../theme'
+import React, { FC } from "react";
+import { BottomTabNavigationOptions } from "@react-navigation/bottom-tabs";
+import { TouchableOpacity, Text, Route, ViewProps } from "react-native";
+import { useColorScheme } from "react-native";
+import { AppLightTheme, AppDarkTheme } from "../../theme";
 
-const Tab = ({ options, route, isFocused, navigation }) => {
+interface Props extends ViewProps {
+  options: BottomTabNavigationOptions;
+  route: Route;
+  isFocused: boolean;
+  navigation: any;
+}
+
+const Tab: FC<Props> = ({ options, route, isFocused, navigation }) => {
   const label =
     options.tabBarLabel !== undefined
       ? options.tabBarLabel
       : options.title !== undefined
-        ? options.title
-        : route.name;
+      ? options.title
+      : route.name;
 
   const scheme = useColorScheme();
-  const tintColor = scheme === 'dark' ? AppDarkTheme.colors.text : AppLightTheme.colors.primary
-  const defaultColor = scheme === 'dark' ? AppDarkTheme.colors.textLight : AppLightTheme.colors.text
-  const color = isFocused ? tintColor : defaultColor
+  const tintColor =
+    scheme === "dark" ? AppDarkTheme.colors.text : AppLightTheme.colors.primary;
+  const defaultColor =
+    scheme === "dark"
+      ? AppDarkTheme.colors.textLight
+      : AppLightTheme.colors.text;
+  const color: string = isFocused ? tintColor : defaultColor;
 
   const onPress = () => {
     const event = navigation.emit({
@@ -57,7 +69,9 @@ const Tab = ({ options, route, isFocused, navigation }) => {
         marginHorizontal: 10,
       }}
     >
-      {options.tabBarIcon({ color })}
+      {options.tabBarIcon
+        ? options.tabBarIcon({ color, focused: isFocused, size: 24 })
+        : null}
       <Text style={{ color, fontSize: 10, fontFamily: "RobotoLight" }}>
         {label}
       </Text>

@@ -4,7 +4,7 @@ import { StyleSheet, View, ViewProps } from "react-native";
 import Color from "../../theme/colors";
 import SeekProgressBar from "./seek-progress";
 import PlaybackControls from "./playback-controls";
-import { usePlayer } from "../../trackPlayerContext";
+import { usePlayer } from "../../providers/PlayerContextProvider";
 
 const Player: FC<ViewProps> = ({ style }) => {
   const { state, progress, seekTo, playPause, skipToNext } = usePlayer();
